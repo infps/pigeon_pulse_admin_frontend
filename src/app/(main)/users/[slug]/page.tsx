@@ -21,7 +21,10 @@ export default function page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const { data, error, isError, isPending, isSuccess } = getUserSummary(slug);
+  const { data, error, isError, isPending, isSuccess } = getUserSummary({
+    params: {},
+    userId: slug,
+  });
 
   const [toShow, setToShow] = useState<
     "total_birds" | "races_joined" | "total_wins" | "paid_amount" | "personal"

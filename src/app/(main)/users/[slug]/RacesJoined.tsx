@@ -5,7 +5,10 @@ import { DataTable } from "@/components/data-table";
 import { getRacesJoined } from "@/lib/api/user";
 
 export default function RacesJoinedComponent({ userId }: { userId: string }) {
-  const { data, isError, isPending, isSuccess, error } = getRacesJoined(userId);
+  const { data, isError, isPending, isSuccess, error } = getRacesJoined({
+    params: {},
+    userId,
+  });
   const racesJoined: RacesJoined[] = data?.data;
 
   if (isPending) {

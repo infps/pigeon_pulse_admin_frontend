@@ -77,7 +77,10 @@ export default function RaceUpdateForm({
     },
   });
 
-  const { mutateAsync, isPending: isCreatingRace } = updateRace(raceId);
+  const { mutateAsync, isPending: isCreatingRace } = updateRace({
+    params: {},
+    raceId,
+  });
   const router = useRouter();
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {

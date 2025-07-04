@@ -7,11 +7,17 @@ import React, { useEffect, useState } from "react";
 import { SkeletonPersonalInformation } from "./SkeletonLoading";
 
 export default function PersonalInformation({ slug }: { slug: string }) {
-  const { data, error, isError, isPending, isSuccess } = getSingleUser(slug);
+  const { data, error, isError, isPending, isSuccess } = getSingleUser({
+    params: {},
+    userId: slug,
+  });
   const [bannedStatus, setBannedStatus] = useState<string>("");
   const [bannedReason, setBannedReason] = useState<string>("");
   const [bannedError, setBannedError] = useState<string>("");
-  const updateUserMutation = updateUser(slug);
+  const updateUserMutation = updateUser({
+    params: {},
+    userId: slug,
+  });
   useEffect(() => {
     if (data?.data) {
       setBannedStatus(data.data.banned ? "ban" : "active");

@@ -6,7 +6,9 @@ import RaceStatsComponent from "./RaceStats";
 import Link from "next/link";
 
 export default function page() {
-  const { data, isError, error, isPending } = listRaceStats();
+  const { data, isError, error, isPending } = listRaceStats({
+    params: {},
+  });
   const raceStats: RaceStats[] = data?.data || [];
   if (isPending) {
     return <div>Loading...</div>;

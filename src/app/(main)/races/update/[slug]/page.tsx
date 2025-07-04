@@ -10,7 +10,10 @@ export default function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = use(params);
-  const { data, error, isError, isPending } = getSingleRace(slug);
+  const { data, error, isError, isPending } = getSingleRace({
+    params: {},
+    raceId: slug,
+  });
   if (isPending) {
     return <div>Loading...</div>;
   }

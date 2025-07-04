@@ -4,7 +4,9 @@ import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardHeader() {
-  const { data, isError, isPending, isSuccess, error } = listDashboardData();
+  const { data, isError, isPending, isSuccess, error } = listDashboardData({
+    params: {},
+  });
   const dashboardData = data?.data;
   
   if (isPending) {

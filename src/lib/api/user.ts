@@ -1,63 +1,146 @@
 import useApiRequest from "../fetch-controller";
 import { apiEndpoints } from "./endpoints";
 
-export function listUsers() {
+export function listUsers({ params }: { params: Record<string, string> }) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+  
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.base,
-    queryKey: ["users", "list"],
+    queryKey: ["users", "list", queryParams],
+    params,
   });
 }
 
-export function getSingleUser(userId: string) {
+export function getSingleUser({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getSingleUser(userId),
-    queryKey: ["users", "get", userId],
+    queryKey: ["users", "get", userId, queryParams],
+    params,
   });
 }
 
-export function getUserSummary(userId: string) {
+export function getUserSummary({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getUserSummary(userId),
-    queryKey: ["users", "summary", userId],
+    queryKey: ["users", "summary", userId, queryParams],
+    params,
   });
 }
 
-export function updateUser(userId: string) {
+export function updateUser({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.updateUser(userId),
-    queryKey: ["users", "get", userId],
+    queryKey: ["users", "update", userId, queryParams],
     method: "PUT",
+    params,
     exact: true,
     invalidateKeys: [
-      { queryKey: ["users", "list"], exact: true },
-      { queryKey: ["users", "get", userId], exact: true },
+      { queryKey: ["users", "list"], exact: false },
+      { queryKey: ["users", "get", userId], exact: false },
+      { queryKey: ["users", "summary", userId], exact: false },
     ],
   });
 }
 
-export function getBirdsbyUserId(userId: string) {
+export function getBirdsbyUserId({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getBirdsbyUserId(userId),
-    queryKey: ["users", "birds", userId],
+    queryKey: ["users", "birds", userId, queryParams],
+    params,
   });
 }
 
-export function getRacesJoined(userId: string) {
+export function getRacesJoined({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getRacesJoined(userId),
-    queryKey: ["users", "races", userId],
+    queryKey: ["users", "races", userId, queryParams],
+    params,
   });
 }
 
-export function getWins(userId: string) {
+export function getWins({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getWins(userId),
-    queryKey: ["users", "wins", userId],
+    queryKey: ["users", "wins", userId, queryParams],
+    params,
   });
 }
-export function getPayments(userId: string) {
+export function getPayments({
+  params,
+  userId,
+}: {
+  params: Record<string, string>;
+  userId: string;
+}) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+    
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getPayments(userId),
-    queryKey: ["users", "wins", userId],
+    queryKey: ["users", "payments", userId, queryParams],
+    params,
   });
 }

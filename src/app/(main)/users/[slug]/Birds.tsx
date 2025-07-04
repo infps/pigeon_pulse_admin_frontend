@@ -6,7 +6,10 @@ import { getBirdsbyUserId } from "@/lib/api/user";
 
 export default function Birds({ userId }: { userId: string }) {
   const { data, isError, isPending, isSuccess, error } =
-    getBirdsbyUserId(userId);
+    getBirdsbyUserId({
+      params: {},
+      userId,
+    });
   const birds: Bird[] = data?.data;
 
   if (isPending) {

@@ -8,7 +8,10 @@ import { DataTable } from "@/components/data-table";
 import { getWins } from "@/lib/api/user";
 
 export default function UserWinComponent({ userId }: { userId: string }) {
-  const { data, isError, isPending, isSuccess, error } = getWins(userId);
+  const { data, isError, isPending, isSuccess, error } = getWins({
+    params: {},
+    userId,
+  });
   const userWins: UserWins[] = data?.data;
 
   if (isPending) {

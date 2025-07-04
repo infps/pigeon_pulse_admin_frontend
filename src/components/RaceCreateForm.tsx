@@ -77,7 +77,9 @@ export default function RaceCreateForm() {
     },
   });
 
-  const { mutateAsync, isPending: isCreatingRace } = createRace();
+  const { mutateAsync, isPending: isCreatingRace } = createRace({
+    params: {},
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
