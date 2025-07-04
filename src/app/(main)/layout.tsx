@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { authClient } from "@/lib/auth-client";
 import useUserStore from "@/store/store";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function MainLayout({
@@ -11,8 +12,14 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { data, error, isPending } = authClient.useSession();
+  const router = useRouter();
   const { setUserData } = useUserStore.getState();
   useEffect(() => {
+    if (!isPending && data === null) {
+      console.log("redirecting");
+      router.push("/login");
+      return;
+    }
     if (data) {
       setUserData(data.session, data.user);
     }

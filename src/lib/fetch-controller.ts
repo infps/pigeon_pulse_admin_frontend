@@ -51,7 +51,7 @@ export default function useApiRequest<T = any>({
   const BASE_URL = baseUrl ?? API_URL;
 
   const fetchData = async (
-    body: any = null,
+    body: any = null
   ): Promise<{
     data?: T;
     error?: string;
@@ -100,7 +100,9 @@ export default function useApiRequest<T = any>({
 
       return { data, status: statusCode };
     } catch (err) {
+      console.log(err);
       if (err instanceof Error) {
+        console.log("Error in fetchData:", err.message);
         return {
           error: err?.message ?? JSON.stringify(err),
           status: Number(err?.cause) || 500,
@@ -120,7 +122,7 @@ export default function useApiRequest<T = any>({
       refetchOnReconnect: false,
       staleTime: Infinity,
     });
-
+    console.log(query.isError);
     return {
       data: query.data?.data as T,
       error: query.error,

@@ -38,7 +38,6 @@ export default function Sidebar() {
     },
   ];
   const pathname = usePathname();
-  console.log(pathname);
   return (
     <div className="w-sm sticky top-0 left-0 h-full">
       <h1 className="text-4xl font-bold text-center text-primary h-24 flex items-center justify-center">
@@ -50,7 +49,8 @@ export default function Sidebar() {
             key={item.name}
             href={item.href}
             className={`${
-              pathname === item.href && "bg-accent/20 text-primary"
+              pathname===item.href
+               && "bg-accent/20 text-primary"
             } flex items-center gap-2 p-4 transition-colors`}
           >
             {item.leftIcon && (

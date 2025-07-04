@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { authClient } from "./lib/auth-client";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const publicPaths = ["/login"];
@@ -9,16 +10,21 @@ export function middleware(request: NextRequest) {
     path.startsWith(publicPath)
   );
 
-  const sessionToken = request.cookies.get("better-auth.session_token")?.value;
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: request.headers,
+    },
+  });
+  console.log("Session in middleware:", session);
 
-  if (isPublicPath && !sessionToken) {
+  if (isPublicPath && !session.data) {
     return NextResponse.next();
   }
-  if (isPublicPath && sessionToken) {
+  if (isPublicPath && session.data) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!sessionToken) {
+  if (!session.data) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
