@@ -461,3 +461,156 @@ export const RacesColumns: ColumnDef<Races>[] = [
     },
   },
 ];
+
+export type Payments = {
+  user: {
+    id: string;
+    name: string | null;
+  };
+  raceEntries: {
+    race: {
+      name: string;
+    };
+    bird: {
+      loft: {
+        loftId: string;
+      };
+    };
+  };
+  id: string;
+  paypalTransactionId: string;
+  payerEmail: string;
+  amount: number;
+  currency: string;
+  status: "PENDING" | "SUCCESS" | "FAILED";
+  paymentTime: Date;
+  userId: string;
+  createdAt: Date;
+};
+
+export const PaymentsColumns: ColumnDef<Payments>[] = [
+  {
+    accessorKey: "SL.No",
+    header: "SL.No",
+    cell: ({ row }) => row.index + 1, // Display the index as SL
+  },
+  {
+    accessorKey: "user.name",
+    header: "User Name",
+  },
+  {
+    accessorKey: "payerEmail",
+    header: "Email",
+  },
+  {
+    accessorKey: "raceEntries.race.name",
+    header: "Race Name",
+  },
+  {
+    accessorKey: "raceEntries.bird.loft.loftId",
+    header: "Loft ID",
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ row }) => {
+      const amount = row.original.amount;
+      return <span className="font-bold">${amount.toFixed(2)}</span>;
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Payment Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as "PENDING" | "SUCCESS" | "FAILED";
+      return (
+        <span
+          className={`${
+            status === "PENDING"
+              ? "text-yellow-500"
+              : status === "SUCCESS"
+              ? "text-green-500"
+              : "text-red-500"
+          } font-bold`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "paypalTransactionId",
+    header: "Transaction ID",
+    cell: ({ row }) => {
+      const transactionId = row.original.paypalTransactionId;
+      return <span className="font-mono">{transactionId}</span>;
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Payment Date",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("createdAt"));
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    },
+  },
+];
+
+export type RaceStats = {
+  name: string;
+  id: string;
+  entries: RaceStatsEntries[];
+};
+
+export type RaceStatsEntries = {
+  arrivalTime: Date | null;
+  position: number | null;
+  bird: {
+    name: string;
+    bandNumber: string;
+    loft: {
+      name: string;
+      loftId: string;
+    };
+  };
+};
+
+export const RaceStatsColumns: ColumnDef<RaceStatsEntries>[] = [
+  {
+    accessorKey: "entries.position",
+    header: "Rank",
+  },
+  {
+    accessorKey: "entries.bird.name",
+    header: "Bird Name",
+  },
+  {
+    accessorKey: "entries.bird.bandNumber",
+    header: "Band Number",
+  },
+  {
+    accessorKey: "entries.bird.loft.name",
+    header: "Loft Name",
+  },
+  {
+    accessorKey: "entries.bird.loft.loftId",
+    header: "Loft ID",
+  },
+  {
+    accessorKey: "entries.arrivalTime",
+    header: "Arrival Time",
+    cell: ({ row }) => {
+      const arrivalTime = row.original.arrivalTime;
+      return arrivalTime
+        ? new Date(arrivalTime).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "N/A";
+    },
+  },
+];

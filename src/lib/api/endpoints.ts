@@ -20,8 +20,18 @@ const racesEndpoints = {
   getSingleRace: (raceId: string) => `/races/${raceId}`,
 };
 
+const paymentsEndpoints = {
+  base: "/payments",
+};
+
+const raceStatsEndpoints = {
+  base: "/race-stats",
+  getRaceStats: (raceId: string) => `/race-stats/${raceId}`,
+};
 export const apiEndpoints = {
   dashboardEndpoints,
   userEndpoints,
   racesEndpoints,
+  paymentsEndpoints,
+  raceStatsEndpoints,
 };
