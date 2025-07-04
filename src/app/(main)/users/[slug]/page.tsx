@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getUserSummary } from "@/lib/api/user";
 import { use, useState, useEffect } from "react";
+import { useQueryState } from "nuqs";
 import Link from "next/link";
 import { CircleArrowRight } from "lucide-react";
 import { SkeletonLoading } from "./SkeletonLoading";
@@ -25,11 +26,17 @@ export default function page({
     params: {},
     userId: slug,
   });
+  const [searchTerm, setSearchTerm] = useQueryState("search", {
+    defaultValue: "",
+  });
 
   const [toShow, setToShow] = useState<
     "total_birds" | "races_joined" | "total_wins" | "paid_amount" | "personal"
   >("personal");
 
+  useEffect(() => {
+    setSearchTerm("");
+  }, [toShow]);
   if (isPending) {
     return <SkeletonLoading />;
   }

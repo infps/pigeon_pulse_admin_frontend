@@ -40,10 +40,15 @@ export default function LoginForm() {
       email: values.email,
       password: values.password,
       callbackURL: "/",
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Login successful");
+        },
+      },
     });
     if (error) {
-      console.log("Login error:", error);
       toast.error(error.message || "Login failed");
+      return;
     }
   }
 

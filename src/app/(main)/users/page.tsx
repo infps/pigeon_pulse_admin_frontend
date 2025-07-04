@@ -27,7 +27,6 @@ export default function page() {
   if (isPending && !data) {
     return <div>Loading...</div>;
   }
-  console.log(users, pagination);
   return (
     <div>
       <div className="flex items-center justify-between mb-4">

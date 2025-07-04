@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   DropdownMenu,
@@ -8,16 +9,36 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import useUserStore from "@/store/store";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function UserControls() {
   const { userData } = useUserStore();
   if (!userData) {
     return null;
   }
+  const router = useRouter();
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success("Logged out successfully");
+          useUserStore.setState({
+            userData: {
+              session: null,
+              user: null,
+            },
+          });
+          router.push("/login");
+        },
+      },
+    });
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer">
           <Avatar>
             {userData?.user?.image ? (
               <AvatarImage src={userData?.user?.image} alt="profile" />
@@ -39,11 +60,9 @@ export default function UserControls() {
           </p>
           <p className="text-xs text-gray-500">{userData?.user?.email}</p>
         </div>
-        <DropdownMenuItem asChild>
-          <Button variant="destructive" className="w-full">
-            Logout
-          </Button>
-        </DropdownMenuItem>
+        <Button onClick={handleLogout} variant="destructive" className="w-full">
+          Logout
+        </Button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

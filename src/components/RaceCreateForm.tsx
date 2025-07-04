@@ -83,7 +83,6 @@ export default function RaceCreateForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log("Form values:", values);
       if (!files || files.length === 0) {
         toast.error("Please upload an image file.");
         return;

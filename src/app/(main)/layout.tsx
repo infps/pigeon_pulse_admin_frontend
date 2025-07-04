@@ -16,7 +16,6 @@ export default function MainLayout({
   const { setUserData } = useUserStore.getState();
   useEffect(() => {
     if (!isPending && data === null) {
-      console.log("redirecting");
       router.push("/login");
       return;
     }

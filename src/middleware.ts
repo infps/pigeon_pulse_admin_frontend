@@ -15,8 +15,6 @@ export async function middleware(request: NextRequest) {
       headers: request.headers,
     },
   });
-  console.log("Session in middleware:", session);
-
   if (isPublicPath && !session.data) {
     return NextResponse.next();
   }
