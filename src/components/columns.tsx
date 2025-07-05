@@ -17,11 +17,6 @@ export type User = {
 
 export const UserColumns: ColumnDef<User>[] = [
   {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
-  {
     accessorKey: "name",
     header: "Name",
   },
@@ -89,11 +84,6 @@ export type Bird = {
 
 export const BirdColumns: ColumnDef<Bird>[] = [
   {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
-  {
     accessorKey: "loft.loftId",
     header: "Loft ID",
   },
@@ -148,11 +138,6 @@ export type RacesJoined = {
 };
 
 export const RacesJoinedColumns: ColumnDef<RacesJoined>[] = [
-  {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
   {
     accessorKey: "race.status",
     header: "Race Status",
@@ -227,11 +212,6 @@ export type UserWins = {
 
 export const UserWinsColumns: ColumnDef<UserWins>[] = [
   {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
-  {
     accessorKey: "race.name",
     header: "Race Name",
   },
@@ -294,11 +274,6 @@ export type UserPayments = {
 };
 
 export const UserPaymentsColumns: ColumnDef<UserPayments>[] = [
-  {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
   {
     accessorKey: "raceEntries.race.name",
     header: "Race Name",
@@ -373,11 +348,6 @@ export type Races = {
 };
 
 export const RacesColumns: ColumnDef<Races>[] = [
-  {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
   {
     accessorKey: "name",
     header: "Race Name",
@@ -489,11 +459,6 @@ export type Payments = {
 };
 
 export const PaymentsColumns: ColumnDef<Payments>[] = [
-  {
-    accessorKey: "SL.No",
-    header: "SL.No",
-    cell: ({ row }) => row.index + 1, // Display the index as SL
-  },
   {
     accessorKey: "user.name",
     header: "User Name",

@@ -47,6 +47,9 @@ export default function page() {
       <div>
         {raceStats.map((raceStat) => (
           <div key={raceStat.id}>
+            <h2 className="text-xl font-bold text-primary mb-4">
+              {raceStat.name}
+            </h2>
             <RaceStatsComponent
               raceId={raceStat.id}
               raceName={raceStat.name}

@@ -49,9 +49,10 @@ export default function Sidebar() {
             key={item.name}
             href={item.href}
             className={`${
-              pathname===item.href
-               && "bg-accent/20 text-primary"
-            } flex items-center gap-2 p-4 transition-colors`}
+              pathname === item.href
+                ? "bg-accent/20 text-primary border-l-4 border-primary"
+                : "border-l-4 border-transparent"
+            } flex items-center gap-2 p-4 transition-colors hover:bg-accent/10`}
           >
             {item.leftIcon && (
               <span className="text-lg">
