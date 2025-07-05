@@ -33,13 +33,7 @@ export default function MainLayout({
   }
 
   if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-red-600">
-          Authentication error: {error.message}
-        </div>
-      </div>
-    );
+    router.push("/login");
   }
   return (
     <div className="h-screen w-full flex">
