@@ -12,6 +12,8 @@ import useUserStore from "@/store/store";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { User } from "lucide-react";
+import Link from "next/link";
 
 export default function UserControls() {
   const { userData } = useUserStore();
@@ -60,6 +62,14 @@ export default function UserControls() {
           </p>
           <p className="text-xs text-gray-500">{userData?.user?.email}</p>
         </div>
+        
+        <DropdownMenuItem asChild className="cursor-pointer mb-2">
+          <Link href="/profile" className="flex items-center gap-2 w-full">
+            <User className="h-4 w-4" />
+            <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        
         <Button onClick={handleLogout} variant="destructive" className="w-full">
           Logout
         </Button>
