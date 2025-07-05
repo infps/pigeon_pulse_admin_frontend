@@ -5,6 +5,8 @@ import { listRaces } from "@/lib/api/races";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 import Pagination from "@/components/Pagination";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
@@ -32,13 +34,18 @@ export default function page() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Races</h1>
-        <input
-          type="text"
-          placeholder="Search races..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border rounded-lg px-3 py-2"
-        />
+        <div className="flex items-center space-x-2">
+          <Button asChild>
+            <Link href={"/races/create"}>Create Race</Link>
+          </Button>
+          <input
+            type="text"
+            placeholder="Search races..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border rounded-lg px-3 py-2"
+          />
+        </div>
       </div>
       <DataTable columns={RacesColumns} data={races} />
       {pagination && <Pagination pagination={pagination} />}

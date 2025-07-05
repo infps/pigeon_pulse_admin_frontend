@@ -57,9 +57,8 @@ export default function RaceCreateForm() {
   const [files, setFiles] = useState<File[] | null>(null);
 
   const dropZoneConfig = {
-    maxFiles: 5,
+    maxFiles: 1,
     maxSize: 1024 * 1024 * 4,
-    multiple: true,
   };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -312,38 +311,53 @@ export default function RaceCreateForm() {
             <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
-                <FileUploader
-                  value={files}
-                  onValueChange={setFiles}
-                  dropzoneOptions={dropZoneConfig}
-                  className="relative bg-background rounded-lg p-2"
-                >
-                  <FileInput
-                    id="fileInput"
-                    className="outline-dashed outline-1 outline-slate-500"
+                <div className="space-y-4">
+                  <FileUploader
+                    value={files}
+                    onValueChange={setFiles}
+                    dropzoneOptions={dropZoneConfig}
+                    className="relative bg-background rounded-lg p-2"
                   >
-                    <div className="flex items-center justify-center flex-col p-8 w-full ">
-                      <CloudUpload className="text-gray-500 w-10 h-10" />
-                      <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-semibold">Click to upload</span>
-                        &nbsp; or drag and drop
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        SVG, PNG, JPG or GIF
-                      </p>
+                    <FileInput
+                      id="fileInput"
+                      className="outline-dashed outline-1 outline-slate-500"
+                    >
+                      <div className="flex items-center justify-center flex-col p-8 w-full ">
+                        <CloudUpload className="text-gray-500 w-10 h-10" />
+                        <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">Click to upload</span>
+                          &nbsp; or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          SVG, PNG, JPG or GIF
+                        </p>
+                      </div>
+                    </FileInput>
+                    <FileUploaderContent>
+                      {files &&
+                        files.length > 0 &&
+                        files.map((file, i) => (
+                          <FileUploaderItem key={i} index={i}>
+                            <Paperclip className="h-4 w-4 stroke-current" />
+                            <span>{file.name}</span>
+                          </FileUploaderItem>
+                        ))}
+                    </FileUploaderContent>
+                  </FileUploader>
+                  {/* Image Preview */}
+                  {files && files.length > 0 && files[0] && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium mb-2">Preview:</p>
+                      <div className="w-full aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <img
+                          src={URL.createObjectURL(files[0])}
+                          alt="Race image preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                  </FileInput>
-                  <FileUploaderContent>
-                    {files &&
-                      files.length > 0 &&
-                      files.map((file, i) => (
-                        <FileUploaderItem key={i} index={i}>
-                          <Paperclip className="h-4 w-4 stroke-current" />
-                          <span>{file.name}</span>
-                        </FileUploaderItem>
-                      ))}
-                  </FileUploaderContent>
-                </FileUploader>
+                  )}
+                </div>
               </FormControl>
 
               <FormMessage />
