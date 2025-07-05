@@ -1,5 +1,12 @@
 "use client";
-import { LayoutDashboard, SquareArrowRight } from "lucide-react";
+import {
+  LayoutDashboard,
+  SquareArrowRight,
+  Users,
+  DollarSign,
+  TrendingUp,
+  Bird,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -10,30 +17,30 @@ export default function Sidebar() {
       name: "Dashboard",
       href: "/",
       leftIcon: LayoutDashboard,
+      rightIcon: <SquareArrowRight />,
     },
     {
       name: "Users",
       href: "/users",
+      leftIcon: Users,
       rightIcon: <SquareArrowRight />,
     },
     {
       name: "Races",
+      leftIcon: Bird,
       href: "/races",
       rightIcon: <SquareArrowRight />,
     },
     {
       name: "Payments",
+      leftIcon: DollarSign,
       href: "/payments",
       rightIcon: <SquareArrowRight />,
     },
     {
       name: "Race Statistics",
+      leftIcon: TrendingUp,
       href: "/race-statistics",
-      rightIcon: <SquareArrowRight />,
-    },
-    {
-      name: "Support Center",
-      href: "/support",
       rightIcon: <SquareArrowRight />,
     },
   ];
