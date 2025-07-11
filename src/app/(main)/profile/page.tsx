@@ -46,7 +46,7 @@ export default function ProfilePage() {
       return;
     }
 
-    const { data, error } = await authClient.changePassword({
+    const { error } = await authClient.changePassword({
       currentPassword: passwords.currentPassword,
       newPassword: passwords.newPassword,
       revokeOtherSessions: true,

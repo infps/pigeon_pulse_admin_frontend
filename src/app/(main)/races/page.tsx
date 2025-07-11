@@ -1,5 +1,5 @@
 "use client";
-import { UserColumns, User, Races, RacesColumns } from "@/components/columns";
+import {  Races, RacesColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { listRaces } from "@/lib/api/races";
 import { useDebounce } from "@/lib/hooks/use-debounce";
@@ -8,7 +8,7 @@ import Pagination from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function page() {
+export default function Page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
     defaultValue: "",
   });
@@ -18,7 +18,7 @@ export default function page() {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } = listRaces({
+  const { data, isPending } = listRaces({
     params: {
       ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
       page,

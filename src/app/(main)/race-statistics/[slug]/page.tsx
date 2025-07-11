@@ -6,7 +6,7 @@ import { RaceStats } from "@/components/columns";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 
-export default function page({
+export default function Page({
   params,
 }: {
   params: Promise<{ slug: string }>;

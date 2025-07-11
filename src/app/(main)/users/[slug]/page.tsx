@@ -1,13 +1,8 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { getUserSummary } from "@/lib/api/user";
 import { use, useState, useEffect } from "react";
 import { useQueryState } from "nuqs";
-import Link from "next/link";
 import { CircleArrowRight } from "lucide-react";
 import { SkeletonLoading } from "./SkeletonLoading";
 import PersonalInformation from "./PersonalInformation";
@@ -16,7 +11,7 @@ import RacesJoinedComponent from "./RacesJoined";
 import UserWinComponent from "./UsersWinComponent";
 import UserPaymentsComponent from "./UserPaymentsComponent";
 
-export default function page({
+export default function Page({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -36,7 +31,7 @@ export default function page({
 
   useEffect(() => {
     setSearchTerm("");
-  }, [toShow]);
+  }, [toShow,setSearchTerm]);
   if (isPending) {
     return <SkeletonLoading />;
   }

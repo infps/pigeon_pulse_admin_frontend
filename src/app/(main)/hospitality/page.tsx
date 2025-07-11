@@ -9,7 +9,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 import Pagination from "@/components/Pagination";
 
-export default function page() {
+export default function Page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
     defaultValue: "",
   });
@@ -19,7 +19,7 @@ export default function page() {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } = getHospitality({
+  const { data, isPending, } = getHospitality({
     params: {
       ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
       page,

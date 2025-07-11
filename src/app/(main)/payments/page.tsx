@@ -1,9 +1,5 @@
 "use client";
 import {
-  UserColumns,
-  User,
-  Races,
-  RacesColumns,
   Payments,
   PaymentsColumns,
 } from "@/components/columns";
@@ -13,7 +9,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 import Pagination from "@/components/Pagination";
 
-export default function page() {
+export default function Page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
     defaultValue: "",
   });

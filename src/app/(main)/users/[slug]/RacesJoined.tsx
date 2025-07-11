@@ -17,7 +17,7 @@ export default function RacesJoinedComponent({ userId }: { userId: string }) {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } = getRacesJoined({
+  const { data,  isPending } = getRacesJoined({
     params: {
       ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
       page,

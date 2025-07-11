@@ -1,5 +1,5 @@
 "use client";
-import { RaceStats, RaceStatsEntries } from "@/components/columns";
+import { RaceStats } from "@/components/columns";
 import { listRaceStats } from "@/lib/api/race-stats";
 import React from "react";
 import RaceStatsComponent from "./RaceStats";
@@ -8,7 +8,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 import Pagination from "@/components/Pagination";
 
-export default function page() {
+export default function Page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
     defaultValue: "",
   });

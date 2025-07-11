@@ -17,7 +17,7 @@ export default function Birds({ userId }: { userId: string }) {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } =
+  const { data,  isPending, } =
     getBirdsbyUserId({
       params: {
         ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),

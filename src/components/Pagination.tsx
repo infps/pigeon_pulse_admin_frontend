@@ -48,7 +48,7 @@ export default function Pagination({ pagination }: PaginationProps) {
 
     // Add dots where there are gaps
     let l;
-    for (let i of range) {
+    for (const i of range) {
       if (l) {
         if (i - l === 2) {
           rangeWithDots.push(l + 1);

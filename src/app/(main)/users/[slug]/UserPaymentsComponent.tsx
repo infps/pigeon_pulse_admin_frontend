@@ -3,11 +3,9 @@
 import {
   UserPayments,
   UserPaymentsColumns,
-  UserWins,
-  UserWinsColumns,
 } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
-import { getPayments, getWins } from "@/lib/api/user";
+import { getPayments } from "@/lib/api/user";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
 import Pagination from "@/components/Pagination";
@@ -22,7 +20,7 @@ export default function UserPaymentsComponent({ userId }: { userId: string }) {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } = getPayments({
+  const { data, isPending } = getPayments({
     params: {
       ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
       page,

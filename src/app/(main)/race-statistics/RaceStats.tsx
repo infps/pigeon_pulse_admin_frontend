@@ -1,17 +1,14 @@
 import { RaceStatsEntries, RaceStatsColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
-import Link from "next/link";
 import Pagination from "@/components/Pagination";
 
 export default function RaceStatsComponent({
   raceStats,
-  raceName,
-  raceId,
   pagination,
 }: {
   raceStats: RaceStatsEntries[];
-  raceName: string;
-  raceId: string;
+  raceName?: string;
+  raceId?: string;
   pagination?: {
     page: number;
     limit: number;

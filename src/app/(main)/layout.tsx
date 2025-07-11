@@ -22,7 +22,7 @@ export default function MainLayout({
     if (data) {
       setUserData(data.session, data.user);
     }
-  }, [data]);
+  }, [data, isPending, setUserData, router]);
 
   if (isPending) {
     return (

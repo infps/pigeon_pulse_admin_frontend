@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { SkeletonPersonalInformation } from "./SkeletonLoading";
 
 export default function PersonalInformation({ slug }: { slug: string }) {
-  const { data, error, isError, isPending, isSuccess } = getSingleUser({
+  const { data, error, isError, isPending } = getSingleUser({
     params: {},
     userId: slug,
   });
@@ -38,7 +38,7 @@ export default function PersonalInformation({ slug }: { slug: string }) {
       };
 
       if (updateUserMutation.mutateAsync) {
-        const { status, error, data } = await updateUserMutation.mutateAsync(
+        const { status, error } = await updateUserMutation.mutateAsync(
           updateData
         );
         if (status === 200) {
@@ -50,6 +50,7 @@ export default function PersonalInformation({ slug }: { slug: string }) {
         }
       }
     } catch (error) {
+      console.error("Error updating user:", error);
       alert("Failed to update user status");
     }
   };

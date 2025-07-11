@@ -20,7 +20,7 @@ export default function UserWinComponent({ userId }: { userId: string }) {
     serialize: (value) => value,
   });
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isError, isPending, isSuccess, error } = getWins({
+  const { data,  isPending } = getWins({
     params: {
       ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
       page,
