@@ -6,6 +6,7 @@ import {
   DollarSign,
   TrendingUp,
   Bird,
+  Hospital,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,6 +42,12 @@ export default function Sidebar() {
       name: "Race Statistics",
       leftIcon: TrendingUp,
       href: "/race-statistics",
+      rightIcon: <SquareArrowRight />,
+    },
+    {
+      name: "Hospitality",
+      leftIcon: Hospital,
+      href: "/hospitality",
       rightIcon: <SquareArrowRight />,
     },
   ];

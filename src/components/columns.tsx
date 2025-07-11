@@ -142,7 +142,7 @@ export const RacesJoinedColumns: ColumnDef<RacesJoined>[] = [
     accessorKey: "race.status",
     header: "Race Status",
     cell: ({ row }) => {
-      const status = row.getValue("race.status") as
+      const status = row.original.race.status as
         | "UPCOMING"
         | "LIVE"
         | "COMPLETED";
@@ -179,9 +179,9 @@ export const RacesJoinedColumns: ColumnDef<RacesJoined>[] = [
     cell: ({ row }) => {
       const position = row.original.position;
       return position !== null ? (
-        <span className="font-bold">{position}</span>
+        <div className="font-bold text-right">{position}</div>
       ) : (
-        <span className="text-gray-500">N/A</span>
+        <div className="text-gray-500 text-right">N/A</div>
       );
     },
   },
@@ -261,7 +261,7 @@ export type UserPayments = {
     race: {
       name: string;
     };
-  };
+  }[];
   status: "PENDING" | "SUCCESS" | "FAILED";
   amount: number;
   id: string;
@@ -275,16 +275,26 @@ export type UserPayments = {
 
 export const UserPaymentsColumns: ColumnDef<UserPayments>[] = [
   {
-    accessorKey: "raceEntries.race.name",
+    // accessorKey: "raceEntries.race.name",
     header: "Race Name",
+    cell: ({ row }) => {
+      const raceName = row.original.raceEntries[0].race?.name;
+      return <span className="font-bold">{raceName}</span>;
+    },
   },
   {
-    accessorKey: "raceEntries.bird.name",
     header: "Bird Name",
+    cell: ({ row }) => {
+      const birdName = row.original.raceEntries[0].bird?.name;
+      return <span className="font-bold">{birdName}</span>;
+    },
   },
   {
-    accessorKey: "raceEntries.bird.loft.name",
     header: "Loft Name",
+    cell: ({ row }) => {
+      const loftName = row.original.raceEntries[0].bird?.loft?.name;
+      return <span className="font-bold">{loftName}</span>;
+    },
   },
   {
     accessorKey: "amount",
@@ -446,7 +456,7 @@ export type Payments = {
         loftId: string;
       };
     };
-  };
+  }[];
   id: string;
   paypalTransactionId: string;
   payerEmail: string;
@@ -468,12 +478,18 @@ export const PaymentsColumns: ColumnDef<Payments>[] = [
     header: "Email",
   },
   {
-    accessorKey: "raceEntries.race.name",
     header: "Race Name",
+    cell: ({ row }) => {
+      const raceName = row.original?.raceEntries[0]?.race.name;
+      return <span className="font-bold">{raceName}</span>;
+    },
   },
   {
-    accessorKey: "raceEntries.bird.loft.loftId",
     header: "Loft ID",
+    cell: ({ row }) => {
+      const loftId = row.original?.raceEntries[0]?.bird.loft.loftId;
+      return <span className="font-mono">{loftId}</span>;
+    },
   },
   {
     accessorKey: "amount",
@@ -548,22 +564,42 @@ export const RaceStatsColumns: ColumnDef<RaceStatsEntries>[] = [
   {
     accessorKey: "entries.position",
     header: "Rank",
+    cell: ({ row }) => {
+      const position = row.original.position;
+      return position !== null ? (
+        <span className="font-bold">{getRank(position)}</span>
+      ) : (
+        <span className="text-gray-500">N/A</span>
+      );
+    },
   },
   {
-    accessorKey: "entries.bird.name",
     header: "Bird Name",
+    cell: ({ row }) => {
+      const birdName = row.original.bird.name;
+      return <span className="font-bold">{birdName}</span>;
+    },
   },
   {
-    accessorKey: "entries.bird.bandNumber",
     header: "Band Number",
+    cell: ({ row }) => {
+      const bandNumber = row.original.bird.bandNumber;
+      return <span className="font-bold">{bandNumber}</span>;
+    },
   },
   {
-    accessorKey: "entries.bird.loft.name",
+    cell: ({ row }) => {
+      const loftName = row.original.bird.loft.name;
+      return <span className="font-bold">{loftName}</span>;
+    },
     header: "Loft Name",
   },
   {
-    accessorKey: "entries.bird.loft.loftId",
     header: "Loft ID",
+    cell: ({ row }) => {
+      const loftId = row.original.bird.loft.loftId;
+      return <span className="font-mono">{loftId}</span>;
+    },
   },
   {
     accessorKey: "entries.arrivalTime",
@@ -579,3 +615,70 @@ export const RaceStatsColumns: ColumnDef<RaceStatsEntries>[] = [
     },
   },
 ];
+
+export type Hospitality = {
+  status: "HOSPITALIZED" | "MISSING";
+  id: string;
+  name: string;
+  bandNumber: string;
+  color: string | null;
+  loft: {
+    name: string;
+    user: {
+      name: string | null;
+    };
+  };
+};
+
+export const HospitalityColumns: ColumnDef<Hospitality>[] = [
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.original.status as "HOSPITALIZED" | "MISSING";
+      return (
+        <span
+          className={`${
+            status === "HOSPITALIZED"
+              ? "text-yellow-500"
+              : "text-red-500"
+          } font-bold`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "name",
+    header: "Bird Name",
+  },
+  {
+    accessorKey: "bandNumber",
+    header: "Band Number",
+  },
+  {
+    accessorKey: "color",
+    header: "Color",
+    cell: ({ row }) => {
+      const color = row.original.color;
+      return <span className="font-bold">{color || "N/A"}</span>;
+    },
+  },
+  {
+    accessorKey: "loft.name",
+    header: "Loft Name",
+    cell: ({ row }) => {
+      const loftName = row.original.loft.name;
+      return <span className="font-bold">{loftName}</span>;
+    },
+  },
+  {
+    accessorKey: "loft.user.name",
+    header: "Loft Owner",
+    cell: ({ row }) => {
+      const ownerName = row.original.loft.user.name;
+      return <span className="font-bold">{ownerName || "N/A"}</span>;
+    },
+  },
+]

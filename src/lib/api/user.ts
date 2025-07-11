@@ -5,7 +5,7 @@ export function listUsers({ params }: { params: Record<string, string> }) {
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-  
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.base,
     queryKey: ["users", "list", queryParams],
@@ -23,7 +23,7 @@ export function getSingleUser({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getSingleUser(userId),
     queryKey: ["users", "get", userId, queryParams],
@@ -41,7 +41,7 @@ export function getUserSummary({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getUserSummary(userId),
     queryKey: ["users", "summary", userId, queryParams],
@@ -59,7 +59,7 @@ export function updateUser({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.updateUser(userId),
     queryKey: ["users", "update", userId, queryParams],
@@ -84,7 +84,7 @@ export function getBirdsbyUserId({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getBirdsbyUserId(userId),
     queryKey: ["users", "birds", userId, queryParams],
@@ -102,7 +102,7 @@ export function getRacesJoined({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getRacesJoined(userId),
     queryKey: ["users", "races", userId, queryParams],
@@ -120,7 +120,7 @@ export function getWins({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getWins(userId),
     queryKey: ["users", "wins", userId, queryParams],
@@ -137,10 +137,22 @@ export function getPayments({
   const queryParams = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
-    
+
   return useApiRequest({
     endpoint: apiEndpoints.userEndpoints.getPayments(userId),
     queryKey: ["users", "payments", userId, queryParams],
+    params,
+  });
+}
+
+export function getHospitality({ params }: { params: Record<string, string> }) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+  return useApiRequest({
+    endpoint: apiEndpoints.dashboardEndpoints.hospitality,
+    queryKey: ["dashboard", "hospitality", queryParams],
     params,
   });
 }

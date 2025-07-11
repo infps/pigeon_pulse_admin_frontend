@@ -1,5 +1,6 @@
 const dashboardEndpoints = {
   base: "/dashboard",
+  hospitality:"/hospitality",
 };
 
 const userEndpoints = {
