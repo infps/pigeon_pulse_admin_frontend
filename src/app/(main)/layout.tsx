@@ -24,7 +24,7 @@ export default function MainLayout({
     }
   }, [data, isPending, setUserData, router]);
 
-  if (isPending) {
+  if (isPending || !data) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-blue-600"></div>
