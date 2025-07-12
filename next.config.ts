@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.weatherapi.com",
+        pathname: "/**", // Allow all paths
+      },
+    ],
+  },
 };
 
 export default nextConfig;
