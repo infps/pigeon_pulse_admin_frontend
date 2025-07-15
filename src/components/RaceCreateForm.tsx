@@ -101,9 +101,9 @@ export default function RaceCreateForm() {
       formData.append("image", files[0]);
       const res = await mutateAsync(formData);
       if (res.error) {
-        toast.error("Failed to create meeting");
+        toast.error("Failed to create race");
       } else {
-        toast.success("Meeting created successfully");
+        toast.success("Race created successfully");
         form.reset();
         setFiles(null);
       }
