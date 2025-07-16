@@ -1,34 +1,25 @@
 "use client";
-import {  Races, RacesColumns } from "@/components/columns";
-import { DataTable } from "@/components/data-table";
-import { listRaces } from "@/lib/api/races";
-import { useDebounce } from "@/lib/hooks/use-debounce";
 import { useQueryState } from "nuqs";
-import Pagination from "@/components/Pagination";
+import RacesClient from "./RacesClient";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useQueryState("search", {
     defaultValue: "",
   });
-  const [page] = useQueryState("page", {
-    defaultValue: "1",
-    parse: (value) => value || "1",
+  const [status, setStatus] = useQueryState("status", {
+    defaultValue: "all",
+    parse: (value) => value || "all",
     serialize: (value) => value,
   });
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data, isPending } = listRaces({
-    params: {
-      ...(debouncedSearchTerm ? { search: debouncedSearchTerm } : {}),
-      page,
-    },
-  });
-  const races: Races[] = data?.data || [];
-  const pagination = data?.pagination;
-  if (isPending && !data) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div>
@@ -38,6 +29,16 @@ export default function Page() {
           <Button asChild>
             <Link href={"/races/create"}>Create Race</Link>
           </Button>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="border rounded-lg px-3 py-2">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
           <input
             type="text"
             placeholder="Search races..."
@@ -47,8 +48,7 @@ export default function Page() {
           />
         </div>
       </div>
-      <DataTable columns={RacesColumns} data={races} />
-      {pagination && <Pagination pagination={pagination} />}
+      <RacesClient />
     </div>
   );
 }

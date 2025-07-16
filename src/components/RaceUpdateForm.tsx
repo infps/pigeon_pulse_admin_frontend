@@ -113,7 +113,7 @@ export default function RaceUpdateForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 p-4 border rounded-lg bg-card mx-auto py-10"
+        className="space-y-8 p-4 border rounded-lg mx-auto py-10"
       >
         <div className="grid grid-cols-2 gap-4">
           <FormField
