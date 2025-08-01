@@ -12,7 +12,14 @@ const schemaEndpoints = {
   getFee: (id: string) => `/schema/fees/${id}`,
 };
 
+const eventEndpoints = {
+  listEvents: "/events/my",
+  getEvent: (id: string) => `/events/${id}`,
+  createEvent: "/events",
+};
+
 export const apiEndpoints = {
   auth: authEndpoints,
   schema: schemaEndpoints,
+  events: eventEndpoints,
 };

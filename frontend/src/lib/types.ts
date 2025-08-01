@@ -42,4 +42,33 @@ type FullPrizeSchema = {
   }[];
 };
 
-export type { User, PrizeSchema, FeeSchema, FullFeeSchema, FullPrizeSchema };
+type Event = {
+  id: string;
+  status: "OPEN" | "CLOSED";
+  name: string;
+  shortName: string;
+  date: string;
+  type: "AGN" | "AS";
+  trainingCount: number;
+  inventoryCount: number;
+  finalRaceCount: number;
+  hotspotCount: number;
+  createdAt: string;
+  updatedAt: string;
+  creatorId: string;
+  feeSchemaId: string;
+  finalRacePrizeSchemaId: string;
+  hotspot1PrizeSchemaId: string;
+  hotspot2PrizeSchemaId: string;
+  hotspot3PrizeSchemaId: string;
+  avgWinnerPrizeSchemaId: string;
+};
+
+export type {
+  User,
+  PrizeSchema,
+  FeeSchema,
+  FullFeeSchema,
+  FullPrizeSchema,
+  Event,
+};

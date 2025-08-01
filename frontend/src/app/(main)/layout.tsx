@@ -1,6 +1,7 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
 import { AuthProvider } from "../auth-provider";
+import Header from "@/components/Header";
 
 export default function MainLayout({
   children,
@@ -12,6 +13,7 @@ export default function MainLayout({
       <div className="h-screen w-full flex">
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
+          <Header />
           <div>{children}</div>
         </main>
       </div>
