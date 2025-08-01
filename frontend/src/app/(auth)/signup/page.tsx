@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogin, useSignup } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
 const formSchema = z.object({
   email: z.string().email("Invalid email address").min(1, "Email is required"),
   password: z
@@ -28,6 +29,7 @@ const formSchema = z.object({
 });
 
 export default function page() {
+  const router = useRouter();
   const { mutateAsync: signup } = useSignup();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,6 +44,7 @@ export default function page() {
       if (!signup) return;
       await signup(values);
       toast.success("Signup successful!");
+      router.push("/");
     } catch (error: any) {
       toast.error(error.message || "Signup failed. Please try again.");
     }
