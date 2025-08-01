@@ -19,14 +19,26 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogin, useSignup } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
-const formSchema = z.object({
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .max(32, "Password must be at most 32 characters"),
-  name: z.string().min(1, "Name is required"),
-});
+const formSchema = z
+  .object({
+    email: z
+      .string()
+      .email("Invalid email address")
+      .min(1, "Email is required"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .max(32, "Password must be at most 32 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm Password is required")
+      .max(32, "Confirm Password must be at most 32 characters"),
+    name: z.string().min(1, "Name is required"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export default function page() {
   const router = useRouter();
@@ -36,6 +48,7 @@ export default function page() {
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
       name: "",
     },
   });
@@ -99,6 +112,20 @@ export default function page() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput placeholder="**********" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
                   <PasswordInput placeholder="**********" {...field} />
                 </FormControl>
