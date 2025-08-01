@@ -18,8 +18,14 @@ const eventEndpoints = {
   createEvent: "/events",
 };
 
+const userEndpoints = {
+  getProfile: "/users/profile",
+  updateProfile: "/users/profile",
+};
+
 export const apiEndpoints = {
   auth: authEndpoints,
   schema: schemaEndpoints,
   events: eventEndpoints,
+  users: userEndpoints,
 };
