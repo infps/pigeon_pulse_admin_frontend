@@ -87,6 +87,28 @@ type Event = {
   avgWinnerPrizeSchemaId: string;
 };
 
+type EventInventory = {
+  id: string;
+  breeder: {
+    id: string;
+    name: string | null;
+    state: string | null;
+  };
+  payment: {
+    paymentValue: number;
+  } | null;
+  registration_date: Date;
+  reserved_birds: number;
+  loft: string;
+  isPaid: boolean;
+};
+
+type Breeders = {
+  id: string;
+  email: string;
+  name: string | null;
+};
+
 export type {
   User,
   PrizeSchema,
@@ -95,4 +117,6 @@ export type {
   FullPrizeSchema,
   Event,
   CurrentUser,
+  EventInventory,
+  Breeders,
 };

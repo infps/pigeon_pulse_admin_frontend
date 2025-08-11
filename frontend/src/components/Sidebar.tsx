@@ -32,6 +32,18 @@ export default function Sidebar() {
       href: "/events",
       rightIcon: <SquareArrowRight />,
     },
+    {
+      name: "Event Inventory",
+      leftIcon: Hospital,
+      href: "/event-inventory",
+      rightIcon: <SquareArrowRight />,
+    },
+    {
+      name: "Birds",
+      leftIcon: Bird,
+      href: "/birds",
+      rightIcon: <SquareArrowRight />,
+    },
   ];
   const pathname = usePathname();
   return (

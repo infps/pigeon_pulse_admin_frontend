@@ -19,7 +19,6 @@ export function AuthProvider({
   const { user, isAuthenticated, isLoading, setUser } = useAuthStore();
 
   const { data: userData, isError, isPending } = useCurrentUser();
-  console.log(userData?.data);
   useEffect(() => {
     if (!isPending) {
       if (userData?.data) {

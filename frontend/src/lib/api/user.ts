@@ -16,3 +16,11 @@ export function useUpdateProfile() {
     invalidateKeys: [{ queryKey: ["userProfile"] }],
   });
 }
+
+export function useGetBreeders(eventId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.getBreeders(eventId),
+    method: "GET",
+    queryKey: ["breeders", eventId],
+  });
+}

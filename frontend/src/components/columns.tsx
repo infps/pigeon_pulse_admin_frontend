@@ -1,4 +1,4 @@
-import { Event } from "@/lib/types";
+import { Event, EventInventory } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
@@ -54,5 +54,43 @@ export const EventColumns: ColumnDef<Event>[] = [
         </Dialog>
       </div>
     ),
+  },
+];
+
+export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
+  {
+    accessorKey: "loft",
+    header: "Loft",
+    cell: ({ row }) => row.getValue("loft"),
+  },
+  {
+    accessorKey: "breeder.name",
+    header: "Breeder",
+  },
+  {
+    accessorKey: "breeder.state",
+    header: "State",
+  },
+  {
+    accessorKey: "registration_date",
+    header: "Registration Date",
+  },
+
+  {
+    accessorKey: "reserved_birds",
+    header: "Reserved Birds",
+  },
+  {
+    accessorKey: "payment.paymentValue",
+    header: "Payment Value",
+    cell: ({ row }) => {
+      const payment = row.original.payment?.paymentValue;
+      return payment ? `$${payment.toFixed(2)}` : "N/A";
+    },
+  },
+  {
+    accessorKey: "isPaid",
+    header: "Paid",
+    cell: ({ row }) => (row.getValue("isPaid") ? "Yes" : "No"),
   },
 ];
