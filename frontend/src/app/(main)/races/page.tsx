@@ -1,7 +1,7 @@
 "use client";
-import { BirdEventInventoryColumns } from "@/components/columns";
+import { RaceColumns } from "@/components/columns";
+import { CreateRaceDialog } from "@/components/CreateRaceDialog";
 import { DataTable } from "@/components/data-table";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -10,10 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useListBirds } from "@/lib/api/birds";
 import { useListEvents } from "@/lib/api/events";
-import { BirdEventInventory, Event } from "@/lib/types";
+import { useListRaces } from "@/lib/api/races";
+import { Event, Race } from "@/lib/types";
 import { useQueryState } from "nuqs";
 import React from "react";
 
@@ -34,40 +33,19 @@ export default function page() {
   const events: Event[] = data.data.events || [];
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
       <div className="flex items-center justify-between gap-2">
         <EventSelect events={events} />
-        {eventId && <BirdSearch />}
+        <CreateRaceDialog events={events} selectedEventId={eventId} />
       </div>
-      {eventId ? (
-        <div className="mt-4">
-          <BirdsTable />
-        </div>
-      ) : (
-        <div className="mt-4">
-          <p className="text-gray-500">
-            Select an event to view its inventory.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function BirdSearch() {
-  const [q, setQ] = useQueryState("q", {
-    defaultValue: "",
-  });
-  return (
-    <div>
-      <Label htmlFor="bird-search">Search Birds</Label>
-      <Input
-        type="text"
-        placeholder="Search birds..."
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        className="border rounded-lg px-3 py-2 w-[300px] mt-2"
-      />
+      <div className="mt-4">
+        {eventId ? (
+          <>
+            <ListRacesTable />
+          </>
+        ) : (
+          <h2 className="text-lg font-semibold">Select an Event</h2>
+        )}
+      </div>
     </div>
   );
 }
@@ -111,36 +89,19 @@ function EventSelect({ events }: { events: Event[] }) {
   );
 }
 
-function BirdsTable() {
-  const [q, setQ] = useQueryState("q");
+function ListRacesTable() {
   const [eventId, setEventId] = useQueryState("eventId", {
     defaultValue: "",
   });
-  const debouncedSearchTerm = useDebounce(q, 300);
-  const { data, error, isError, isPending } = useListBirds({
-    id: eventId,
-    params: {
-      ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
-    },
-  });
+
+  const { data, error, isError, isPending } = useListRaces(eventId);
   if (isPending) {
-    return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Loading...
-      </div>
-    );
+    return <div>Loading...</div>;
   }
   if (isError) {
-    return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Error: {error.message}
-      </div>
-    );
+    return <div>Error: {error.message}</div>;
   }
-  console.log("data", data);
-  const birdsInventory: BirdEventInventory[] = data?.data || [];
+  const races: Race[] = data?.data;
 
-  return (
-    <DataTable columns={BirdEventInventoryColumns} data={birdsInventory} />
-  );
+  return <DataTable columns={RaceColumns} data={races} />;
 }

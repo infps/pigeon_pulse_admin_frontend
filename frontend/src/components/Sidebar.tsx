@@ -39,6 +39,12 @@ export default function Sidebar() {
       rightIcon: <SquareArrowRight />,
     },
     {
+      name: "Races",
+      leftIcon: TrendingUp,
+      href: "/races",
+      rightIcon: <SquareArrowRight />,
+    },
+    {
       name: "Birds",
       leftIcon: Bird,
       href: "/birds",

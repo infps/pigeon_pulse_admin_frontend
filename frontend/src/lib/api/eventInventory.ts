@@ -15,3 +15,12 @@ export function getEventInventory(
     queryKey: ["eventInventory", eventId, queryParams],
   });
 }
+
+export function updateEventInventoryItem(id: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.eventInventory.updateItem(id),
+    method: "PUT",
+    queryKey: ["eventInventory", id],
+    invalidateKeys: [{ queryKey: ["eventInventory"] }, { queryKey: ["birds"] }],
+  });
+}

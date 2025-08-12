@@ -109,6 +109,63 @@ type Breeders = {
   name: string | null;
 };
 
+type BirdEventInventory = {
+  arrivalDate: string | null;
+  band: string | null;
+  band_1: string | null;
+  band_2: string | null;
+  band_3: string | null;
+  band_4: string | null;
+  note: string | null;
+  bird: {
+    birdName: string;
+    breeder: {
+      id: string;
+      name: string;
+    };
+    breederId: string;
+    color: string;
+    createdAt: string;
+    id: string;
+    imageUrl: string | null;
+    is_active: boolean;
+    is_lost: boolean;
+    lost_date: string | null;
+    lost_race_id: string | null;
+    sex: "HEN" | "COCK";
+    updatedAt: string;
+  };
+  birdId: string;
+  createdAt: string;
+  departureDate: string | null;
+  eventId: string;
+  eventInventoryId: string | null;
+  id: string;
+  rfId: string | null;
+  updatedAt: string;
+};
+
+type Race = {
+  arrivalDate: string;
+  arrivalTemperature: string | null;
+  arrivalWeather: string | null;
+  arrivalWind: string | null;
+  createdAt: string;
+  distance: number;
+  eventId: string;
+  externalRaceId: string;
+  id: string;
+  isClosed: boolean;
+  location: string;
+  startTime: string;
+  sunrise: string | null;
+  sunset: string | null;
+  temperature: string | null;
+  type: "TRAINING";
+  updatedAt: string;
+  weather: string | null;
+  wind: string | null;
+};
 export type {
   User,
   PrizeSchema,
@@ -119,4 +176,6 @@ export type {
   CurrentUser,
   EventInventory,
   Breeders,
+  BirdEventInventory,
+  Race,
 };

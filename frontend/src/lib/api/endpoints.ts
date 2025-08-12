@@ -26,10 +26,16 @@ const userEndpoints = {
 
 const eventInventoryEndpoints = {
   list: (eventId: string) => `/event-inventory/${eventId}`,
+  updateItem: (id: string) => `/event-inventory/item/${id}`,
 };
 
 const birdsEndpoints = {
   listByEvent: (eventId: string) => `/birds/event/${eventId}`,
+};
+
+const raceEndpoints = {
+  create: "/races",
+  listRaces: (eventId: string) => `/races/event/${eventId}`,
 };
 
 export const apiEndpoints = {
@@ -39,4 +45,5 @@ export const apiEndpoints = {
   birds: birdsEndpoints,
   users: userEndpoints,
   eventInventory: eventInventoryEndpoints,
+  races: raceEndpoints,
 };
