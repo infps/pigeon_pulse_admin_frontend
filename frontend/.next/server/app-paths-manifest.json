@@ -1,15 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(main)/birds/page": "app/(main)/birds/page.js",
-  "/(main)/event-inventory/page": "app/(main)/event-inventory/page.js",
-  "/(auth)/signup/page": "app/(auth)/signup/page.js",
   "/(main)/events/page": "app/(main)/events/page.js",
   "/(main)/page": "app/(main)/page.js",
-  "/(main)/profile/page": "app/(main)/profile/page.js",
-  "/(main)/races/[raceId]/entries/page": "app/(main)/races/[raceId]/entries/page.js",
-  "/(main)/races/[raceId]/results/page": "app/(main)/races/[raceId]/results/page.js",
-  "/(main)/races/page": "app/(main)/races/page.js",
-  "/(main)/schemas/page": "app/(main)/schemas/page.js"
+  "/(main)/schemas/page": "app/(main)/schemas/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogin, useSignup } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
+import { cookies } from "next/headers";
 const formSchema = z
   .object({
     email: z
@@ -55,7 +56,8 @@ export default function page() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (!signup) return;
-      await signup(values);
+      const { data, error } = await signup(values);
+      document.cookie = `token=${data.data.token}; path=/; max-age=86400; secure; SameSite=Strict;`;
       toast.success("Signup successful!");
       router.push("/");
     } catch (error: any) {

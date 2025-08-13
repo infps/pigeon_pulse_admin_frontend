@@ -40,7 +40,9 @@ export default function page() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       if (!login) return;
-      await login(values);
+      const { data } = await login(values);
+      console.log(data)
+      document.cookie = `accessToken=${data.data.token}; path=/;`;
       toast.success("Login successful!");
       router.push("/");
     } catch (error: any) {
