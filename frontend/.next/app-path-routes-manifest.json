@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/(auth)/login/page": "/login",
+  "/(main)/birds/page": "/birds",
+  "/(main)/event-inventory/page": "/event-inventory",
+  "/(auth)/signup/page": "/signup",
+  "/(main)/events/page": "/events",
+  "/(main)/page": "/",
+  "/(main)/profile/page": "/profile",
+  "/(main)/races/[raceId]/entries/page": "/races/[raceId]/entries",
+  "/(main)/races/[raceId]/results/page": "/races/[raceId]/results",
+  "/(main)/races/page": "/races",
+  "/(main)/schemas/page": "/schemas"
+}
