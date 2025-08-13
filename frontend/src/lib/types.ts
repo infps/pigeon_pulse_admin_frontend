@@ -161,10 +161,60 @@ type Race = {
   sunrise: string | null;
   sunset: string | null;
   temperature: string | null;
-  type: "TRAINING";
+  type:
+    | "TRAINING"
+    | "INVENTORY"
+    | "LOFT_FLY"
+    | "PULLING_FLIGHT"
+    | "FINAL_RACE"
+    | "HOTSPOT_1"
+    | "HOTSPOT_2"
+    | "HOTSPOT_3"
+    | "AVG_WINNER";
   updatedAt: string;
   weather: string | null;
   wind: string | null;
+};
+
+type RaceItem = {
+  eventInventoryItem: {
+    rfId: string | null;
+    band: string | null;
+    bird: {
+      color: string;
+      is_lost: boolean;
+      breeder: {
+        name: string | null;
+      };
+    };
+  };
+  loftBasketed: boolean;
+  raceBasketed: boolean;
+  raceBasketTime: Date | null;
+};
+type RaceResult = {
+  eventInventoryItem: {
+    rfId: string | null;
+    band: string | null;
+    bird: {
+      birdName: string;
+      color: string;
+      breeder: {
+        name: string | null;
+      };
+    };
+  };
+  raceItemResult: {
+    distance: number;
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    raceItemId: string;
+    arrivalTime: Date;
+    speed: number;
+    distanceUnit: string;
+    speedUnit: string;
+  } | null;
 };
 export type {
   User,
@@ -178,4 +228,6 @@ export type {
   Breeders,
   BirdEventInventory,
   Race,
+  RaceItem,
+  RaceResult,
 };

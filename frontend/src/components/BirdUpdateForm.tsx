@@ -75,7 +75,7 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
       is_active: bird.bird.is_active ?? true,
       is_lost: bird.bird.is_lost ?? false,
       lost_date: bird.bird.lost_date ? new Date(bird.bird.lost_date) : null,
-      arrivalDate: bird.arrivalDate ? new Date(bird.arrivalDate) : new Date(),
+      arrivalDate: bird.arrivalDate ? new Date(bird.arrivalDate) : null,
       departureDate: bird.departureDate ? new Date(bird.departureDate) : null,
     },
   });

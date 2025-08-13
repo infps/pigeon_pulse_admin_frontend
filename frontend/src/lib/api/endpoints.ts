@@ -36,6 +36,12 @@ const birdsEndpoints = {
 const raceEndpoints = {
   create: "/races",
   listRaces: (eventId: string) => `/races/event/${eventId}`,
+  listRace: (raceId: string) => `/races/${raceId}`,
+  listRaceItems: (raceId: string) => `/races/${raceId}/items`,
+  loftBasketing: (raceId: string) => `/races/${raceId}/item/loft-basket`,
+  raceBasketing: (raceId: string) => `/races/${raceId}/item/race-basket`,
+  publishResult: (raceId: string) => `/races/${raceId}/publish-result`,
+  listResults: (raceId: string) => `/races/${raceId}/results`,
 };
 
 export const apiEndpoints = {
