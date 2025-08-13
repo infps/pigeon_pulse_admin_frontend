@@ -1,4 +1,5 @@
 import { User } from "@/lib/types";
+import { tokenStorage } from "@/lib/utils";
 import { create } from "zustand";
 
 interface AuthState {
@@ -23,12 +24,15 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       isLoading: false,
     }),
 
-  clearAuth: () =>
+  clearAuth: () => {
+    // Clear token from localStorage using utility
+    tokenStorage.remove();
     set({
       user: null,
       isAuthenticated: false,
       isLoading: false,
-    }),
+    });
+  },
 
   setLoading: (loading: boolean) => set({ isLoading: loading }),
 }));

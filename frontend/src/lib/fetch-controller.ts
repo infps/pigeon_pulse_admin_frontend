@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useAuthStore } from "@/store/store"; // Adjust path as needed
+import { tokenStorage } from "./utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -37,6 +38,21 @@ const apiClient = axios.create({
   },
 });
 
+// Request interceptor to add Authorization header
+apiClient.interceptors.request.use(
+  (config) => {
+    // Get token from localStorage using utility
+    const token = tokenStorage.get();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor to handle 401 errors
 apiClient.interceptors.response.use(
   (response) => response,
@@ -49,6 +65,9 @@ apiClient.interceptors.response.use(
       if (!currentPath.includes("/login") && !currentPath.includes("/signup")) {
         const { clearAuth } = useAuthStore.getState();
         clearAuth();
+        
+        // Clear token from localStorage using utility
+        tokenStorage.remove();
 
         window.location.href = `/login`;
       }

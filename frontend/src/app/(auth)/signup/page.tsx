@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+import { cn, tokenStorage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogin, useSignup } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
 const formSchema = z
   .object({
     email: z
@@ -57,7 +56,8 @@ export default function page() {
     try {
       if (!signup) return;
       const { data, error } = await signup(values);
-      document.cookie = `token=${data.data.token}; path=/; max-age=86400; secure; SameSite=Strict;`;
+      // Store token in localStorage instead of cookies
+      tokenStorage.set(data.data.token);
       toast.success("Signup successful!");
       router.push("/");
     } catch (error: any) {

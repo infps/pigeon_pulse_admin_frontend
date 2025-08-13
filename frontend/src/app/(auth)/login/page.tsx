@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
+import { cn, tokenStorage } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -42,7 +42,8 @@ export default function page() {
       if (!login) return;
       const { data } = await login(values);
       console.log(data)
-      document.cookie = `accessToken=${data.data.token}; path=/;`;
+      // Store token in localStorage instead of cookies
+      tokenStorage.set(data.data.token);
       toast.success("Login successful!");
       router.push("/");
     } catch (error: any) {

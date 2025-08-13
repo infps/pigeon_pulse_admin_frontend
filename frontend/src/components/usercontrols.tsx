@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useLogout } from "@/lib/api/auth";
+import { tokenStorage } from "@/lib/utils";
 
 export default function UserControls() {
   const { user } = useAuthStore();
@@ -24,8 +25,8 @@ export default function UserControls() {
   const handleLogout = async () => {
     if (!logout) return;
     try {
-      document.cookie =
-        "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+      // Remove token from localStorage using utility
+      tokenStorage.remove();
       const { data, error } = await logout({});
       if (error) {
         toast.error("Failed to log out");
