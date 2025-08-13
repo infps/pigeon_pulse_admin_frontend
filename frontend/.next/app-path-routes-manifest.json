@@ -8,8 +8,8 @@
   "/(main)/events/page": "/events",
   "/(main)/page": "/",
   "/(main)/profile/page": "/profile",
-  "/(main)/races/[raceId]/results/page": "/races/[raceId]/results",
   "/(main)/races/[raceId]/entries/page": "/races/[raceId]/entries",
+  "/(main)/races/[raceId]/results/page": "/races/[raceId]/results",
   "/(main)/races/page": "/races",
   "/(main)/schemas/page": "/schemas"
 }

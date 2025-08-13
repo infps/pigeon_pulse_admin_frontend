@@ -36,14 +36,14 @@ export function useListRaceItems(raceId: string) {
 export function useRaceLoftBasketing(raceId: string) {
   return useApiRequest({
     endpoint: apiEndpoints.races.loftBasketing(raceId),
-    method: "PATCH",
+    method: "POST",
     invalidateKeys: [{ queryKey: ["raceItems"] }],
   });
 }
 export function useRaceBasketing(raceId: string) {
   return useApiRequest({
     endpoint: apiEndpoints.races.raceBasketing(raceId),
-    method: "PATCH",
+    method: "POST",
     invalidateKeys: [{ queryKey: ["raceItems"] }],
   });
 }
