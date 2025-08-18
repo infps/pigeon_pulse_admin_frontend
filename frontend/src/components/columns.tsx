@@ -1,5 +1,6 @@
 import {
   BirdEventInventory,
+  BreederAddressBook,
   Event,
   EventInventory,
   Race,
@@ -410,5 +411,64 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
       const distance = row.original.raceItemResult?.distance;
       return distance ? `${distance} miles` : "N/A";
     },
+  },
+];
+
+export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
+  {
+    header: "Sl. No.",
+    cell: ({ row }) => row.index + 1,
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    accessorKey: "primaryPhone",
+    header: "Phone",
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
+  },
+  {
+    accessorKey: "city",
+    header: "City",
+  },
+  {
+    accessorKey: "state",
+    header: "State",
+  },
+  {
+    accessorKey: "zip",
+    header: "Zip",
+  },
+  {
+    accessorKey: "country",
+    header: "Country",
+  },
+  {
+    accessorKey: "ssn",
+    header: "SSN",
+  },
+  {
+    accessorKey: "taxNumber",
+    header: "Tax Number",
+  },
+  {
+    accessorKey: "cellPhone",
+    header: "Cell Phone",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+  },
+  {
+    accessorKey: "alternativeEmail",
+    header: "Alternative Email",
   },
 ];

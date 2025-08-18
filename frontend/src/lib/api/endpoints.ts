@@ -22,6 +22,7 @@ const userEndpoints = {
   getProfile: "/users/profile",
   updateProfile: "/users/profile",
   getBreeders: (id: string) => `/users/breeders/event/${id}`,
+  getBreedersAddressBook: `/users/breeders`,
 };
 
 const eventInventoryEndpoints = {

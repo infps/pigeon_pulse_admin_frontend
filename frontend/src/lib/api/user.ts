@@ -24,3 +24,15 @@ export function useGetBreeders(eventId: string) {
     queryKey: ["breeders", eventId],
   });
 }
+
+export function useGetBreederAddressBook(params: Record<string, any>) {
+  const queryParams = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+  return useApiRequest({
+    endpoint: apiEndpoints.users.getBreedersAddressBook,
+    method: "GET",
+    params,
+    queryKey: ["breederAddressBook", queryParams],
+  });
+}

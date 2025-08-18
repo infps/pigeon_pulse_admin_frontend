@@ -14,10 +14,16 @@ import React from "react";
 
 export default function Sidebar() {
   const sidebarItems = [
+    // {
+    //   name: "Dashboard",
+    //   href: "/",
+    //   leftIcon: LayoutDashboard,
+    //   rightIcon: <SquareArrowRight />,
+    // },
     {
-      name: "Dashboard",
-      href: "/",
-      leftIcon: LayoutDashboard,
+      name: "Breeders",
+      href: "/breeders",
+      leftIcon: Users,
       rightIcon: <SquareArrowRight />,
     },
     {

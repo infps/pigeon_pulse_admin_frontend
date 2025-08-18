@@ -56,6 +56,12 @@
       "namedRegex": "^/birds(?:/)?$"
     },
     {
+      "page": "/breeders",
+      "regex": "^/breeders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/breeders(?:/)?$"
+    },
+    {
       "page": "/event-inventory",
       "regex": "^/event\\-inventory(?:/)?$",
       "routeKeys": {},

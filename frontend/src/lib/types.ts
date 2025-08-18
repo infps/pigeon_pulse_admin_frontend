@@ -216,6 +216,29 @@ type RaceResult = {
     speedUnit: string;
   } | null;
 };
+
+type BreederAddressBook = {
+  address: string | null;
+  alternativeEmail: string | null;
+  cellPhone: string | null;
+  city: string | null;
+  country: string | null;
+  createdAt: string;
+  email: string;
+  fax: string | null;
+  id: string;
+  name: string;
+  primaryPhone: string | null;
+  role: string;
+  sms: string | null;
+  ssn: string | null;
+  state: string | null;
+  status: "ACTIVE" | "INACTIVE" | "PROSPECT";
+  taxNumber: string | null;
+  updatedAt: string;
+  webAddress: string | null;
+  zip: string | null;
+};
 export type {
   User,
   PrizeSchema,
@@ -230,4 +253,5 @@ export type {
   Race,
   RaceItem,
   RaceResult,
+  BreederAddressBook,
 };
