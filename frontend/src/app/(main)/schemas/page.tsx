@@ -3,6 +3,7 @@ import SchemaComponent from "@/components/SchemaComponent";
 import SchemaForm from "@/components/SchemaForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { CardSkeleton } from "@/components/loading-skeletons";
 import { useGetFees, useGetPrizes } from "@/lib/api/schema";
 import { FeeSchema, PrizeSchema } from "@/lib/types";
 import React, { useState } from "react";
@@ -46,10 +47,23 @@ export default function page() {
             </DialogContent>
           </Dialog>
         </div>
-        {isFeePending && <p>Loading fees...</p>}
-        {isFeeError && <p>Error loading fees: {feeError.message}</p>}
+        {isFeePending && (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        )}
+        {isFeeError && (
+          <div className="text-center p-8">
+            <p className="text-lg text-destructive mb-2">Failed to load fee schemas</p>
+            <p className="text-sm text-muted-foreground">{feeError.message}</p>
+          </div>
+        )}
         {isFeeSuccess && feeSchema.length === 0 && (
-          <p>No fee schemas available.</p>
+          <div className="text-center p-8">
+            <p className="text-lg text-muted-foreground">No fee schemas available.</p>
+          </div>
         )}
         {isFeeSuccess &&
           feeSchema.map((schema) => (
@@ -72,10 +86,23 @@ export default function page() {
             </DialogContent>
           </Dialog>
         </div>
-        {isPrizePending && <p>Loading prizes...</p>}
-        {isPrizeError && <p>Error loading prizes: {prizeError.message}</p>}
+        {isPrizePending && (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        )}
+        {isPrizeError && (
+          <div className="text-center p-8">
+            <p className="text-lg text-destructive mb-2">Failed to load prize schemas</p>
+            <p className="text-sm text-muted-foreground">{prizeError.message}</p>
+          </div>
+        )}
         {isPrizeSuccess && prizeSchema.length === 0 && (
-          <p>No prize schemas available.</p>
+          <div className="text-center p-8">
+            <p className="text-lg text-muted-foreground">No prize schemas available.</p>
+          </div>
         )}
         {isPrizeSuccess &&
           prizeSchema.map((schema) => (

@@ -1,6 +1,7 @@
 "use client";
 import { getEventInventoryItem } from "@/lib/api/eventInventory";
 import { EventInventoryItem } from "@/lib/types";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import React, { useState } from "react";
 import {
   DialogContent,
@@ -162,7 +163,7 @@ export default function EventInventoryDialog({
   if (isPending) {
     return (
       <div className="flex items-center justify-center h-32">
-        <div>Loading...</div>
+        <LoadingSpinner text="Loading inventory..." />
       </div>
     );
   }
@@ -170,7 +171,10 @@ export default function EventInventoryDialog({
   if (isError || !eventInventoryItem) {
     return (
       <div className="flex items-center justify-center h-32">
-        <div>Error loading event inventory</div>
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load event inventory</p>
+          <p className="text-sm text-muted-foreground">Please try again</p>
+        </div>
       </div>
     );
   }

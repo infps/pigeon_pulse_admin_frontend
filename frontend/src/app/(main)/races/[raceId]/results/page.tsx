@@ -1,6 +1,7 @@
 "use client";
 import { RaceResultColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
+import { TableSkeleton } from "@/components/loading-skeletons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -107,9 +108,31 @@ function PublishResult({ raceId }: { raceId: string }) {
 function RaceDetails({ raceId }: { raceId: string }) {
   const { data, error, isError, isPending } = useGetRace(raceId);
 
-  if (isPending) return <div>Loading...</div>;
-  if (isError)
-    return <div className="text-red-500">Error: {error.message}</div>;
+  if (isPending) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow">
+        <div className="space-y-4">
+          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+          <div className="space-y-2">
+            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-4 w-36 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isError) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load race details</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   const race: Race = data.data;
 
@@ -331,11 +354,21 @@ function RaceDetails({ raceId }: { raceId: string }) {
 function RaceResults({ raceId }: { raceId: string }) {
   const { data, error, isError, isPending } = useListRaceResults(raceId);
   const results: RaceResult[] = data?.data || [];
-  return (
-    <>
-      {isError && <p className="text-red-500">Error loading race results</p>}
-      {isPending && <p>Loading...</p>}
-      <DataTable columns={RaceResultColumns} data={results} />
-    </>
-  );
+  
+  if (isPending) {
+    return <TableSkeleton rows={8} columns={6} />;
+  }
+  
+  if (isError) {
+    return (
+      <div className="flex h-96 w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load race results</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return <DataTable columns={RaceResultColumns} data={results} />;
 }

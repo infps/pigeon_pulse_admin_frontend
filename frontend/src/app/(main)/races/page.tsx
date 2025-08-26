@@ -3,6 +3,7 @@ import { RaceColumns } from "@/components/columns";
 import { CreateRaceDialog } from "@/components/CreateRaceDialog";
 import { DataTable } from "@/components/data-table";
 import { Label } from "@/components/ui/label";
+import { SelectSkeleton, TableSkeleton } from "@/components/loading-skeletons";
 import {
   Select,
   SelectContent,
@@ -21,15 +22,44 @@ export default function page() {
     defaultValue: "",
   });
   const { data, error, isError, isPending } = useListEvents();
+  
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="p-4">
+        <div className="flex items-center justify-between gap-2">
+          <SelectSkeleton />
+          <div className="w-32 h-10 bg-muted animate-pulse rounded" />
+        </div>
+        <div className="mt-4">
+          <TableSkeleton rows={6} columns={4} />
+        </div>
+      </div>
+    );
   }
+  
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="p-4">
+        <div className="flex h-96 w-full items-center justify-center">
+          <div className="text-center">
+            <p className="text-lg text-destructive mb-2">Failed to load events</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
+          </div>
+        </div>
+      </div>
+    );
   }
+  
   if (!data || data.length === 0) {
-    return <div>No events found.</div>;
+    return (
+      <div className="p-4">
+        <div className="flex h-96 w-full items-center justify-center">
+          <p className="text-lg text-muted-foreground">No events found.</p>
+        </div>
+      </div>
+    );
   }
+  
   const events: Event[] = data.data.events || [];
   return (
     <div className="p-4">
@@ -95,8 +125,20 @@ function ListRacesTable() {
   });
 
   const { data, error, isError, isPending } = useListRaces(eventId);
+  
   if (isPending) {
-    return <div>Loading...</div>;
+    return <TableSkeleton rows={6} columns={5} />;
+  }
+  
+  if (isError) {
+    return (
+      <div className="flex h-96 w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load races</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
   }
   if (isError) {
     return <div>Error: {error.message}</div>;

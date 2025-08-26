@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/store";
 import { useCurrentUser } from "@/lib/api/auth";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -40,7 +41,7 @@ export function AuthProvider({
   if (isPending || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }

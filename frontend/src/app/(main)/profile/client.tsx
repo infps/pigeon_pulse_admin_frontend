@@ -1,5 +1,6 @@
 "use client";
 
+import { FormSkeleton } from "@/components/loading-skeletons";
 import { useGetProfile, useUpdateProfile } from "@/lib/api/user";
 import { CurrentUser } from "@/lib/types";
 import { useForm } from "react-hook-form";
@@ -110,21 +111,22 @@ export default function ProfilePage() {
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg">Loading...</div>
+      <div className="p-6 max-w-4xl mx-auto">
+        <FormSkeleton />
       </div>
     );
   }
-
+  
   if (isError) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-lg text-red-600">Error: {error.message}</div>
+      <div className="flex h-96 w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load profile</p>
+          <p className="text-sm text-muted-foreground">{error?.message || "An error occurred"}</p>
+        </div>
       </div>
     );
-  }
-
-  return (
+  }  return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="space-y-6">
         <div>

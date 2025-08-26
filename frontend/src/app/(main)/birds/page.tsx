@@ -3,6 +3,7 @@ import { BirdEventInventoryColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SelectSkeleton, TableSkeleton, SearchSkeleton } from "@/components/loading-skeletons";
 import {
   Select,
   SelectContent,
@@ -22,15 +23,47 @@ export default function page() {
     defaultValue: "",
   });
   const { data, error, isError, isPending } = useListEvents();
+  
   if (isPending) {
-    return <div>Loading...</div>;
+    return (
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
+        <div className="flex items-center justify-between gap-2">
+          <SelectSkeleton />
+          <SearchSkeleton />
+        </div>
+        <div className="mt-4">
+          <TableSkeleton rows={6} columns={4} />
+        </div>
+      </div>
+    );
   }
+  
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
+        <div className="flex h-96 w-full items-center justify-center">
+          <div className="text-center">
+            <p className="text-lg text-destructive mb-2">Failed to load events</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
+          </div>
+        </div>
+      </div>
+    );
   }
+  
   if (!data || data.length === 0) {
-    return <div>No events found.</div>;
+    return (
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
+        <div className="flex h-96 w-full items-center justify-center">
+          <p className="text-lg text-muted-foreground">No events found.</p>
+        </div>
+      </div>
+    );
   }
+  
   const events: Event[] = data.data.events || [];
   return (
     <div className="p-4">
@@ -123,20 +156,22 @@ function BirdsTable() {
       ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
     },
   });
+  
   if (isPending) {
-    return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Loading...
-      </div>
-    );
+    return <TableSkeleton rows={6} columns={4} />;
   }
+  
   if (isError) {
     return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Error: {error.message}
+      <div className="flex h-96 w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load birds</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
       </div>
     );
   }
+  
   console.log("data", data);
   const birdsInventory: BirdEventInventory[] = data?.data || [];
 

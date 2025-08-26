@@ -4,6 +4,7 @@ import { BreederAddressBookColumns, EventColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TableSkeleton } from "@/components/loading-skeletons";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useGetBreederAddressBook } from "@/lib/api/user";
 import { BreederAddressBook, Event } from "@/lib/types";
@@ -18,18 +19,22 @@ export default function BreedersTable() {
     useGetBreederAddressBook({
       ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
     });
-  if (isPending)
+  
+  if (isPending) {
+    return <TableSkeleton rows={8} columns={5} />;
+  }
+  
+  if (isError) {
     return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Loading...
+      <div className="flex h-96 w-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-destructive mb-2">Failed to load breeders</p>
+          <p className="text-sm text-muted-foreground">{error.message}</p>
+        </div>
       </div>
     );
-  if (isError)
-    return (
-      <div className="flex h-96 w-full items-center justify-between">
-        Error: {error.message}
-      </div>
-    );
+  }
+  
   const breeders: BreederAddressBook[] = data?.data || [];
 
   return <DataTable columns={BreederAddressBookColumns} data={breeders} />;
