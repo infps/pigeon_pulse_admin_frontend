@@ -16,6 +16,15 @@ export function getEventInventory(
   });
 }
 
+
+export function getEventInventoryItem(id: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.eventInventory.getDetails(id),
+    method: "GET",
+    queryKey: ["eventInventory", id],
+  });
+}
+
 export function updateEventInventoryItem(id: string) {
   return useApiRequest({
     endpoint: apiEndpoints.eventInventory.updateItem(id),

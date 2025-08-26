@@ -10,7 +10,7 @@
   "/(main)/page": "/",
   "/(main)/profile/page": "/profile",
   "/(main)/races/[raceId]/entries/page": "/races/[raceId]/entries",
-  "/(main)/races/[raceId]/results/page": "/races/[raceId]/results",
   "/(main)/races/page": "/races",
+  "/(main)/races/[raceId]/results/page": "/races/[raceId]/results",
   "/(main)/schemas/page": "/schemas"
 }

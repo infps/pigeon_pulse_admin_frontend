@@ -65,7 +65,7 @@ const formSchema = z.object({
   avgWinnerPrizeSchemaId: z.uuid("Invalid prize schema ID format"),
 });
 
-export function EventUpdateFetch({ id }: { id: string }) {
+export function EventUpdateFetch({ id, onClose }: { id: string; onClose?: () => void }) {
   const { data, isPending, error, isError, isSuccess } = useGetEvent(id);
   const {
     data: getFeesData,
@@ -98,6 +98,7 @@ export function EventUpdateFetch({ id }: { id: string }) {
       defaultValues={event}
       feeSchemas={feesSchema}
       prizeSchemas={prizeSchemas}
+      onClose={onClose}
     />
   );
 }
@@ -108,12 +109,14 @@ export default function EventCreateForm({
   feeSchemas,
   prizeSchemas,
   id,
+  onClose,
 }: {
   defaultValues?: Event;
   action: "create" | "update";
   feeSchemas: FeeSchema[];
   prizeSchemas: PrizeSchema[];
   id: string;
+  onClose?: () => void;
 }) {
   const { mutateAsync: createEvent } = useCreateEvent();
   const { mutateAsync: updateEvent } = useUpdateEvent(id);
@@ -149,6 +152,7 @@ export default function EventCreateForm({
         }
         toast.success("Event created successfully!");
         form.reset();
+        onClose?.();
       } else if (action === "update" && id) {
         if (!updateEvent) return;
         const { data, error, status } = await updateEvent(values);
@@ -157,6 +161,7 @@ export default function EventCreateForm({
           return;
         }
         toast.success("Event updated successfully!");
+        onClose?.();
       }
     } catch (error) {
       console.error("Form submission error", error);
@@ -176,7 +181,11 @@ export default function EventCreateForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={form.formState.isSubmitting}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={form.formState.isSubmitting}
+              >
                 <FormControl className="w-[300px]">
                   <SelectTrigger>
                     <SelectValue placeholder="" />
@@ -200,7 +209,12 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="" type="text" {...field} disabled={form.formState.isSubmitting} />
+                  <Input
+                    placeholder=""
+                    type="text"
+                    {...field}
+                    disabled={form.formState.isSubmitting}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -215,7 +229,12 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Short Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="" type="text" {...field} disabled={form.formState.isSubmitting} />
+                  <Input
+                    placeholder=""
+                    type="text"
+                    {...field}
+                    disabled={form.formState.isSubmitting}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -229,7 +248,7 @@ export default function EventCreateForm({
             name="date"
             render={({ field }) => (
               <FormItem className="flex flex-col w-full">
-                <FormLabel>Date</FormLabel>
+                <FormLabel>Projected Final Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -252,6 +271,7 @@ export default function EventCreateForm({
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
+                      disabled={(date) => date < new Date()}
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
@@ -302,7 +322,7 @@ export default function EventCreateForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}
@@ -323,7 +343,7 @@ export default function EventCreateForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}
@@ -344,7 +364,7 @@ export default function EventCreateForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}
@@ -365,7 +385,7 @@ export default function EventCreateForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}

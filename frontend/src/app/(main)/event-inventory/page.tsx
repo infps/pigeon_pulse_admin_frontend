@@ -1,6 +1,7 @@
 "use client";
 import { EventInventoryColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
+import EventInventoryDialog from "@/components/EventInventoryDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -40,7 +41,6 @@ export default function EventInventoryPage() {
       <div className="flex items-center justify-between gap-2">
         <EventSelect events={events} />
         {eventId && <BreederSearch />}
-        {/* {eventId && <BreederSelect eventId={eventId} />} */}
       </div>
       {eventId ? (
         <div className="mt-4">
@@ -114,55 +114,6 @@ function EventSelect({ events }: { events: Event[] }) {
   );
 }
 
-// function BreederSelect({ eventId }: { eventId: string }) {
-//   const [breederId, setBreederId] = useQueryState("breederId", {
-//     defaultValue: "",
-//   });
-//   const { data, error, isError, isPending } = useGetBreeders(eventId);
-//   if (isPending) {
-//     return <div>Loading breeders...</div>;
-//   }
-//   if (isError) {
-//     return <div>Error: {error.message}</div>;
-//   }
-
-//   const breeders: Breeders[] = data?.data || [];
-
-//   return (
-//     <div>
-//       <Label htmlFor="event-select">Select an Event</Label>
-//       <Select
-//         onValueChange={(e) => {
-//           if (e === "all") {
-//             setBreederId("");
-//           } else {
-//             setBreederId(e);
-//           }
-//         }}
-//         value={breederId}
-//       >
-//         <SelectTrigger className="w-[300px] mt-2" id="event-select">
-//           <SelectValue placeholder="Select an breeder" />
-//         </SelectTrigger>
-//         <SelectContent>
-//           <SelectItem value="all" onClick={() => setBreederId("")}>
-//             All Breeders
-//           </SelectItem>
-//           {breeders.map((breeder) => (
-//             <SelectItem
-//               key={breeder.id}
-//               value={breeder.id}
-//               onClick={() => setBreederId(breeder.id)}
-//             >
-//               {breeder.name}
-//             </SelectItem>
-//           ))}
-//         </SelectContent>
-//       </Select>
-//     </div>
-//   );
-// }
-
 function EventInventoryTable() {
   const [q, setQ] = useQueryState("q");
   const [eventId, setEventId] = useQueryState("eventId", {
@@ -172,6 +123,7 @@ function EventInventoryTable() {
   const { data, error, isError, isPending } = getEventInventory(eventId, {
     ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
   });
+  console.log(data);
   if (isPending) {
     return (
       <div className="flex h-96 w-full items-center justify-between">

@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useGetFees, useGetPrizes } from "@/lib/api/schema";
 import { FeeSchema, PrizeSchema } from "@/lib/types";
-import React from "react";
+import React, { useState } from "react";
 
 export default function page() {
+  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
+  const [isPrizeDialogOpen, setIsPrizeDialogOpen] = useState(false);
+  
   const {
     data: prizeData,
     isPending: isPrizePending,
@@ -30,12 +33,16 @@ export default function page() {
       <div className="w-1/2 p-4 border-r">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Fee Schema</h1>
-          <Dialog>
+          <Dialog open={isFeeDialogOpen} onOpenChange={setIsFeeDialogOpen}>
             <DialogTrigger asChild>
               <Button>Create Fee Scheme</Button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl w-full">
-              <SchemaForm type="fee" action="create" />
+              <SchemaForm 
+                type="fee" 
+                action="create" 
+                onClose={() => setIsFeeDialogOpen(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -52,12 +59,16 @@ export default function page() {
       <div className="w-1/2 p-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Prize Schema</h1>
-          <Dialog>
+          <Dialog open={isPrizeDialogOpen} onOpenChange={setIsPrizeDialogOpen}>
             <DialogTrigger asChild>
               <Button>Create Prize Scheme</Button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl w-full">
-              <SchemaForm type="prize" action="create" />
+              <SchemaForm 
+                type="prize" 
+                action="create" 
+                onClose={() => setIsPrizeDialogOpen(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>

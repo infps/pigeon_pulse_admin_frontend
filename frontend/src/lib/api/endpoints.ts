@@ -26,7 +26,9 @@ const userEndpoints = {
 };
 
 const eventInventoryEndpoints = {
-  list: (eventId: string) => `/event-inventory/${eventId}`,
+  list: (eventId: string) => `/event-inventory/event/${eventId}`,
+  getDetails: (eventInventoryId: string) =>
+    `/event-inventory/${eventInventoryId}`,
   updateItem: (id: string) => `/event-inventory/item/${id}`,
 };
 

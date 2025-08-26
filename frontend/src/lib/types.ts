@@ -87,6 +87,10 @@ type Event = {
   avgWinnerPrizeSchemaId: string;
 };
 
+type EventInventoryPayment = {
+  paymentValue: number;
+};
+
 type EventInventory = {
   id: string;
   breeder: {
@@ -94,13 +98,45 @@ type EventInventory = {
     name: string | null;
     state: string | null;
   };
-  payment: {
-    paymentValue: number;
-  } | null;
+  payments: EventInventoryPayment[];
   registration_date: Date;
   reserved_birds: number;
   loft: string;
   isPaid: boolean;
+};
+
+type EventInventoryItem = {
+  breeder: {
+    name: string;
+  };
+  event: {
+    name: string;
+    date: Date;
+  };
+  eventInventoryItems: BirdEventInventory[];
+  loft: string;
+  payments: {
+    breederId: string;
+    eventInventoryId: string;
+    id: string;
+    paymentDate: Date | null;
+    paymentMethod: string;
+    paymentNote: string | null;
+    paymentValue: number;
+    status: string;
+    transactionId: string;
+    type:
+      | "PERCH_FEE"
+      | "ENTRY_FEE"
+      | "HOTSPOT_FEE_1"
+      | "HOTSPOT_FEE_2"
+      | "HOTSPOT_FEE_3"
+      | "HOTSPOT_FEE_4"
+      | "FINAL_RACE_FEE"
+      | "OTHER";
+  }[];
+  registration_date: Date;
+  reserved_birds: number;
 };
 
 type Breeders = {
@@ -110,7 +146,7 @@ type Breeders = {
 };
 
 type BirdEventInventory = {
-  arrivalDate: string | null;
+  arrivalDate: Date | null;
   band: string | null;
   band_1: string | null;
   band_2: string | null;
@@ -137,12 +173,12 @@ type BirdEventInventory = {
   };
   birdId: string;
   createdAt: string;
-  departureDate: string | null;
+  departureDate: Date | null;
   eventId: string;
-  eventInventoryId: string | null;
+  eventInventoryId: string;
   id: string;
   rfId: string | null;
-  updatedAt: string;
+  updatedAt: Date;
 };
 
 type Race = {
@@ -254,4 +290,5 @@ export type {
   RaceItem,
   RaceResult,
   BreederAddressBook,
+  EventInventoryItem,
 };

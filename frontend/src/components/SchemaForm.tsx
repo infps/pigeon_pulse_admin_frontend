@@ -31,6 +31,7 @@ import { toast } from "sonner";
 const feeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   entryFee: z.number().min(0, "Entry fee must be a positive number"),
+  perchFee: z.number().min(0, "Perch fee must be a positive number"),
   expensePercentage: z
     .number()
     .min(0, "Percent for expenses must be a positive number")
@@ -68,24 +69,18 @@ export default function SchemaForm({
   type,
   action,
   id,
+  onClose,
 }: {
   type?: "fee" | "prize";
   action: "update" | "create";
   id?: string;
+  onClose?: () => void;
 }) {
-  console.log(
-    "SchemaForm rendered with type:",
-    type,
-    "action:",
-    action,
-    "id:",
-    id
-  );
   if (type === "fee" && action === "create") {
     return (
       <>
         <DialogTitle>Create Fee</DialogTitle>
-        <FeeSchemaForm action="create" />
+        <FeeSchemaForm action="create" onClose={onClose} />
       </>
     );
   }
@@ -93,7 +88,7 @@ export default function SchemaForm({
     return (
       <>
         <DialogTitle>Update Fee</DialogTitle>
-        <FeeSchemaFormFetch id={id} />
+        <FeeSchemaFormFetch id={id} onClose={onClose} />
       </>
     );
   }
@@ -102,7 +97,7 @@ export default function SchemaForm({
     return (
       <>
         <DialogTitle>Update Prize</DialogTitle>
-        <PrizeSchemaFormFetch id={id} />
+        <PrizeSchemaFormFetch id={id} onClose={onClose} />
       </>
     );
   }
@@ -111,27 +106,27 @@ export default function SchemaForm({
     return (
       <>
         <DialogTitle>Create Prize</DialogTitle>
-        <PrizeSchemaForm action="create" />
+        <PrizeSchemaForm action="create" onClose={onClose} />
       </>
     );
   }
 }
 
-function FeeSchemaFormFetch({ id }: { id: string }) {
+function FeeSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
   const { data, isPending, error, isError, isSuccess } = useGetFee(id);
   const feeSchema: FullFeeSchema = data?.data;
   if (isPending) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
-  return <FeeSchemaForm action="update" id={id} defaultValues={feeSchema} />;
+  return <FeeSchemaForm action="update" id={id} defaultValues={feeSchema} onClose={onClose} />;
 }
 
-function PrizeSchemaFormFetch({ id }: { id: string }) {
+function PrizeSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
   const { data, isPending, error, isError, isSuccess } = useGetPrize(id);
   const prizeSchema: FullPrizeSchema = data?.data;
   if (isPending) return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
   return (
-    <PrizeSchemaForm action="update" id={id} defaultValues={prizeSchema} />
+    <PrizeSchemaForm action="update" id={id} defaultValues={prizeSchema} onClose={onClose} />
   );
 }
 
@@ -139,10 +134,12 @@ function PrizeSchemaForm({
   action,
   id,
   defaultValues,
+  onClose,
 }: {
   action: "update" | "create";
   id?: string;
   defaultValues?: FullPrizeSchema;
+  onClose?: () => void;
 }) {
   const { mutateAsync: createPrize } = useCreatePrize();
   const { mutateAsync: updatePrize } = useUpdatePrize(id ? id : "");
@@ -170,6 +167,7 @@ function PrizeSchemaForm({
         }
         toast.success("Prize created successfully!");
         form.reset();
+        onClose?.();
       } else if (action === "update" && id) {
         if (!updatePrize) return;
         const { data, error, status } = await updatePrize(values);
@@ -178,6 +176,7 @@ function PrizeSchemaForm({
           return;
         }
         toast.success("Prize updated successfully!");
+        onClose?.();
       }
     } catch (error) {
       console.error("Form submission error", error);
@@ -198,9 +197,9 @@ function PrizeSchemaForm({
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="" 
-                  type="text" 
+                <Input
+                  placeholder=""
+                  type="text"
                   {...field}
                   disabled={form.formState.isSubmitting}
                 />
@@ -221,7 +220,7 @@ function PrizeSchemaForm({
                   <FormControl>
                     <Input
                       placeholder=""
-                      type="number"
+                      type="text"
                       {...fromField}
                       onChange={(e) =>
                         fromField.onChange(Number(e.target.value))
@@ -243,7 +242,7 @@ function PrizeSchemaForm({
                   <FormControl>
                     <Input
                       placeholder=""
-                      type="number"
+                      type="text"
                       {...toField}
                       onChange={(e) => toField.onChange(Number(e.target.value))}
                       disabled={form.formState.isSubmitting}
@@ -261,15 +260,21 @@ function PrizeSchemaForm({
                 <FormItem className="w-full">
                   <FormLabel>Percentage</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder=""
-                      type="number"
-                      {...percentageField}
-                      onChange={(e) =>
-                        percentageField.onChange(Number(e.target.value))
-                      }
-                      disabled={form.formState.isSubmitting}
-                    />
+                    <div className="relative">
+                      <Input
+                        placeholder=""
+                        type="text"
+                        {...percentageField}
+                        onChange={(e) =>
+                          percentageField.onChange(Number(e.target.value))
+                        }
+                        disabled={form.formState.isSubmitting}
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        %
+                      </span>
+                    </div>
                   </FormControl>
 
                   <FormMessage />
@@ -310,10 +315,12 @@ function FeeSchemaForm({
   action,
   id,
   defaultValues,
+  onClose,
 }: {
   action: "update" | "create";
   id?: string;
   defaultValues?: FullFeeSchema;
+  onClose?: () => void;
 }) {
   const { mutateAsync: createFee } = useCreateFee();
   const { mutateAsync: updateFee } = useUpdateFee(id ? id : "");
@@ -322,6 +329,7 @@ function FeeSchemaForm({
     defaultValues: defaultValues || {
       name: "",
       entryFee: 0,
+      perchFee: 0,
       expensePercentage: 0,
       minEntryFee: 0,
       entryFeeRefundable: false,
@@ -346,6 +354,7 @@ function FeeSchemaForm({
         }
         toast.success("Fee created successfully!");
         form.reset();
+        onClose?.();
       } else if (action === "update" && id) {
         if (!updateFee) return;
         const { data, error, status } = await updateFee(values);
@@ -354,6 +363,7 @@ function FeeSchemaForm({
           return;
         }
         toast.success("Fee updated successfully!");
+        onClose?.();
       }
     } catch (error) {
       console.error("Form submission error", error);
@@ -394,13 +404,45 @@ function FeeSchemaForm({
               <FormItem className="w-full">
                 <FormLabel>Entry Fee</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="perchFee"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Perch Fee</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -415,13 +457,19 @@ function FeeSchemaForm({
               <FormItem className="w-full">
                 <FormLabel>Percent for expenses</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pr-8"
+                    />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      %
+                    </span>
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -437,13 +485,19 @@ function FeeSchemaForm({
               <FormItem className="w-full">
                 <FormLabel>Min entry fees per team</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -482,13 +536,19 @@ function FeeSchemaForm({
               <FormItem>
                 <FormLabel>HS1</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -503,13 +563,19 @@ function FeeSchemaForm({
               <FormItem>
                 <FormLabel>HS 2</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -524,13 +590,19 @@ function FeeSchemaForm({
               <FormItem>
                 <FormLabel>HS 3</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -545,13 +617,19 @@ function FeeSchemaForm({
               <FormItem>
                 <FormLabel>Final Race</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder=""
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      $
+                    </span>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                      className="pl-8"
+                    />
+                  </div>
                 </FormControl>
 
                 <FormMessage />
@@ -569,7 +647,7 @@ function FeeSchemaForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}
@@ -590,7 +668,7 @@ function FeeSchemaForm({
                 <FormControl>
                   <Input
                     placeholder=""
-                    type="number"
+                    type="text"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     disabled={form.formState.isSubmitting}
