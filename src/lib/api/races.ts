@@ -1,75 +1,64 @@
 import useApiRequest from "../fetch-controller";
 import { apiEndpoints } from "./endpoints";
 
-export function listRaces({ params }: { params: Record<string, string> }) {
-  const queryParams = Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-    
+export function useCreateRace() {
   return useApiRequest({
-    endpoint: apiEndpoints.racesEndpoints.base,
-    queryKey: ["races", "list", queryParams],
-    params,
-  });
-}
-
-export function createRace({ params }: { params: Record<string, string> }) {
-  const queryParams = Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-    
-  return useApiRequest({
-    endpoint: apiEndpoints.racesEndpoints.createRace,
+    endpoint: apiEndpoints.races.create,
     method: "POST",
-    bodyType: "formdata",
-    headers: {},
-    queryKey: ["races", "create", queryParams],
-    params,
-    invalidateKeys: [
-      { queryKey: ["races", "list"], exact: false },
-    ],
+    invalidateKeys: [{ queryKey: ["races"] }],
   });
 }
 
-export function updateRace({ 
-  params, 
-  raceId 
-}: { 
-  params: Record<string, string>;
-  raceId: string;
-}) {
-  const queryParams = Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-    
+export function useListRaces(eventId: string) {
   return useApiRequest({
-    endpoint: apiEndpoints.racesEndpoints.updateRace(raceId),
-    method: "PATCH",
-    bodyType: "formdata",
-    headers: {},
-    queryKey: ["races", "update", raceId, queryParams],
-    params,
-    invalidateKeys: [
-      { queryKey: ["races", "list"], exact: false },
-      { queryKey: ["races", "single", raceId], exact: false },
-    ],
+    endpoint: apiEndpoints.races.listRaces(eventId),
+    method: "GET",
+    queryKey: ["races"],
   });
 }
 
-export function getSingleRace({ 
-  params, 
-  raceId 
-}: { 
-  params: Record<string, string>;
-  raceId: string;
-}) {
-  const queryParams = Object.entries(params)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-    
+export function useGetRace(raceId: string) {
   return useApiRequest({
-    endpoint: apiEndpoints.racesEndpoints.getSingleRace(raceId),
-    queryKey: ["races", "single", raceId, queryParams],
-    params,
+    endpoint: apiEndpoints.races.listRace(raceId),
+    method: "GET",
+    queryKey: ["race", raceId],
+  });
+}
+
+export function useListRaceItems(raceId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.races.listRaceItems(raceId),
+    method: "GET",
+    queryKey: ["raceItems", raceId],
+  });
+}
+
+export function useRaceLoftBasketing(raceId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.races.loftBasketing(raceId),
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["raceItems"] }],
+  });
+}
+export function useRaceBasketing(raceId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.races.raceBasketing(raceId),
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["raceItems"] }],
+  });
+}
+
+export function usePublishRaceResult(raceId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.races.publishResult(raceId),
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["raceResults", raceId] }],
+  });
+}
+export function useListRaceResults(raceId: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.races.listResults(raceId),
+    method: "GET",
+    queryKey: ["raceResults", raceId],
   });
 }

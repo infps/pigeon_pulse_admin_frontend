@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
 import QueryProvider from "./query-client";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-
+import { Toaster } from "sonner";
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,17 +26,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>
-          <QueryProvider>
-            <Toaster richColors={true} />
-            {children}
-          </QueryProvider>
-        </NuqsAdapter>
+
+        <QueryProvider>
+          <NuqsAdapter>
+
+          <Toaster richColors={true} />
+          {children}
+          </NuqsAdapter>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -14,40 +14,46 @@ import React from "react";
 
 export default function Sidebar() {
   const sidebarItems = [
+    // {
+    //   name: "Dashboard",
+    //   href: "/",
+    //   leftIcon: LayoutDashboard,
+    //   rightIcon: <SquareArrowRight />,
+    // },
     {
-      name: "Dashboard",
-      href: "/",
-      leftIcon: LayoutDashboard,
-      rightIcon: <SquareArrowRight />,
-    },
-    {
-      name: "Users",
-      href: "/users",
+      name: "Breeders",
+      href: "/breeders",
       leftIcon: Users,
       rightIcon: <SquareArrowRight />,
     },
     {
-      name: "Races",
+      name: "Schema",
+      href: "/schemas",
+      leftIcon: Users,
+      rightIcon: <SquareArrowRight />,
+    },
+    {
+      name: "Events",
       leftIcon: Bird,
+      href: "/events",
+      rightIcon: <SquareArrowRight />,
+    },
+    {
+      name: "Event Inventory",
+      leftIcon: Hospital,
+      href: "/event-inventory",
+      rightIcon: <SquareArrowRight />,
+    },
+    {
+      name: "Races",
+      leftIcon: TrendingUp,
       href: "/races",
       rightIcon: <SquareArrowRight />,
     },
     {
-      name: "Payments",
-      leftIcon: DollarSign,
-      href: "/payments",
-      rightIcon: <SquareArrowRight />,
-    },
-    {
-      name: "Race Statistics",
-      leftIcon: TrendingUp,
-      href: "/race-statistics",
-      rightIcon: <SquareArrowRight />,
-    },
-    {
-      name: "Hospitality",
-      leftIcon: Hospital,
-      href: "/hospitality",
+      name: "Birds",
+      leftIcon: Bird,
+      href: "/birds",
       rightIcon: <SquareArrowRight />,
     },
   ];

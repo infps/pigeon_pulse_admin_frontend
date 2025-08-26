@@ -1,38 +1,58 @@
-const dashboardEndpoints = {
-  base: "/dashboard",
-  hospitality:"/hospitality",
+const authEndpoints = {
+  login: "/auth/admin/login",
+  logout: "/auth/admin/logout",
+  signup: "/auth/admin/signup",
+  session: "/auth/session",
+};
+
+const schemaEndpoints = {
+  getPrizes: "/schema/prizes",
+  getPrize: (id: string) => `/schema/prizes/${id}`,
+  getFees: "/schema/fees",
+  getFee: (id: string) => `/schema/fees/${id}`,
+};
+
+const eventEndpoints = {
+  listEvents: "/events/my",
+  getEvent: (id: string) => `/events/${id}`,
+  createEvent: "/events",
 };
 
 const userEndpoints = {
-  base: "/users",
-  getSingleUser: (userId: string) => `/users/${userId}`,
-  getUserSummary: (userId: string) => `/users/summary/${userId}`,
-  updateUser: (userId: string) => `/users/${userId}`,
-  getBirdsbyUserId: (userId: string) => `/users/birds/${userId}`,
-  getRacesJoined: (userId: string) => `/users/races/${userId}`,
-  getWins: (userId: string) => `/users/wins/${userId}`,
-  getPayments: (userId: string) => `/users/payments/${userId}`,
+  getProfile: "/users/profile",
+  updateProfile: "/users/profile",
+  getBreeders: (id: string) => `/users/breeders/event/${id}`,
+  getBreedersAddressBook: `/users/breeders`,
 };
 
-const racesEndpoints = {
-  base: "/races",
-  createRace: "/races/create",
-  updateRace: (raceId: string) => `/races/update/${raceId}`,
-  getSingleRace: (raceId: string) => `/races/${raceId}`,
+const eventInventoryEndpoints = {
+  list: (eventId: string) => `/event-inventory/event/${eventId}`,
+  getDetails: (eventInventoryId: string) =>
+    `/event-inventory/${eventInventoryId}`,
+  updateItem: (id: string) => `/event-inventory/item/${id}`,
 };
 
-const paymentsEndpoints = {
-  base: "/payments",
+const birdsEndpoints = {
+  listByEvent: (eventId: string) => `/birds/event/${eventId}`,
 };
 
-const raceStatsEndpoints = {
-  base: "/race-stats",
-  getRaceStats: (raceId: string) => `/race-stats/${raceId}`,
+const raceEndpoints = {
+  create: "/races",
+  listRaces: (eventId: string) => `/races/event/${eventId}`,
+  listRace: (raceId: string) => `/races/${raceId}`,
+  listRaceItems: (raceId: string) => `/races/${raceId}/items`,
+  loftBasketing: (raceId: string) => `/races/${raceId}/item/loft-basket`,
+  raceBasketing: (raceId: string) => `/races/${raceId}/item/race-basket`,
+  publishResult: (raceId: string) => `/races/${raceId}/publish-result`,
+  listResults: (raceId: string) => `/races/${raceId}/results`,
 };
+
 export const apiEndpoints = {
-  dashboardEndpoints,
-  userEndpoints,
-  racesEndpoints,
-  paymentsEndpoints,
-  raceStatsEndpoints,
+  auth: authEndpoints,
+  schema: schemaEndpoints,
+  events: eventEndpoints,
+  birds: birdsEndpoints,
+  users: userEndpoints,
+  eventInventory: eventInventoryEndpoints,
+  races: raceEndpoints,
 };
