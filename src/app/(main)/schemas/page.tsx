@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardSkeleton } from "@/components/loading-skeletons";
-import { useGetFees, useGetPrizes } from "@/lib/api/schema";
+import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
 import { FeeSchema, PrizeSchema } from "@/lib/types";
 import React, { useState } from "react";
 
@@ -14,7 +14,6 @@ export default function page() {
   const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
   const [isPrizeDialogOpen, setIsPrizeDialogOpen] = useState(false);
   const [isBettingDialogOpen, setIsBettingDialogOpen] = useState(false);
-  const [bettingSchemaName, setBettingSchemaName] = useState("");
   
   const {
     data: prizeData,
@@ -30,16 +29,17 @@ export default function page() {
     isError: isFeeError,
     error: feeError,
   } = useGetFees({ params: {} });
+  const {
+    data: bettingData,
+    isPending: isBettingPending,
+    isSuccess: isBettingSuccess,
+    isError: isBettingError,
+    error: bettingError,
+  } = useGetBettings({ params: {} });
 
   const prizeSchema: PrizeSchema[] = prizeData?.data || [];
   const feeSchema: FeeSchema[] = feeData?.data || [];
-
-  const handleCreateBettingSchema = () => {
-    // TODO: Implement backend functionality
-    console.log("Creating betting schema:", bettingSchemaName);
-    setBettingSchemaName("");
-    setIsBettingDialogOpen(false);
-  };
+  const bettingSchema: any[] = bettingData?.data || [];
 
   return (
     <div className="flex h-screen">
@@ -128,42 +128,37 @@ export default function page() {
             <DialogTrigger asChild>
               <Button>Create Betting Scheme</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <div className="space-y-4 p-4">
-                <h2 className="text-lg font-semibold">Create Betting Schema</h2>
-                <div className="space-y-2">
-                  <Label htmlFor="betting-name">Schema Name</Label>
-                  <Input
-                    id="betting-name"
-                    placeholder="Enter schema name"
-                    value={bettingSchemaName}
-                    onChange={(e) => setBettingSchemaName(e.target.value)}
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsBettingDialogOpen(false);
-                      setBettingSchemaName("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateBettingSchema}
-                    disabled={!bettingSchemaName.trim()}
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
+            <DialogContent className="max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+              <SchemaForm 
+                type="betting" 
+                action="create" 
+                onClose={() => setIsBettingDialogOpen(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>
-        <div className="text-center p-8">
-          <p className="text-lg text-muted-foreground">No betting schemas available.</p>
-        </div>
+        {isBettingPending && (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        )}
+        {isBettingError && (
+          <div className="text-center p-8">
+            <p className="text-lg text-destructive mb-2">Failed to load betting schemas</p>
+            <p className="text-sm text-muted-foreground">{bettingError.message}</p>
+          </div>
+        )}
+        {isBettingSuccess && bettingSchema.length === 0 && (
+          <div className="text-center p-8">
+            <p className="text-lg text-muted-foreground">No betting schemas available.</p>
+          </div>
+        )}
+        {isBettingSuccess &&
+          bettingSchema.map((schema) => (
+            <SchemaComponent key={schema.id} schema={schema} type="betting" />
+          ))}
       </div>
     </div>
   );

@@ -85,3 +85,47 @@ export function useDeleteFee(id: string) {
     invalidateKeys: [{ queryKey: ["fee", id] }],
   });
 }
+
+export function useGetBettings({ params }: { params: Record<string, string> }) {
+  const queryParmas = Object.entries(params)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+  return useApiRequest({
+    endpoint: apiEndpoints.schema.getBettings,
+    params,
+    queryKey: ["bettings", queryParmas],
+  });
+}
+
+export function useGetBetting(id: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.schema.getBetting(id),
+    method: "GET",
+    queryKey: ["betting", id],
+  });
+}
+
+export function useCreateBetting() {
+  return useApiRequest({
+    endpoint: apiEndpoints.schema.getBettings,
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["bettings"] }],
+  });
+}
+
+export function useUpdateBetting(id: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.schema.getBetting(id),
+    method: "PUT",
+    invalidateKeys: [{ queryKey: ["betting", id] }],
+  });
+}
+
+export function useDeleteBetting(id: string) {
+  return useApiRequest({
+    endpoint: apiEndpoints.schema.getBetting(id),
+    method: "DELETE",
+    invalidateKeys: [{ queryKey: ["betting", id] }],
+  });
+}

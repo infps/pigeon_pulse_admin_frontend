@@ -7,8 +7,8 @@ export default function SchemaComponent({
   schema,
   type,
 }: {
-  schema: FeeSchema | PrizeSchema;
-  type: "fee" | "prize";
+  schema: FeeSchema | PrizeSchema | any;
+  type: "fee" | "prize" | "betting";
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -19,7 +19,7 @@ export default function SchemaComponent({
           <h2 className="text-xl font-semibold">{schema.name}</h2>
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl w-full">
+      <DialogContent className="max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         <SchemaForm 
           type={type} 
           action="update" 

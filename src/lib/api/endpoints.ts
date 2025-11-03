@@ -10,6 +10,8 @@ const schemaEndpoints = {
   getPrize: (id: string) => `/schema/prizes/${id}`,
   getFees: "/schema/fees",
   getFee: (id: string) => `/schema/fees/${id}`,
+  getBettings: "/schema/bettings",
+  getBetting: (id: string) => `/schema/bettings/${id}`,
 };
 
 const eventEndpoints = {
