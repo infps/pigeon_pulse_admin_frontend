@@ -37,6 +37,10 @@ type FeeSchema = {
   id: string;
   name: string;
 };
+type BettingSchema = {
+  id: string;
+  name: string;
+};
 
 type FullFeeSchema = {
   id: string;
@@ -80,6 +84,7 @@ type Event = {
   updatedAt: string;
   creatorId: string;
   feeSchemaId: string;
+  bettingSchemeId?: string;
   finalRacePrizeSchemaId: string;
   hotspot1PrizeSchemaId: string;
   hotspot2PrizeSchemaId: string;
@@ -279,6 +284,7 @@ export type {
   User,
   PrizeSchema,
   FeeSchema,
+  BettingSchema,
   FullFeeSchema,
   FullPrizeSchema,
   Event,

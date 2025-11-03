@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useGetFees, useGetPrizes } from "@/lib/api/schema";
+import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
 import EventCreateForm from "./EventCreateForm";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { FeeSchema, PrizeSchema } from "@/lib/types";
+import { FeeSchema, PrizeSchema, BettingSchema } from "@/lib/types";
 
 export default function CreateEventButton() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -26,10 +26,20 @@ export default function CreateEventButton() {
   } = useGetPrizes({
     params: {},
   });
+  const {
+    data: getBettingsData,
+    error: getBettingsError,
+    isError: getBettingsIsError,
+    isPending: getBettingsIsPending,
+    isSuccess: getBettingsIsSuccess,
+  } = useGetBettings({
+    params: {},
+  });
   const feesSchema: FeeSchema[] = getFeesData?.data || [];
   const prizeSchemas: PrizeSchema[] = getPrizesData?.data || [];
+  const bettingSchemas: BettingSchema[] = getBettingsData?.data || [];
 
-  if (getFeesIsPending || getPrizesIsPending) {
+  if (getFeesIsPending || getPrizesIsPending || getBettingsIsPending) {
     return null;
   }
   return (
@@ -43,6 +53,7 @@ export default function CreateEventButton() {
           action="create"
           feeSchemas={feesSchema}
           prizeSchemas={prizeSchemas}
+          bettingSchemas={bettingSchemas}
           id=""
           onClose={() => setIsDialogOpen(false)}
         />

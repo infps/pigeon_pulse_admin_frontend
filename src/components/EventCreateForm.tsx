@@ -31,9 +31,9 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Event, FeeSchema, PrizeSchema } from "@/lib/types";
+import { Event, FeeSchema, PrizeSchema, BettingSchema } from "@/lib/types";
 import { useCreateEvent, useGetEvent, useUpdateEvent } from "@/lib/api/events";
-import { useGetFees, useGetPrizes } from "@/lib/api/schema";
+import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
 
 const formSchema = z.object({
   name: z.string().min(1, "Event name is required"),
@@ -58,6 +58,7 @@ const formSchema = z.object({
     .int()
     .min(0, "Hotspot count must be a non-negative integer"),
   feeSchemaId: z.uuid("Invalid fee schema ID format"),
+  bettingSchemeId: z.uuid("Invalid betting schema ID format").optional(),
   finalRacePrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   hotspot1PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   hotspot2PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
@@ -85,10 +86,20 @@ export function EventUpdateFetch({ id, onClose }: { id: string; onClose?: () => 
   } = useGetPrizes({
     params: {},
   });
+  const {
+    data: getBettingsData,
+    error: getBettingsError,
+    isError: getBettingsIsError,
+    isPending: getBettingsIsPending,
+    isSuccess: getBettingsIsSuccess,
+  } = useGetBettings({
+    params: {},
+  });
   const feesSchema: FeeSchema[] = getFeesData?.data || [];
   const prizeSchemas: PrizeSchema[] = getPrizesData?.data || [];
+  const bettingSchemas: BettingSchema[] = getBettingsData?.data || [];
   const event: Event = data?.data;
-  if (isPending || getPrizesIsPending || getFeesIsPending)
+  if (isPending || getPrizesIsPending || getFeesIsPending || getBettingsIsPending)
     return <p>Loading...</p>;
   if (isError) return <p>Error: {error.message}</p>;
   return (
@@ -98,6 +109,7 @@ export function EventUpdateFetch({ id, onClose }: { id: string; onClose?: () => 
       defaultValues={event}
       feeSchemas={feesSchema}
       prizeSchemas={prizeSchemas}
+      bettingSchemas={bettingSchemas}
       onClose={onClose}
     />
   );
@@ -108,6 +120,7 @@ export default function EventCreateForm({
   action,
   feeSchemas,
   prizeSchemas,
+  bettingSchemas,
   id,
   onClose,
 }: {
@@ -115,6 +128,7 @@ export default function EventCreateForm({
   action: "create" | "update";
   feeSchemas: FeeSchema[];
   prizeSchemas: PrizeSchema[];
+  bettingSchemas: BettingSchema[];
   id: string;
   onClose?: () => void;
 }) {
@@ -132,6 +146,7 @@ export default function EventCreateForm({
       finalRaceCount: defaultValues?.finalRaceCount || 0,
       hotspotCount: defaultValues?.hotspotCount || 0,
       feeSchemaId: defaultValues?.feeSchemaId || "",
+      bettingSchemeId: defaultValues?.bettingSchemeId || undefined,
       finalRacePrizeSchemaId: defaultValues?.finalRacePrizeSchemaId || "",
       hotspot1PrizeSchemaId: defaultValues?.hotspot1PrizeSchemaId || "",
       hotspot2PrizeSchemaId: defaultValues?.hotspot2PrizeSchemaId || "",
@@ -429,6 +444,37 @@ export default function EventCreateForm({
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="bettingSchemeId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Betting Schema (Optional)</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={form.formState.isSubmitting}
+                >
+                  <FormControl className="w-full">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Betting Schema" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {bettingSchemas.map((betting: BettingSchema) => (
+                      <SelectItem key={betting.id} value={betting.id}>
+                        {betting.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="finalRacePrizeSchemaId"
