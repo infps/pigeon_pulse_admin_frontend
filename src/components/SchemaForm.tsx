@@ -32,71 +32,171 @@ import { FullFeeSchema, FullPrizeSchema } from "@/lib/types";
 import { DialogTitle } from "./ui/dialog";
 import { toast } from "sonner";
 
-const feeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  entryFee: z.number().min(0, "Entry fee must be a positive number"),
-  perchFee: z.number().min(0, "Perch fee must be a positive number"),
-  expensePercentage: z
-    .number()
-    .min(0, "Percent for expenses must be a positive number")
-    .max(100, "Percent for expenses cannot exceed 100"),
-  minEntryFee: z.number().min(0, "Min entry fee must be a positive number"),
-  entryFeeRefundable: z.boolean(),
-  hs1Fee: z.number().min(0, "HS1 fee must be a positive number"),
-  hs2Fee: z.number().min(0, "HS2 fee must be a positive number"),
-  hs3Fee: z.number().min(0, "HS3 fee must be a positive number"),
-  finalRaceFee: z.number().min(0, "Final race fee must be a positive number"),
-  maxBirds: z
-    .number()
-    .min(1, "Limit of main birds per team must be at least 1"),
-  maxBackupBirds: z
-    .number()
-    .min(0, "Limit of backup birds per team must be a positive number"),
-  floatingBackup: z.boolean(),
-});
+const feeSchema = z
+  .object({
+    name: z.string().min(1, "Fee name is required"),
+    entryFee: z.number().min(0, "Entry fee must be a non-negative number"),
+    isRefundable: z.boolean(),
+    minEntryFees: z
+      .number()
+      .int()
+      .min(0, "Minimum entry fees must be a non-negative integer"),
+    maxBirdCount: z
+      .number()
+      .int()
+      .min(0, "Maximum number of birds must be at least 0"),
+    maxBackupBirdCount: z
+      .number()
+      .int()
+      .min(0, "Maximum number of backup birds must be at least 0"),
+    isFloatingBackup: z.boolean(),
+    feesCutPercent: z
+      .number()
+      .min(0, "Fees cut percent must be a non-negative number")
+      .max(100, "Fees cut percent cannot exceed 100"),
+    hotSpot1Fee: z
+      .number()
+      .min(0, "Hot spot 1 fee must be a non-negative number"),
+    hotSpot2Fee: z
+      .number()
+      .min(0, "Hot spot 2 fee must be a non-negative number"),
+    hotSpot3Fee: z
+      .number()
+      .min(0, "Hot spot 3 fee must be a non-negative number"),
+    hotSpotFinalFee: z
+      .number()
+      .min(0, "Hot spot final fee must be a non-negative number"),
+    perchFees: z.array(
+      z.object({
+        birdNo: z.number().int().min(1, "Bird number must be at least 1"),
+        perchFee: z
+          .number()
+          .min(0, "Perch fee must be a non-negative number"),
+      })
+    ),
+  })
+  .refine((data) => data.perchFees.length === data.maxBirdCount, {
+    message: "Perch fees length must match max bird count",
+    path: ["perchFees"],
+  });
 
 const prizeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Prize name is required"),
   distributions: z.array(
     z.object({
       fromPosition: z.number().int().min(1, "From position must be at least 1"),
       toPosition: z.number().int().min(1, "To position must be at least 1"),
-      percentage: z
+      prizeValue: z
         .number()
-        .min(0, "Percentage must be a non-negative number")
-        .max(100, "Percentage cannot exceed 100"),
+        .min(0, "Prize value must be a non-negative number")
+        .max(100, "Prize value cannot exceed 100"),
     })
   ),
 });
 
 const bettingSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  belgianShow1: z.number().min(0).max(100).optional(),
-  belgianShow2: z.number().min(0).max(100).optional(),
-  belgianShow3: z.number().min(0).max(100).optional(),
-  belgianShow4: z.number().min(0).max(100).optional(),
-  belgianShow5: z.number().min(0).max(100).optional(),
-  belgianShow6: z.number().min(0).max(100).optional(),
-  belgianShow7: z.number().min(0).max(100).optional(),
-  standardShow1: z.number().min(0).max(100).optional(),
-  standardShow2: z.number().min(0).max(100).optional(),
-  standardShow3: z.number().min(0).max(100).optional(),
-  standardShow4: z.number().min(0).max(100).optional(),
-  standardShow5: z.number().min(0).max(100).optional(),
-  standardShow6: z.number().min(0).max(100).optional(),
-  wta_1: z.number().min(0).max(100).optional(),
-  wta_2: z.number().min(0).max(100).optional(),
-  wta_3: z.number().min(0).max(100).optional(),
-  wta_4: z.number().min(0).max(100).optional(),
-  wta_5: z.number().min(0).max(100).optional(),
-  cut_percent: z.number().min(0).max(100),
+  name: z.string().min(1, "Betting name is required"),
+  bettingCutPercent: z
+    .number()
+    .min(0, "Betting cut percent must be a non-negative number")
+    .max(100, "Betting cut percent cannot exceed 100"),
+  belgianShow1: z
+    .number()
+    .min(0, "Belgian Show 1 must be a non-negative number")
+    .max(100, "Belgian Show 1 cannot exceed 100")
+    .optional(),
+  belgianShow2: z
+    .number()
+    .min(0, "Belgian Show 2 must be a non-negative number")
+    .max(100, "Belgian Show 2 cannot exceed 100")
+    .optional(),
+  belgianShow3: z
+    .number()
+    .min(0, "Belgian Show 3 must be a non-negative number")
+    .max(100, "Belgian Show 3 cannot exceed 100")
+    .optional(),
+  belgianShow4: z
+    .number()
+    .min(0, "Belgian Show 4 must be a non-negative number")
+    .max(100, "Belgian Show 4 cannot exceed 100")
+    .optional(),
+  belgianShow5: z
+    .number()
+    .min(0, "Belgian Show 5 must be a non-negative number")
+    .max(100, "Belgian Show 5 cannot exceed 100")
+    .optional(),
+  belgianShow6: z
+    .number()
+    .min(0, "Belgian Show 6 must be a non-negative number")
+    .max(100, "Belgian Show 6 cannot exceed 100")
+    .optional(),
+  belgianShow7: z
+    .number()
+    .min(0, "Belgian Show 7 must be a non-negative number")
+    .max(100, "Belgian Show 7 cannot exceed 100")
+    .optional(),
+  standardShow1: z
+    .number()
+    .min(0, "Standard Show 1 must be a non-negative number")
+    .max(100, "Standard Show 1 cannot exceed 100")
+    .optional(),
+  standardShow2: z
+    .number()
+    .min(0, "Standard Show 2 must be a non-negative number")
+    .max(100, "Standard Show 2 cannot exceed 100")
+    .optional(),
+  standardShow3: z
+    .number()
+    .min(0, "Standard Show 3 must be a non-negative number")
+    .max(100, "Standard Show 3 cannot exceed 100")
+    .optional(),
+  standardShow4: z
+    .number()
+    .min(0, "Standard Show 4 must be a non-negative number")
+    .max(100, "Standard Show 4 cannot exceed 100")
+    .optional(),
+  standardShow5: z
+    .number()
+    .min(0, "Standard Show 5 must be a non-negative number")
+    .max(100, "Standard Show 5 cannot exceed 100")
+    .optional(),
+  standardShow6: z
+    .number()
+    .min(0, "Standard Show 6 must be a non-negative number")
+    .max(100, "Standard Show 6 cannot exceed 100")
+    .optional(),
+  wta1: z
+    .number()
+    .min(0, "WTA 1 must be a non-negative number")
+    .max(100, "WTA 1 cannot exceed 100")
+    .optional(),
+  wta2: z
+    .number()
+    .min(0, "WTA 2 must be a non-negative number")
+    .max(100, "WTA 2 cannot exceed 100")
+    .optional(),
+  wta3: z
+    .number()
+    .min(0, "WTA 3 must be a non-negative number")
+    .max(100, "WTA 3 cannot exceed 100")
+    .optional(),
+  wta4: z
+    .number()
+    .min(0, "WTA 4 must be a non-negative number")
+    .max(100, "WTA 4 cannot exceed 100")
+    .optional(),
+  wta5: z
+    .number()
+    .min(0, "WTA 5 must be a non-negative number")
+    .max(100, "WTA 5 cannot exceed 100")
+    .optional(),
   standardShowPercentages: z.array(
     z.object({
-      position: z.number().int().min(1, "Position must be at least 1"),
-      percentage: z
+      place: z.number().int().min(1, "Place must be at least 1"),
+      percValue: z
         .number()
-        .min(0, "Percentage must be a non-negative number")
-        .max(100, "Percentage cannot exceed 100"),
+        .min(0, "Percentage value must be a non-negative number")
+        .max(100, "Percentage value cannot exceed 100"),
     })
   ),
 });
@@ -227,7 +327,7 @@ function PrizeSchemaForm({
   defaultValues?: FullPrizeSchema;
   onClose?: () => void;
 }) {
-  const { mutateAsync: createPrize } = useCreatePrize();
+    const { mutateAsync: createPrize } = useCreatePrize();
   const { mutateAsync: updatePrize } = useUpdatePrize(id ? id : "");
   const form = useForm<z.infer<typeof prizeSchema>>({
     resolver: zodResolver(prizeSchema),
@@ -341,18 +441,18 @@ function PrizeSchemaForm({
             />
             <FormField
               control={form.control}
-              name={`distributions.${index}.percentage`}
-              render={({ field: percentageField }) => (
+              name={`distributions.${index}.prizeValue`}
+              render={({ field: prizeValueField }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Percentage</FormLabel>
+                  <FormLabel>Prize Value</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         placeholder=""
                         type="text"
-                        {...percentageField}
+                        {...prizeValueField}
                         onChange={(e) =>
-                          percentageField.onChange(Number(e.target.value))
+                          prizeValueField.onChange(Number(e.target.value))
                         }
                         disabled={form.formState.isSubmitting}
                         className="pr-8"
@@ -382,7 +482,7 @@ function PrizeSchemaForm({
           <Button
             type="button"
             onClick={() =>
-              append({ fromPosition: 1, toPosition: 1, percentage: 0 })
+              append({ fromPosition: 1, toPosition: 1, prizeValue: 0 })
             }
             disabled={form.formState.isSubmitting}
           >
@@ -395,9 +495,7 @@ function PrizeSchemaForm({
       </form>
     </Form>
   );
-}
-
-function BettingSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
+}function BettingSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
   const { data, isPending, error, isError, isSuccess } = useGetBetting(id);
   const bettingSchemaData = data?.data;
   
@@ -453,12 +551,12 @@ function BettingSchemaForm({
       standardShow4: 0,
       standardShow5: 0,
       standardShow6: 0,
-      wta_1: 0,
-      wta_2: 0,
-      wta_3: 0,
-      wta_4: 0,
-      wta_5: 0,
-      cut_percent: 0,
+      wta1: 0,
+      wta2: 0,
+      wta3: 0,
+      wta4: 0,
+      wta5: 0,
+      bettingCutPercent: 0,
       standardShowPercentages: [],
     },
   });
@@ -603,16 +701,16 @@ function BettingSchemaForm({
                   <div className="flex items-start space-x-2" key={field.id}>
                     <FormField
                       control={form.control}
-                      name={`standardShowPercentages.${index}.position`}
-                      render={({ field: positionField }) => (
+                      name={`standardShowPercentages.${index}.place`}
+                      render={({ field: placeField }) => (
                         <FormItem className="flex-1">
                           <FormControl>
                             <Input
-                              placeholder="Position"
+                              placeholder="Place"
                               type="text"
-                              {...positionField}
+                              {...placeField}
                               onChange={(e) =>
-                                positionField.onChange(Number(e.target.value))
+                                placeField.onChange(Number(e.target.value))
                               }
                               disabled={form.formState.isSubmitting}
                             />
@@ -623,17 +721,17 @@ function BettingSchemaForm({
                     />
                     <FormField
                       control={form.control}
-                      name={`standardShowPercentages.${index}.percentage`}
-                      render={({ field: percentageField }) => (
+                      name={`standardShowPercentages.${index}.percValue`}
+                      render={({ field: percValueField }) => (
                         <FormItem className="flex-1">
                           <FormControl>
                             <div className="relative">
                               <Input
                                 placeholder="Percentage"
                                 type="text"
-                                {...percentageField}
+                                {...percValueField}
                                 onChange={(e) =>
-                                  percentageField.onChange(Number(e.target.value))
+                                  percValueField.onChange(Number(e.target.value))
                                 }
                                 disabled={form.formState.isSubmitting}
                                 className="pr-8"
@@ -662,7 +760,7 @@ function BettingSchemaForm({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => append({ position: 1, percentage: 0 })}
+                onClick={() => append({ place: 1, percValue: 0 })}
                 disabled={form.formState.isSubmitting}
                 className="w-full"
               >
@@ -678,9 +776,9 @@ function BettingSchemaForm({
           <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5].map((num) => (
               <FormField
-                key={`wta_${num}`}
+                key={`wta${num}`}
                 control={form.control}
-                name={`wta_${num}` as any}
+                name={`wta${num}` as any}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>WTA {num}</FormLabel>
@@ -710,7 +808,7 @@ function BettingSchemaForm({
         {/* Cut Percent Section */}
         <FormField
           control={form.control}
-          name="cut_percent"
+          name="bettingCutPercent"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Percent for Expenses</FormLabel>
@@ -771,19 +869,31 @@ function FeeSchemaForm({
     defaultValues: defaultValues || {
       name: "",
       entryFee: 0,
-      perchFee: 0,
-      expensePercentage: 0,
-      minEntryFee: 0,
-      entryFeeRefundable: false,
-      hs1Fee: 0,
-      hs2Fee: 0,
-      hs3Fee: 0,
-      finalRaceFee: 0,
-      maxBirds: 1,
-      maxBackupBirds: 0,
-      floatingBackup: false,
+      isRefundable: false,
+      minEntryFees: 0,
+      maxBirdCount: 1,
+      maxBackupBirdCount: 0,
+      isFloatingBackup: false,
+      feesCutPercent: 0,
+      hotSpot1Fee: 0,
+      hotSpot2Fee: 0,
+      hotSpot3Fee: 0,
+      hotSpotFinalFee: 0,
+      perchFees: [{ birdNo: 1, perchFee: 0 }],
     },
   });
+
+  const maxBirdCountValue = form.watch("maxBirdCount");
+
+  // Update perchFees array when maxBirdCount changes
+  const handleMaxBirdCountChange = (newMaxBirdCount: number) => {
+    const currentPerchFees = form.getValues("perchFees") || [];
+    const newPerchFees = Array.from({ length: newMaxBirdCount }, (_, i) => ({
+      birdNo: i + 1,
+      perchFee: currentPerchFees[i]?.perchFee ?? 0,
+    }));
+    form.setValue("perchFees", newPerchFees);
+  };
 
   async function onSubmit(values: z.infer<typeof feeSchema>) {
     try {
@@ -865,39 +975,13 @@ function FeeSchemaForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="perchFee"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Perch Fee</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
-                    </span>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                      className="pl-8"
-                    />
-                  </div>
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}
-            name="expensePercentage"
+            name="feesCutPercent"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Percent for expenses</FormLabel>
+                <FormLabel>Fees Cut Percent</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -922,24 +1006,18 @@ function FeeSchemaForm({
         <div className="flex space-x-4">
           <FormField
             control={form.control}
-            name="minEntryFee"
+            name="minEntryFees"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>Min entry fees per team</FormLabel>
                 <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      $
-                    </span>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                      className="pl-8"
-                    />
-                  </div>
+                  <Input
+                    placeholder=""
+                    type="text"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    disabled={form.formState.isSubmitting}
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -948,7 +1026,7 @@ function FeeSchemaForm({
           />
           <FormField
             control={form.control}
-            name="entryFeeRefundable"
+            name="isRefundable"
             render={({ field }) => (
               <FormItem className="flex flex-row space-x-3 w-full space-y-0 p-2 self-end">
                 <FormControl>
@@ -973,10 +1051,10 @@ function FeeSchemaForm({
         <div className="grid grid-cols-4 gap-4">
           <FormField
             control={form.control}
-            name="hs1Fee"
+            name="hotSpot1Fee"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>HS1</FormLabel>
+                <FormLabel>Hot Spot 1</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -1000,10 +1078,10 @@ function FeeSchemaForm({
 
           <FormField
             control={form.control}
-            name="hs2Fee"
+            name="hotSpot2Fee"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>HS 2</FormLabel>
+                <FormLabel>Hot Spot 2</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -1027,10 +1105,10 @@ function FeeSchemaForm({
 
           <FormField
             control={form.control}
-            name="hs3Fee"
+            name="hotSpot3Fee"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>HS 3</FormLabel>
+                <FormLabel>Hot Spot 3</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -1054,10 +1132,10 @@ function FeeSchemaForm({
 
           <FormField
             control={form.control}
-            name="finalRaceFee"
+            name="hotSpotFinalFee"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Final Race</FormLabel>
+                <FormLabel>Hot Spot Final</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -1082,16 +1160,22 @@ function FeeSchemaForm({
         <div className="flex space-x-4">
           <FormField
             control={form.control}
-            name="maxBirds"
+            name="maxBirdCount"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Limit of main birds per team</FormLabel>
+                <FormLabel>Maximum number of birds</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
                     type="text"
                     {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      field.onChange(value);
+                      if (value >= 0) {
+                        handleMaxBirdCountChange(value);
+                      }
+                    }}
                     disabled={form.formState.isSubmitting}
                   />
                 </FormControl>
@@ -1103,10 +1187,10 @@ function FeeSchemaForm({
 
           <FormField
             control={form.control}
-            name="maxBackupBirds"
+            name="maxBackupBirdCount"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Limit of backup birds per team</FormLabel>
+                <FormLabel>Maximum number of backup birds</FormLabel>
                 <FormControl>
                   <Input
                     placeholder=""
@@ -1122,9 +1206,46 @@ function FeeSchemaForm({
             )}
           />
         </div>
+        
+        {/* Dynamic Perch Fees Section */}
+        {maxBirdCountValue > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Perch Fees</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: maxBirdCountValue }, (_, index) => (
+                <FormField
+                  key={index}
+                  control={form.control}
+                  name={`perchFees.${index}.perchFee`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bird {index + 1} - Perch Fee</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            $
+                          </span>
+                          <Input
+                            placeholder="0"
+                            type="text"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            disabled={form.formState.isSubmitting}
+                            className="pl-8"
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         <FormField
           control={form.control}
-          name="floatingBackup"
+          name="isFloatingBackup"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>

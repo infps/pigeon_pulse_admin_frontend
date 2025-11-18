@@ -51,7 +51,7 @@ export default function page() {
               <DialogTrigger asChild>
                 <Button>Start Scanner</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-sm">
+              <DialogContent className="sm:max-w-sm max-h-[80vh] overflow-y-auto">
                 <PublishResult raceId={raceId} />
               </DialogContent>
             </Dialog>

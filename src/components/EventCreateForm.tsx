@@ -37,33 +37,43 @@ import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
 
 const formSchema = z.object({
   name: z.string().min(1, "Event name is required"),
-  status: z.enum(["OPEN", "CLOSED"]),
   shortName: z.string().min(1, "Short name is required"),
   date: z.date(),
   type: z.enum(["AGN", "AS"]),
-  trainingCount: z
+  isOpen: z.boolean(),
+  trainingFrom: z
     .number()
     .int()
-    .min(0, "Training count must be a non-negative integer"),
-  inventoryCount: z
+    .min(0, "Training from must be a non-negative integer"),
+  trainingTo: z
     .number()
     .int()
-    .min(0, "Inventory count must be a non-negative integer"),
-  finalRaceCount: z
+    .min(0, "Training to must be a non-negative integer"),
+  inventoryFrom: z
     .number()
     .int()
-    .min(0, "Final race count must be a non-negative integer"),
-  hotspotCount: z
+    .min(0, "Inventory from must be a non-negative integer"),
+  inventoryTo: z
     .number()
     .int()
-    .min(0, "Hotspot count must be a non-negative integer"),
+    .min(0, "Inventory to must be a non-negative integer"),
+  finalFrom: z.number().int().min(0, "Final to must be a non-negative integer"),
+  finalTo: z.number().int().min(0, "Final to must be a non-negative integer"),
+  hotspotFrom: z
+    .number()
+    .int()
+    .min(0, "Hotspot from must be a non-negative integer"),
+  hotspotTo: z
+    .number()
+    .int()
+    .min(0, "Hotspot to must be a non-negative integer"),
   feeSchemaId: z.uuid("Invalid fee schema ID format"),
-  bettingSchemeId: z.uuid("Invalid betting schema ID format").optional(),
   finalRacePrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   hotspot1PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   hotspot2PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   hotspot3PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
   avgWinnerPrizeSchemaId: z.uuid("Invalid prize schema ID format"),
+  bettingSchemaId: z.uuid("Invalid betting schema ID format").optional(),
 });
 
 export function EventUpdateFetch({ id, onClose }: { id: string; onClose?: () => void }) {
@@ -129,29 +139,33 @@ export default function EventCreateForm({
   feeSchemas: FeeSchema[];
   prizeSchemas: PrizeSchema[];
   bettingSchemas: BettingSchema[];
-  id: string;
+  id?: string;
   onClose?: () => void;
 }) {
   const { mutateAsync: createEvent } = useCreateEvent();
-  const { mutateAsync: updateEvent } = useUpdateEvent(id);
+  const { mutateAsync: updateEvent } = useUpdateEvent(id || "");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      status: defaultValues?.status || "OPEN",
+      isOpen: defaultValues?.isOpen ?? true,
       name: defaultValues?.name || "",
       shortName: defaultValues?.shortName || "",
       type: defaultValues?.type || "AGN",
-      trainingCount: defaultValues?.trainingCount || 0,
-      inventoryCount: defaultValues?.inventoryCount || 0,
-      finalRaceCount: defaultValues?.finalRaceCount || 0,
-      hotspotCount: defaultValues?.hotspotCount || 0,
+      trainingFrom: defaultValues?.trainingFrom || 0,
+      trainingTo: defaultValues?.trainingTo || 0,
+      inventoryFrom: defaultValues?.inventoryFrom || 0,
+      inventoryTo: defaultValues?.inventoryTo || 0,
+      finalFrom: defaultValues?.finalFrom || 0,
+      finalTo: defaultValues?.finalTo || 0,
+      hotspotFrom: defaultValues?.hotspotFrom || 0,
+      hotspotTo: defaultValues?.hotspotTo || 0,
       feeSchemaId: defaultValues?.feeSchemaId || "",
-      bettingSchemeId: defaultValues?.bettingSchemeId || undefined,
-      finalRacePrizeSchemaId: defaultValues?.finalRacePrizeSchemaId || "",
-      hotspot1PrizeSchemaId: defaultValues?.hotspot1PrizeSchemaId || "",
-      hotspot2PrizeSchemaId: defaultValues?.hotspot2PrizeSchemaId || "",
-      hotspot3PrizeSchemaId: defaultValues?.hotspot3PrizeSchemaId || "",
-      avgWinnerPrizeSchemaId: defaultValues?.avgWinnerPrizeSchemaId || "",
+      bettingSchemaId: defaultValues?.bettingSchemeId || undefined,
+      finalRacePrizeSchemaId: defaultValues?.finalRacePrizeSchemaId || undefined,
+      hotspot1PrizeSchemaId: defaultValues?.hotspot1PrizeSchemaId || undefined,
+      hotspot2PrizeSchemaId: defaultValues?.hotspot2PrizeSchemaId || undefined,
+      hotspot3PrizeSchemaId: defaultValues?.hotspot3PrizeSchemaId || undefined,
+      avgWinnerPrizeSchemaId: defaultValues?.avgWinnerPrizeSchemaId || undefined,
       date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
     },
   });
@@ -192,13 +206,13 @@ export default function EventCreateForm({
       >
         <FormField
           control={form.control}
-          name="status"
+          name="isOpen"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
               <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
+                onValueChange={(value) => field.onChange(value === "true")}
+                value={field.value ? "true" : "false"}
                 disabled={form.formState.isSubmitting}
               >
                 <FormControl className="w-[300px]">
@@ -207,8 +221,8 @@ export default function EventCreateForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="OPEN">Open</SelectItem>
-                  <SelectItem value="CLOSED">Closed</SelectItem>
+                  <SelectItem value="true">Open</SelectItem>
+                  <SelectItem value="false">Closed</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -327,90 +341,174 @@ export default function EventCreateForm({
           />
         </div>
         <h4 className="font-semibold mt-4 mb-2">Race Number Range</h4>
-        <div className="grid grid-cols-4 gap-4">
-          <FormField
-            control={form.control}
-            name="trainingCount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Training</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    type="text"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="trainingFrom"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Training From</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="trainingTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Training To</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="inventoryCount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Inventory/Loft fly/Pulling Flight</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    type="text"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="inventoryFrom"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inventory/Loft fly/Pulling Flight From</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="inventoryTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inventory/Loft fly/Pulling Flight To</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="finalRaceCount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Final Race</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    type="text"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="finalFrom"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Final Race From</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="finalTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Final Race To</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="hotspotCount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Hotspot</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder=""
-                    type="text"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="hotspotFrom"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hotspot From</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="hotspotTo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hotspot To</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder=""
+                      type="text"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
         <h4 className="font-semibold mt-4 mb-2">Schemas</h4>
         <div className="grid grid-cols-2 gap-4">
@@ -446,13 +544,13 @@ export default function EventCreateForm({
 
           <FormField
             control={form.control}
-            name="bettingSchemeId"
+            name="bettingSchemaId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Betting Schema (Optional)</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -482,8 +580,8 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Final Race</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -513,8 +611,8 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Hot spot 1</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -543,8 +641,8 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Hot spot 2</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -575,8 +673,8 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Hot spot 3</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -605,8 +703,8 @@ export default function EventCreateForm({
               <FormItem>
                 <FormLabel>Avg Winner</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(value || null)}
+                  value={field.value || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">

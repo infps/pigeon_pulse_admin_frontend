@@ -21,6 +21,8 @@ import { useLogin, useSignup } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
 const formSchema = z
   .object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
     email: z
       .string()
       .email("Invalid email address")
@@ -33,7 +35,6 @@ const formSchema = z
       .string()
       .min(6, "Confirm Password is required")
       .max(32, "Confirm Password must be at most 32 characters"),
-    name: z.string().min(1, "Name is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -46,10 +47,11 @@ export default function page() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-      name: "",
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -77,12 +79,26 @@ export default function page() {
         >
           <FormField
             control={form.control}
-            name="name"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" type="text" {...field} />
+                  <Input placeholder="John" type="text" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Doe" type="text" {...field} />
                 </FormControl>
 
                 <FormMessage />

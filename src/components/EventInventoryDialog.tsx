@@ -28,7 +28,34 @@ function ClickableBirdName({
   birdName: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  console.log(bird);
+  
+  // Map new structure to old BirdEventInventory structure for BirdUpdateForm
+  const mappedBird = {
+    ...bird,
+    band: bird.bird.band,
+    band_1: bird.bird.band1,
+    band_2: bird.bird.band2,
+    band_3: bird.bird.band3,
+    band_4: bird.bird.band4,
+    rfId: bird.bird.rfId,
+    note: bird.bird.note,
+    arrivalDate: bird.arrivalDate ? new Date(bird.arrivalDate) : null,
+    departureDate: bird.departureDate ? new Date(bird.departureDate) : null,
+    updatedAt: new Date(bird.updatedAt),
+    bird: {
+      ...bird.bird,
+      imageUrl: bird.bird.pictureId,
+      is_active: bird.bird.isActive,
+      is_lost: bird.bird.isLost,
+      lost_date: bird.bird.lostDate,
+      lost_race_id: bird.bird.lostRaceId,
+      breeder: {
+        id: bird.bird.breeder.id,
+        name: `${bird.bird.breeder.firstName} ${bird.bird.breeder.lastName}`,
+      },
+    },
+  };
+  
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
@@ -36,9 +63,9 @@ function ClickableBirdName({
           {birdName}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogTitle>Edit Bird</DialogTitle>
-        <BirdUpdateForm bird={bird} />
+        <BirdUpdateForm bird={mappedBird as any} />
       </DialogContent>
     </Dialog>
   );
@@ -58,7 +85,7 @@ const paymentsColumns: ColumnDef<EventInventoryItem["payments"][0]>[] = [
     accessorKey: "paymentDate",
     header: "Date",
     cell: ({ row }) => {
-      const date = row.getValue("paymentDate") as Date;
+      const date = row.getValue("paymentDate") as string;
       return <div>{date ? new Date(date).toLocaleDateString() : "-"}</div>;
     },
   },
@@ -110,10 +137,10 @@ const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
       },
     },
     {
-      accessorKey: "band",
+      accessorKey: "bird.band",
       header: "Band",
       cell: ({ row }) => {
-        const band = row.getValue("band") as string;
+        const band = row.original.bird.band;
         return <div>{band || "N/A"}</div>;
       },
     },
@@ -137,7 +164,7 @@ const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
       accessorKey: "arrivalDate",
       header: "Arrival Date",
       cell: ({ row }) => {
-        const date = row.getValue("arrivalDate") as Date;
+        const date = row.getValue("arrivalDate") as string;
         return <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>;
       },
     },
@@ -145,7 +172,7 @@ const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
       accessorKey: "departureDate",
       header: "Departure Date",
       cell: ({ row }) => {
-        const date = row.getValue("departureDate") as Date;
+        const date = row.getValue("departureDate") as string;
         return <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>;
       },
     },
@@ -241,7 +268,7 @@ export default function EventInventoryDialog({
         </div>
         <div>
           <div className="font-semibold">Breeder</div>
-          <div>{eventInventoryItem.breeder.name}</div>
+          <div>{`${eventInventoryItem.breeder.firstName} ${eventInventoryItem.breeder.lastName}`}</div>
         </div>
         <div className="text-right">
           <div className="text-lg font-semibold">OPEN</div>
@@ -257,17 +284,17 @@ export default function EventInventoryDialog({
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <span className="font-medium">Name:</span>{" "}
-                {eventInventoryItem.breeder.name}
+                {`${eventInventoryItem.breeder.firstName} ${eventInventoryItem.breeder.lastName}`}
               </div>
               <div>
                 <span className="font-medium">Sign-up date:</span>{" "}
                 {new Date(
-                  eventInventoryItem.registration_date
+                  eventInventoryItem.createdAt
                 ).toLocaleDateString()}
               </div>
               <div>
                 <span className="font-medium">Reserved bird count:</span>{" "}
-                {eventInventoryItem.reserved_birds}
+                {eventInventoryItem.reservedBirds}
               </div>
               <div>
                 <span className="font-medium">Loft:</span>{" "}

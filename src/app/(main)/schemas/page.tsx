@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardSkeleton } from "@/components/loading-skeletons";
 import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
-import { FeeSchema, PrizeSchema } from "@/lib/types";
+import { BettingSchema, FeeSchema, PrizeSchema } from "@/lib/types";
 import React, { useState } from "react";
 
 export default function page() {
@@ -39,7 +39,7 @@ export default function page() {
 
   const prizeSchema: PrizeSchema[] = prizeData?.data || [];
   const feeSchema: FeeSchema[] = feeData?.data || [];
-  const bettingSchema: any[] = bettingData?.data || [];
+  const bettingSchema: BettingSchema[] = bettingData?.data || [];
 
   return (
     <div className="flex h-screen">
@@ -50,7 +50,7 @@ export default function page() {
             <DialogTrigger asChild>
               <Button>Create Fee Scheme</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-5xl w-full">
+            <DialogContent className="max-w-5xl w-full max-h-[80vh] overflow-y-auto">
               <SchemaForm 
                 type="fee" 
                 action="create" 
@@ -89,7 +89,7 @@ export default function page() {
             <DialogTrigger asChild>
               <Button>Create Prize Scheme</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-5xl w-full">
+            <DialogContent className="max-w-5xl w-full max-h-[80vh] overflow-y-auto">
               <SchemaForm 
                 type="prize" 
                 action="create" 

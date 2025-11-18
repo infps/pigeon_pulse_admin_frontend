@@ -47,7 +47,7 @@ export default function CreateEventButton() {
       <DialogTrigger asChild>
         <Button>Create Event</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogTitle>Create Event</DialogTitle>
         <EventCreateForm
           action="create"

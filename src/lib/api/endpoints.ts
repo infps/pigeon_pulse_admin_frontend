@@ -2,7 +2,7 @@ const authEndpoints = {
   login: "/auth/admin/login",
   logout: "/auth/admin/logout",
   signup: "/auth/admin/signup",
-  session: "/auth/session",
+  session: "/auth/admin/session",
 };
 
 const schemaEndpoints = {
@@ -42,7 +42,18 @@ const raceEndpoints = {
   create: "/races",
   listRaces: (eventId: string) => `/races/event/${eventId}`,
   listRace: (raceId: string) => `/races/${raceId}`,
+  updateRace: (raceId: string) => `/races/${raceId}`,
   listRaceItems: (raceId: string) => `/races/${raceId}/items`,
+  updateRaceItem: (raceId: string, raceItemId: string) =>
+    `/races/${raceId}/items/${raceItemId}`,
+  listBaskets: (raceId: string) => `/races/${raceId}/baskets`,
+  createBasket: (raceId: string) => `/races/${raceId}/baskets`,
+  updateBasket: (raceId: string, basketId: string) =>
+    `/races/${raceId}/baskets/${basketId}`,
+  deleteBasket: (raceId: string, basketId: string) =>
+    `/races/${raceId}/baskets/${basketId}`,
+  assignBasket: (raceId: string, basketId: string) =>
+    `/races/${raceId}/baskets/${basketId}/assign`,
   loftBasketing: (raceId: string) => `/races/${raceId}/item/loft-basket`,
   raceBasketing: (raceId: string) => `/races/${raceId}/item/race-basket`,
   publishResult: (raceId: string) => `/races/${raceId}/publish-result`,

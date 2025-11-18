@@ -16,13 +16,16 @@ import { useListRaces } from "@/lib/api/races";
 import { Event, Race } from "@/lib/types";
 import { useQueryState } from "nuqs";
 import React from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default function page() {
   const [eventId, setEventId] = useQueryState("eventId", {
     defaultValue: "",
   });
   const { data, error, isError, isPending } = useListEvents();
-  
+
   if (isPending) {
     return (
       <div className="p-4">
@@ -36,20 +39,22 @@ export default function page() {
       </div>
     );
   }
-  
+
   if (isError) {
     return (
       <div className="p-4">
         <div className="flex h-96 w-full items-center justify-center">
           <div className="text-center">
-            <p className="text-lg text-destructive mb-2">Failed to load events</p>
+            <p className="text-lg text-destructive mb-2">
+              Failed to load events
+            </p>
             <p className="text-sm text-muted-foreground">{error.message}</p>
           </div>
         </div>
       </div>
     );
   }
-  
+
   if (!data || data.length === 0) {
     return (
       <div className="p-4">
@@ -59,13 +64,17 @@ export default function page() {
       </div>
     );
   }
-  
+
   const events: Event[] = data.data.events || [];
   return (
     <div className="p-4">
       <div className="flex items-center justify-between gap-2">
         <EventSelect events={events} />
-        <CreateRaceDialog events={events} selectedEventId={eventId} />
+        <Link href={"/races/create"}>
+          <Button>
+            <Plus /> Create Race
+          </Button>
+        </Link>
       </div>
       <div className="mt-4">
         {eventId ? (
@@ -125,11 +134,11 @@ function ListRacesTable() {
   });
 
   const { data, error, isError, isPending } = useListRaces(eventId);
-  
+
   if (isPending) {
     return <TableSkeleton rows={6} columns={5} />;
   }
-  
+
   if (isError) {
     return (
       <div className="flex h-96 w-full items-center justify-center">

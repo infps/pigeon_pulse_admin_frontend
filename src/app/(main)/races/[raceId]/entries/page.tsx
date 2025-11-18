@@ -1,436 +1,105 @@
 "use client";
-import {
-  useGetRace,
-  useListRaceItems,
-  useRaceBasketing,
-  useRaceLoftBasketing,
-} from "@/lib/api/races";
-import { Race, RaceItem } from "@/lib/types";
-import { TableSkeleton } from "@/components/loading-skeletons";
+import { useListRaceItems } from "@/lib/api/races";
+import { RaceItem } from "@/lib/types";
 import { useParams } from "next/navigation";
-import React, { useRef } from "react";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  ClockIcon,
-  SunriseIcon,
-  SunsetIcon,
-  ThermometerIcon,
-  WindIcon,
-} from "lucide-react";
+import React, { useState } from "react";
 import { DataTable } from "@/components/data-table";
 import { RaceItemColumns } from "@/components/columns";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { ErrorState } from "@/components/error-state";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BasketManagement } from "@/components/BasketManagement";
+import { EditRaceItemBasketDialog } from "@/components/EditRaceItemBasketDialog";
 
-export default function page() {
-  const params = useParams<{ raceId: string }>();
-  const raceId = params.raceId;
+export default function RaceEntriesPage() {
+  const { raceId } = useParams<{ raceId: string }>();
+  const [selectedRaceItem, setSelectedRaceItem] = useState<RaceItem | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  if (!raceId) {
-    return <div className="text-red-500">Invalid race ID</div>;
-  }
+  const { data, error, isPending, isError } = useListRaceItems(raceId);
+  const raceItems: RaceItem[] = data?.data || [];
 
-  return (
-    <>
-      <RaceDetails raceId={raceId} />
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold mb-4">Race Entries</h2>
-          <div className="flex items-center space-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>Loft Basketing</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-sm">
-                <RaceLoftBasketing raceId={raceId} />
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>Race Basketing</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-sm">
-                <RaceBasketing raceId={raceId} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-        <RaceEntries raceId={raceId} />
-      </div>
-    </>
-  );
-}
-
-function RaceDetails({ raceId }: { raceId: string }) {
-  const { data, error, isError, isPending } = useGetRace(raceId);
+  const handleRowClick = (raceItem: RaceItem) => {
+    setSelectedRaceItem(raceItem);
+    setIsDialogOpen(true);
+  };
 
   if (isPending) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow">
-        <div className="space-y-4">
-          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
-          <div className="space-y-2">
-            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-36 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <LoadingSpinner />
       </div>
     );
   }
-  
+
   if (isError) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow">
-        <div className="text-center">
-          <p className="text-lg text-destructive mb-2">Failed to load race details</p>
-          <p className="text-sm text-muted-foreground">{error.message}</p>
-        </div>
+      <div className="container mx-auto py-8">
+        <ErrorState message={error?.message || "Failed to load race entries"} />
       </div>
     );
   }
 
-  const race: Race = data.data;
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const getTypeLabel = (type: string) => {
-    const typeLabels: Record<string, string> = {
-      TRAINING: "Training",
-      INVENTORY: "Inventory",
-      LOFT_FLY: "Loft Fly",
-      PULLING_FLIGHT: "Pulling Flight",
-      FINAL_RACE: "Final Race",
-      HOTSPOT_1: "Hotspot 1",
-      HOTSPOT_2: "Hotspot 2",
-      HOTSPOT_3: "Hotspot 3",
-      AVG_WINNER: "Average Winner",
-    };
-    return typeLabels[type] || type;
-  };
-
-  const getStatusBadge = (isClosed: boolean) => {
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          isClosed
-            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-        }`}
-      >
-        {isClosed ? "Closed" : "Open"}
-      </span>
-    );
-  };
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Race #{race.externalRaceId}</h1>
-          <p className="text-muted-foreground">Race Details and Entries</p>
-        </div>
-        {getStatusBadge(race.isClosed)}
-      </div>
-
-      {/* Basic Information Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Basic Info Card */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-              <MapPinIcon className="h-5 w-5" />
-              Basic Information
+    <div className="container mx-auto py-8 px-6">
+      <h1 className="text-3xl font-bold mb-6">Race Entries</h1>
+      
+      <div className="flex gap-6">
+        {/* Left side - 70% - Race Items Table */}
+        <div className="w-[70%]">
+          <div className="rounded-lg border bg-card">
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-semibold">Race Items</h2>
+              <p className="text-sm text-muted-foreground">
+                Total entries: {raceItems.length}
+              </p>
             </div>
-          </div>
-          <div className="p-6 pt-0 space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Type
-              </label>
-              <p className="text-lg">{getTypeLabel(race.type)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Location
-              </label>
-              <p className="text-lg">{race.location}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Distance
-              </label>
-              <p className="text-lg">{race.distance} miles</p>
+            <div className="p-4">
+              <DataTable 
+                columns={RaceItemColumns} 
+                data={raceItems}
+                onRowClick={handleRowClick}
+              />
             </div>
           </div>
         </div>
 
-        {/* Schedule Card */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-              <CalendarIcon className="h-5 w-5" />
-              Schedule
+        {/* Right side - 30% - Baskets */}
+        <div className="w-[30%]">
+          <div className="rounded-lg border bg-card">
+            <div className="p-4 border-b">
+              <h2 className="text-xl font-semibold">Baskets</h2>
             </div>
-          </div>
-          <div className="p-6 pt-0 space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Start Time
-              </label>
-              <p className="text-lg">{formatDateTime(race.startTime)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Arrival Date
-              </label>
-              <p className="text-lg">{formatDate(race.arrivalDate)}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Sun Times Card */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col space-y-1.5 p-6">
-            <div className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-              <SunriseIcon className="h-5 w-5" />
-              Sun Times
-            </div>
-          </div>
-          <div className="p-6 pt-0 space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Sunrise
-              </label>
-              <p className="text-lg">{race.sunrise || "Not set"}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Sunset
-              </label>
-              <p className="text-lg">{race.sunset || "Not set"}</p>
+            <div className="p-4">
+              <Tabs defaultValue="loft" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="loft">Loft Baskets</TabsTrigger>
+                  <TabsTrigger value="race">Race Baskets</TabsTrigger>
+                </TabsList>
+                <TabsContent value="loft" className="mt-4">
+                  <BasketManagement raceId={raceId} isRaceBasket={false} />
+                </TabsContent>
+                <TabsContent value="race" className="mt-4">
+                  <BasketManagement raceId={raceId} isRaceBasket={true} />
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Weather Information */}
-      {(race.weather ||
-        race.wind ||
-        race.temperature ||
-        race.arrivalWeather ||
-        race.arrivalWind ||
-        race.arrivalTemperature) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Liberation Weather */}
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <div className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-                <ThermometerIcon className="h-5 w-5" />
-                Liberation Weather
-              </div>
-            </div>
-            <div className="p-6 pt-0 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Weather
-                </label>
-                <p className="text-lg">{race.weather || "Not recorded"}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Temperature
-                </label>
-                <p className="text-lg">{race.temperature || "Not recorded"}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Wind
-                </label>
-                <p className="text-lg">{race.wind || "Not recorded"}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Arrival Weather */}
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <div className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-                <WindIcon className="h-5 w-5" />
-                Arrival Weather
-              </div>
-            </div>
-            <div className="p-6 pt-0 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Weather
-                </label>
-                <p className="text-lg">
-                  {race.arrivalWeather || "Not recorded"}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Temperature
-                </label>
-                <p className="text-lg">
-                  {race.arrivalTemperature || "Not recorded"}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">
-                  Wind
-                </label>
-                <p className="text-lg">{race.arrivalWind || "Not recorded"}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Edit Race Item Basket Dialog */}
+      {selectedRaceItem && (
+        <EditRaceItemBasketDialog
+          raceItem={selectedRaceItem}
+          raceId={raceId}
+          isOpen={isDialogOpen}
+          onClose={() => {
+            setIsDialogOpen(false);
+            setSelectedRaceItem(null);
+          }}
+        />
       )}
     </div>
-  );
-}
-
-function RaceEntries({ raceId }: { raceId: string }) {
-  const { data, error, isError, isPending } = useListRaceItems(raceId);
-  console.log(data);
-  const raceItems: RaceItem[] = data?.data || [];
-  
-  if (isPending) {
-    return <TableSkeleton rows={8} columns={6} />;
-  }
-  
-  if (isError) {
-    return (
-      <div className="flex h-96 w-full items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-destructive mb-2">Failed to load race entries</p>
-          <p className="text-sm text-muted-foreground">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
-  
-  return <DataTable columns={RaceItemColumns} data={raceItems} />;
-}
-
-function RaceBasketing({ raceId }: { raceId: string }) {
-  const { mutateAsync: basketing } = useRaceBasketing(raceId);
-  const ref = useRef<HTMLInputElement>(null);
-  const handleSubmit = async (e: React.FormEvent) => {
-    if (!basketing) return;
-    e.preventDefault();
-    if (!ref.current) return;
-    const rfId = ref.current.value;
-    try {
-      const { data, error } = await basketing({ rfId });
-      if (error) {
-        toast.error(`Error: ${error}`);
-      } else {
-        toast.success("Bird basketed successfully!");
-      }
-      ref.current.value = "";
-    } catch (error) {
-      toast.error(`${error}`);
-    }
-  };
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>Race Basketing</DialogTitle>
-        <DialogDescription>
-          Enter the RFID to basket the bird!
-        </DialogDescription>
-      </DialogHeader>
-      <div className="grid gap-4">
-        <div className="grid gap-3">
-          <Label htmlFor="rfId">RFID</Label>
-          <Input ref={ref} id="rfId" name="rfId" />
-        </div>
-      </div>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
-        </DialogClose>
-        <Button onClick={handleSubmit} type="submit">
-          Save changes
-        </Button>
-      </DialogFooter>
-    </>
-  );
-}
-
-function RaceLoftBasketing({ raceId }: { raceId: string }) {
-  const { mutateAsync: loftBasketing } = useRaceLoftBasketing(raceId);
-  const ref = useRef<HTMLInputElement>(null);
-  const handleSubmit = async (e: React.FormEvent) => {
-    if (!loftBasketing) return;
-    e.preventDefault();
-    if (!ref.current) return;
-    const rfId = ref.current.value;
-    try {
-      const { data, error } = await loftBasketing({ rfId });
-      if (error) {
-        toast.error(`${error}`);
-      } else {
-        toast.success("Bird lofted successfully!");
-      }
-      ref.current.value = "";
-    } catch (error) {
-      toast.error(`Error: ${error}`);
-    }
-  };
-  return (
-    <>
-      <DialogHeader>
-        <DialogTitle>Loft Basketing</DialogTitle>
-        <DialogDescription>
-          Enter the RFID to basket the bird!
-        </DialogDescription>
-      </DialogHeader>
-      <div className="grid gap-4">
-        <div className="grid gap-3">
-          <Label htmlFor="rfId">RFID</Label>
-          <Input ref={ref} id="rfId" name="rfId" />
-        </div>
-      </div>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
-        </DialogClose>
-        <Button onClick={handleSubmit} type="submit">
-          Save changes
-        </Button>
-      </DialogFooter>
-    </>
   );
 }

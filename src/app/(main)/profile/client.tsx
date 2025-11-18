@@ -20,20 +20,29 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 const updateUserSchema = z.object({
-  name: z.string().min(1, "Name is required").optional(),
+  firstName: z.string().min(1, "First name is required").optional(),
+  lastName: z.string().min(1, "Last name is required").optional(),
   country: z.string().optional(),
   ssn: z.string().optional(),
   taxNumber: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
-  primaryPhone: z.string().optional(),
-  cellPhone: z.string().optional(),
+  isDefaultAddress1: z.boolean().optional(),
+  address1: z.string().optional(),
+  city1: z.string().optional(),
+  state1: z.string().optional(),
+  zip1: z.string().optional(),
+  address2: z.string().optional(),
+  city2: z.string().optional(),
+  state2: z.string().optional(),
+  zip2: z.string().optional(),
+  phone: z.string().optional(),
+  cell: z.string().optional(),
   fax: z.string().optional(),
   sms: z.string().optional(),
-  alternativeEmail: z.string().email("Invalid email format").optional().or(z.literal("")),
+  email2: z.string().email("Invalid email format").optional().or(z.literal("")),
   webAddress: z.string().url("Invalid URL format").optional().or(z.literal("")),
+  note: z.string().optional(),
+  defaultNameAgn: z.string().optional(),
+  defaultNameAs: z.string().optional(),
 });
 
 type UpdateUserFormData = z.infer<typeof updateUserSchema>;
@@ -45,20 +54,29 @@ export default function ProfilePage() {
   const form = useForm<UpdateUserFormData>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       country: "",
       ssn: "",
       taxNumber: "",
-      address: "",
-      city: "",
-      state: "",
-      zip: "",
-      primaryPhone: "",
-      cellPhone: "",
+      isDefaultAddress1: false,
+      address1: "",
+      city1: "",
+      state1: "",
+      zip1: "",
+      address2: "",
+      city2: "",
+      state2: "",
+      zip2: "",
+      phone: "",
+      cell: "",
       fax: "",
       sms: "",
-      alternativeEmail: "",
+      email2: "",
       webAddress: "",
+      note: "",
+      defaultNameAgn: "",
+      defaultNameAs: "",
     },
   });
 
@@ -68,20 +86,29 @@ export default function ProfilePage() {
   useEffect(() => {
     if (userData) {
       form.reset({
-        name: userData.name || "",
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
         country: userData.country || "",
         ssn: userData.ssn || "",
         taxNumber: userData.taxNumber || "",
-        address: userData.address || "",
-        city: userData.city || "",
-        state: userData.state || "",
-        zip: userData.zip || "",
-        primaryPhone: userData.primaryPhone || "",
-        cellPhone: userData.cellPhone || "",
+        isDefaultAddress1: userData.isDefaultAddress1 || false,
+        address1: userData.address1 || "",
+        city1: userData.city1 || "",
+        state1: userData.state1 || "",
+        zip1: userData.zip1 || "",
+        address2: userData.address2 || "",
+        city2: userData.city2 || "",
+        state2: userData.state2 || "",
+        zip2: userData.zip2 || "",
+        phone: userData.phone || "",
+        cell: userData.cell || "",
         fax: userData.fax || "",
         sms: userData.sms || "",
-        alternativeEmail: userData.alternativeEmail || "",
+        email2: userData.email2 || "",
         webAddress: userData.webAddress || "",
+        note: userData.note || "",
+        defaultNameAgn: userData.defaultNameAgn || "",
+        defaultNameAs: userData.defaultNameAs || "",
       });
     }
   }, [userData, form]);
@@ -145,12 +172,25 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your name" {...field} />
+                          <Input placeholder="Enter your first name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your last name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -164,6 +204,32 @@ export default function ProfilePage() {
                         <FormLabel>Country</FormLabel>
                         <FormControl>
                           <Input placeholder="Enter your country" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="defaultNameAgn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Default Name (AGN)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter default AGN name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="defaultNameAs"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Default Name (AS)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter default AS name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -205,18 +271,18 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Address Information */}
+              {/* Primary Address Information */}
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Address Information</h2>
+                <h2 className="text-xl font-semibold">Primary Address</h2>
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="address"
+                    name="address1"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Address</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your address" {...field} />
+                          <Input placeholder="Enter your primary address" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -225,7 +291,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
-                      name="city"
+                      name="city1"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>City</FormLabel>
@@ -238,7 +304,7 @@ export default function ProfilePage() {
                     />
                     <FormField
                       control={form.control}
-                      name="state"
+                      name="state1"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>State</FormLabel>
@@ -251,7 +317,68 @@ export default function ProfilePage() {
                     />
                     <FormField
                       control={form.control}
-                      name="zip"
+                      name="zip1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ZIP Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your ZIP code" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Secondary Address Information */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Secondary Address</h2>
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="address2"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your secondary address" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="city2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>City</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your city" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="state2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>State</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your state" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="zip2"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>ZIP Code</FormLabel>
@@ -272,12 +399,12 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="primaryPhone"
+                    name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Primary Phone</FormLabel>
+                        <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your primary phone" {...field} />
+                          <Input placeholder="Enter your phone number" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -285,7 +412,7 @@ export default function ProfilePage() {
                   />
                   <FormField
                     control={form.control}
-                    name="cellPhone"
+                    name="cell"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Cell Phone</FormLabel>
@@ -331,7 +458,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="alternativeEmail"
+                    name="email2"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Alternative Email</FormLabel>
@@ -364,6 +491,24 @@ export default function ProfilePage() {
                     )}
                   />
                 </div>
+              </div>
+
+              {/* Additional Information */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Additional Information</h2>
+                <FormField
+                  control={form.control}
+                  name="note"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter any additional notes" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <div className="flex justify-end pt-6">
