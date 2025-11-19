@@ -421,6 +421,13 @@ type Race = {
   updatedAt: string;
   weather: string | null;
   wind: string | null;
+  stats?: {
+    totalBirds: number;
+    basketed: number;
+    arrived: number;
+    notArrived: number;
+    lost: number;
+  };
 };
 
 type RaceItem = {

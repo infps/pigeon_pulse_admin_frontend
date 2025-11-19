@@ -589,7 +589,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
 export const RaceColumns: ColumnDef<Race>[] = [
   {
     accessorKey: "raceNumber",
-    header: "Race Number",
+    header: "Race #",
   },
   {
     accessorKey: "type",
@@ -632,12 +632,29 @@ export const RaceColumns: ColumnDef<Race>[] = [
     },
   },
   {
-    accessorKey: "sunrise",
-    header: "Sunrise",
+    accessorKey: "stats.totalBirds",
+    header: "Birds in Race",
+    cell: ({ row }) => row.original.stats?.totalBirds || 0,
   },
   {
-    accessorKey: "sunset",
-    header: "Sunset",
+    accessorKey: "stats.basketed",
+    header: "Basketed",
+    cell: ({ row }) => row.original.stats?.basketed || 0,
+  },
+  {
+    accessorKey: "stats.arrived",
+    header: "Arrived",
+    cell: ({ row }) => row.original.stats?.arrived || 0,
+  },
+  {
+    accessorKey: "stats.notArrived",
+    header: "Not Arrived",
+    cell: ({ row }) => row.original.stats?.notArrived || 0,
+  },
+  {
+    accessorKey: "stats.lost",
+    header: "Lost",
+    cell: ({ row }) => row.original.stats?.lost || 0,
   },
   {
     accessorKey: "isClosed",
