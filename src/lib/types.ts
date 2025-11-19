@@ -484,26 +484,39 @@ type RaceResult = {
 };
 
 type BreederAddressBook = {
-  address: string | null;
-  alternativeEmail: string | null;
-  cellPhone: string | null;
-  city: string | null;
+  address1: string | null;
+  address2: string | null;
+  breederNumber: number;
+  cell: string | null;
+  city1: string | null;
+  city2: string | null;
   country: string | null;
   createdAt: string;
-  email: string;
+  defaultNameAgn: string | null;
+  defaultNameAs: string | null;
+  email: string | null;
+  email2: string | null;
   fax: string | null;
+  firstName: string | null;
   id: string;
-  name: string;
-  primaryPhone: string | null;
-  role: string;
+  isDefaultAddress1: boolean;
+  lastName: string | null;
+  loginName: string | null;
+  loginPassword: string | null;
+  note: string | null;
+  phone: string | null;
+  pictureId: string | null;
   sms: string | null;
   ssn: string | null;
-  state: string | null;
+  state1: string | null;
+  state2: string | null;
   status: "ACTIVE" | "INACTIVE" | "PROSPECT";
+  statusDate: string | null;
   taxNumber: string | null;
   updatedAt: string;
   webAddress: string | null;
-  zip: string | null;
+  zip1: string | null;
+  zip2: string | null;
 };
 
 type Basket = {
