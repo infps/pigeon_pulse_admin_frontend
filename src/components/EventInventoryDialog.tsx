@@ -1,6 +1,6 @@
 "use client";
 import { getEventInventoryItem } from "@/lib/api/eventInventory";
-import { EventInventoryItem } from "@/lib/types";
+import { EventInventoryItem, EventInventoryItemDetail, EventInventoryPayment } from "@/lib/types";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import React, { useState } from "react";
 import {
@@ -24,10 +24,12 @@ function ClickableBirdName({
   bird,
   birdName,
 }: {
-  bird: EventInventoryItem["eventInventoryItems"][0];
+  bird: EventInventoryItemDetail;
   birdName: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  if (!bird.bird) return <div className="font-medium">{birdName}</div>;
   
   // Map new structure to old BirdEventInventory structure for BirdUpdateForm
   const mappedBird = {
@@ -39,19 +41,19 @@ function ClickableBirdName({
     band_4: bird.bird.band4,
     rfId: bird.bird.rfId,
     note: bird.bird.note,
-    arrivalDate: bird.arrivalDate ? new Date(bird.arrivalDate) : null,
+    arrivalDate: bird.arrivalTime ? new Date(bird.arrivalTime) : null,
     departureDate: bird.departureDate ? new Date(bird.departureDate) : null,
-    updatedAt: new Date(bird.updatedAt),
+    updatedAt: new Date(),
     bird: {
       ...bird.bird,
-      imageUrl: bird.bird.pictureId,
+      imageUrl: bird.bird.idPicture,
       is_active: bird.bird.isActive,
       is_lost: bird.bird.isLost,
       lost_date: bird.bird.lostDate,
-      lost_race_id: bird.bird.lostRaceId,
+      lost_race_id: bird.bird.lostIdRace,
       breeder: {
-        id: bird.bird.breeder.id,
-        name: `${bird.bird.breeder.firstName} ${bird.bird.breeder.lastName}`,
+        id: bird.bird.breeder?.idBreeder || 0,
+        name: `${bird.bird.breeder?.firstName || ""} ${bird.bird.breeder?.lastName || ""}`,
       },
     },
   };
@@ -72,13 +74,22 @@ function ClickableBirdName({
 }
 
 // Column definitions for payments table
-const paymentsColumns: ColumnDef<EventInventoryItem["payments"][0]>[] = [
+const paymentsColumns: ColumnDef<EventInventoryPayment>[] = [
   {
-    accessorKey: "type",
+    accessorKey: "paymentType",
     header: "Type",
     cell: ({ row }) => {
-      const type = row.getValue("type") as string;
-      return <div className="font-medium">{type.replace(/_/g, " ")}</div>;
+      const type = row.getValue("paymentType") as number;
+      const typeMap: Record<number, string> = {
+        0: "Perch Fee",
+        1: "Entry Fee",
+        2: "Classes",
+        3: "Hotspot Fee 2",
+        4: "Hotspot Fee 3",
+        5: "Hotspot Fee 4",
+        6: "Final Race Fee",
+      };
+      return <div className="font-medium">{typeMap[type] || "Other"}</div>;
     },
   },
   {
@@ -93,32 +104,37 @@ const paymentsColumns: ColumnDef<EventInventoryItem["payments"][0]>[] = [
     accessorKey: "paymentValue",
     header: "Value",
     cell: ({ row }) => {
-      const value = row.getValue("paymentValue") as number;
-      return <div>${value.toFixed(2)}</div>;
+      const value = row.getValue("paymentValue") as number | null;
+      return <div>${value ? value.toFixed(2) : "0.00"}</div>;
     },
   },
   {
     accessorKey: "paymentMethod",
     header: "Method",
     cell: ({ row }) => {
-      const method = row.getValue("paymentMethod") as string;
-      return <div>{method}</div>;
+      const method = row.getValue("paymentMethod") as number | null;
+      const methodMap: Record<number, string> = {
+        0: "Bank Transfer",
+        1: "Credit Card",
+        2: "Cash",
+        3: "Check",
+      };
+      return <div>{method !== null ? methodMap[method] || "Other" : "-"}</div>;
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "paymentValue",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      const isCompleted =
-        status.toLowerCase() === "completed" || status.toLowerCase() === "paid";
+      const value = row.getValue("paymentValue") as number | null;
+      const isPaid = value !== null && value > 0;
       return (
         <div
           className={`font-medium ${
-            isCompleted ? "text-green-600" : "text-red-600"
+            isPaid ? "text-green-600" : "text-red-600"
           }`}
         >
-          {status}
+          {isPaid ? "Paid" : "Pending"}
         </div>
       );
     },
@@ -126,13 +142,13 @@ const paymentsColumns: ColumnDef<EventInventoryItem["payments"][0]>[] = [
 ];
 
 // Column definitions for birds table
-const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
+const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
   [
     {
       accessorKey: "bird.birdName",
       header: "Bird Name",
       cell: ({ row }) => {
-        const birdName = row.original.bird.birdName;
+        const birdName = row.original.bird?.birdName || "N/A";
         return <ClickableBirdName bird={row.original} birdName={birdName} />;
       },
     },
@@ -140,7 +156,7 @@ const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
       accessorKey: "bird.band",
       header: "Band",
       cell: ({ row }) => {
-        const band = row.original.bird.band;
+        const band = row.original.bird?.band;
         return <div>{band || "N/A"}</div>;
       },
     },
@@ -148,23 +164,27 @@ const birdsColumns: ColumnDef<EventInventoryItem["eventInventoryItems"][0]>[] =
       accessorKey: "bird.color",
       header: "Color",
       cell: ({ row }) => {
-        const color = row.original.bird.color;
-        return <div>{color}</div>;
+        const color = row.original.bird?.color;
+        return <div>{color || "N/A"}</div>;
       },
     },
     {
       accessorKey: "bird.sex",
       header: "Sex",
       cell: ({ row }) => {
-        const sex = row.original.bird.sex;
-        return <div>{sex}</div>;
+        const sex = row.original.bird?.sex;
+        const sexMap: Record<number, string> = {
+          0: "Male",
+          1: "Female",
+        };
+        return <div>{sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A"}</div>;
       },
     },
     {
-      accessorKey: "arrivalDate",
+      accessorKey: "arrivalTime",
       header: "Arrival Date",
       cell: ({ row }) => {
-        const date = row.getValue("arrivalDate") as string;
+        const date = row.getValue("arrivalTime") as string;
         return <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>;
       },
     },
@@ -183,7 +203,7 @@ export default function EventInventoryDialog({
   onClose,
 }: EventInventoryDialogContentProps) {
   const { data, error, isError, isPending, isSuccess } =
-    getEventInventoryItem(id);
+    getEventInventoryItem(parseInt(id));
 
   const eventInventoryItem: EventInventoryItem = data?.data;
 
@@ -206,7 +226,7 @@ export default function EventInventoryDialog({
     );
   }
 
-  // Calculate fees and totals
+  // Calculate fees and totals from eventInventoryItems
   const calculateFees = () => {
     const fees = {
       perchFee: 0,
@@ -216,44 +236,26 @@ export default function EventInventoryDialog({
       total: 0,
     };
 
-    eventInventoryItem.payments.forEach((payment) => {
-      switch (payment.type) {
-        case "PERCH_FEE":
-          fees.perchFee += payment.paymentValue;
-          break;
-        case "ENTRY_FEE":
-          fees.entryFee += payment.paymentValue;
-          break;
-        case "HOTSPOT_FEE_1":
-        case "HOTSPOT_FEE_2":
-        case "HOTSPOT_FEE_3":
-        case "HOTSPOT_FEE_4":
-          fees.hotSpotFee += payment.paymentValue;
-          break;
-        default:
-          fees.classes += payment.paymentValue;
-      }
-      fees.total += payment.paymentValue;
+    eventInventoryItem.eventInventoryItems?.forEach((item) => {
+      if (item.perchFeeValue) fees.perchFee += item.perchFeeValue;
+      if (item.entryFeeValue) fees.entryFee += item.entryFeeValue;
+      if (item.hotSpotFeeValue) fees.hotSpotFee += item.hotSpotFeeValue;
     });
+
+    fees.total = fees.perchFee + fees.entryFee + fees.hotSpotFee + fees.classes;
 
     return fees;
   };
 
   const fees = calculateFees();
 
-  // Only count completed payments for balance calculation
-  const completedPayments = eventInventoryItem.payments.filter(
-    (payment) =>
-      payment.status.toLowerCase() === "completed" ||
-      payment.status.toLowerCase() === "paid"
-  );
-
-  const totalCompletedPayments = completedPayments.reduce(
-    (sum, payment) => sum + payment.paymentValue,
+  // Calculate total payments
+  const totalPayments = eventInventoryItem.payments?.reduce(
+    (sum, payment) => sum + (payment.paymentValue || 0),
     0
-  );
+  ) || 0;
 
-  const balance = totalCompletedPayments - fees.total;
+  const balance = totalPayments - fees.total;
 
   return (
     <div className="space-y-6">
@@ -261,14 +263,14 @@ export default function EventInventoryDialog({
       <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
         <div>
           <div className="font-semibold">Event</div>
-          <div>{eventInventoryItem.event.name}</div>
+          <div>{eventInventoryItem.event?.eventName || "N/A"}</div>
           <div className="text-sm text-gray-600">
-            {new Date(eventInventoryItem.event.date).toLocaleDateString()}
+            {eventInventoryItem.event?.eventDate ? new Date(eventInventoryItem.event.eventDate).toLocaleDateString() : "N/A"}
           </div>
         </div>
         <div>
           <div className="font-semibold">Breeder</div>
-          <div>{`${eventInventoryItem.breeder.firstName} ${eventInventoryItem.breeder.lastName}`}</div>
+          <div>{`${eventInventoryItem.breeder?.firstName || ""} ${eventInventoryItem.breeder?.lastName || ""}`}</div>
         </div>
         <div className="text-right">
           <div className="text-lg font-semibold">OPEN</div>
@@ -284,21 +286,15 @@ export default function EventInventoryDialog({
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <span className="font-medium">Name:</span>{" "}
-                {`${eventInventoryItem.breeder.firstName} ${eventInventoryItem.breeder.lastName}`}
-              </div>
-              <div>
-                <span className="font-medium">Sign-up date:</span>{" "}
-                {new Date(
-                  eventInventoryItem.createdAt
-                ).toLocaleDateString()}
+                {`${eventInventoryItem.breeder?.firstName || ""} ${eventInventoryItem.breeder?.lastName || ""}`}
               </div>
               <div>
                 <span className="font-medium">Reserved bird count:</span>{" "}
-                {eventInventoryItem.reservedBirds}
+                {eventInventoryItem.reservedBirds || 0}
               </div>
               <div>
                 <span className="font-medium">Loft:</span>{" "}
-                {eventInventoryItem.loft}
+                {eventInventoryItem.loft || "N/A"}
               </div>
             </div>
           </div>
@@ -308,7 +304,7 @@ export default function EventInventoryDialog({
             <div className="font-semibold">Payments</div>
             <DataTable
               columns={paymentsColumns}
-              data={eventInventoryItem.payments}
+              data={eventInventoryItem.payments || []}
             />
           </div>
         </div>
@@ -340,7 +336,7 @@ export default function EventInventoryDialog({
               </div>
               <div className="flex justify-between">
                 <span>Payments:</span>
-                <span>${totalCompletedPayments.toFixed(2)}</span>
+                <span>${totalPayments.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Transfer due:</span>
@@ -370,7 +366,7 @@ export default function EventInventoryDialog({
         <div className="font-semibold">Birds</div>
         <DataTable
           columns={birdsColumns}
-          data={eventInventoryItem.eventInventoryItems}
+          data={eventInventoryItem.eventInventoryItems || []}
         />
       </div>
     </div>

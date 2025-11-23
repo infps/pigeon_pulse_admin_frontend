@@ -100,8 +100,8 @@ export function BreederSearch() {
               </SelectItem>
             ) : (
               events.map((event) => (
-                <SelectItem key={event.id} value={event.id}>
-                  {event.name}
+                <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                  {event.eventName}
                 </SelectItem>
               ))
             )}
@@ -120,9 +120,9 @@ export function BreederSearch() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="ACTIVE">Active</SelectItem>
-            <SelectItem value="INACTIVE">Inactive</SelectItem>
-            <SelectItem value="PROSPECT">Prospect</SelectItem>
+            <SelectItem value="0">Active</SelectItem>
+            <SelectItem value="1">Inactive</SelectItem>
+            <SelectItem value="2">Prospect</SelectItem>
           </SelectContent>
         </Select>
       </div>

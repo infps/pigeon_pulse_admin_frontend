@@ -17,11 +17,11 @@ export function useListEvents({
   });
 }
 
-export function useGetEvent(id: string) {
+export function useGetEvent(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.events.getEvent(id),
     method: "GET",
-    queryKey: ["event", id],
+    queryKey: ["event", String(id)],
   });
 }
 
@@ -33,12 +33,12 @@ export function useCreateEvent() {
   });
 }
 
-export function useUpdateEvent(id: string) {
+export function useUpdateEvent(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.events.getEvent(id),
     method: "PUT",
     invalidateKeys: [
-      { queryKey: ["event", id] },
+      { queryKey: ["event", String(id)] },
       { queryKey: ["events"], exact: false },
     ],
   });

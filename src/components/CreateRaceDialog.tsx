@@ -131,8 +131,8 @@ export function CreateRaceDialog({
                       </FormControl>
                       <SelectContent>
                         {events.map((event) => (
-                          <SelectItem key={event.id} value={event.id}>
-                            {event.name}
+                          <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                            {event.eventName}
                           </SelectItem>
                         ))}
                       </SelectContent>

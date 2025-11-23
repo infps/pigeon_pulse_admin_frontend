@@ -13,11 +13,11 @@ export function useGetPrizes({ params }: { params: Record<string, string> }) {
   });
 }
 
-export function useGetPrize(id: string) {
+export function useGetPrize(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getPrize(id),
     method: "GET",
-    queryKey: ["prize", id],
+    queryKey: ["prize", String(id)],
   });
 }
 
@@ -33,11 +33,11 @@ export function useGetFees({ params }: { params: Record<string, string> }) {
   });
 }
 
-export function useGetFee(id: string) {
+export function useGetFee(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getFee(id),
     method: "GET",
-    queryKey: ["fee", id],
+    queryKey: ["fee", String(id)],
   });
 }
 
@@ -49,18 +49,18 @@ export function useCreatePrize() {
   });
 }
 
-export function useUpdatePrize(id: string) {
+export function useUpdatePrize(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getPrize(id),
     method: "PUT",
-    invalidateKeys: [{ queryKey: ["prize", id] }],
+    invalidateKeys: [{ queryKey: ["prize", String(id)] }],
   });
 }
-export function useDeletePrize(id: string) {
+export function useDeletePrize(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getPrize(id),
     method: "DELETE",
-    invalidateKeys: [{ queryKey: ["prize", id] }],
+    invalidateKeys: [{ queryKey: ["prize", String(id)] }],
   });
 }
 
@@ -71,18 +71,18 @@ export function useCreateFee() {
     invalidateKeys: [{ queryKey: ["fees"] }],
   });
 }
-export function useUpdateFee(id: string) {
+export function useUpdateFee(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getFee(id),
     method: "PUT",
-    invalidateKeys: [{ queryKey: ["fee", id] }],
+    invalidateKeys: [{ queryKey: ["fee", String(id)] }],
   });
 }
-export function useDeleteFee(id: string) {
+export function useDeleteFee(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getFee(id),
     method: "DELETE",
-    invalidateKeys: [{ queryKey: ["fee", id] }],
+    invalidateKeys: [{ queryKey: ["fee", String(id)] }],
   });
 }
 
@@ -98,11 +98,11 @@ export function useGetBettings({ params }: { params: Record<string, string> }) {
   });
 }
 
-export function useGetBetting(id: string) {
+export function useGetBetting(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getBetting(id),
     method: "GET",
-    queryKey: ["betting", id],
+    queryKey: ["betting", String(id)],
   });
 }
 
@@ -114,18 +114,18 @@ export function useCreateBetting() {
   });
 }
 
-export function useUpdateBetting(id: string) {
+export function useUpdateBetting(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getBetting(id),
     method: "PUT",
-    invalidateKeys: [{ queryKey: ["betting", id] }],
+    invalidateKeys: [{ queryKey: ["betting", String(id)] }],
   });
 }
 
-export function useDeleteBetting(id: string) {
+export function useDeleteBetting(id: number) {
   return useApiRequest({
     endpoint: apiEndpoints.schema.getBetting(id),
     method: "DELETE",
-    invalidateKeys: [{ queryKey: ["betting", id] }],
+    invalidateKeys: [{ queryKey: ["betting", String(id)] }],
   });
 }

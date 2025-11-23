@@ -14,7 +14,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { useListBirds } from "@/lib/api/birds";
 import { useListEvents } from "@/lib/api/events";
-import { BirdEventInventory, Event } from "@/lib/types";
+import { BirdEventInventory, Event, EventInventory, EventInventoryItemDetail } from "@/lib/types";
 import { useQueryState } from "nuqs";
 import React from "react";
 
@@ -131,11 +131,11 @@ function EventSelect({ events }: { events: Event[] }) {
           </SelectItem>
           {events.map((event) => (
             <SelectItem
-              key={event.id}
-              value={event.id}
-              onClick={() => setEventId(event.id)}
+              key={event.idEvent}
+              value={String(event.idEvent)}
+              onClick={() => setEventId(String(event.idEvent))}
             >
-              {event.name} ({event.shortName})
+              {event.eventName} ({event.eventShortName})
             </SelectItem>
           ))}
         </SelectContent>
@@ -151,7 +151,7 @@ function BirdsTable() {
   });
   const debouncedSearchTerm = useDebounce(q, 300);
   const { data, error, isError, isPending } = useListBirds({
-    id: eventId,
+    id: parseInt(eventId),
     params: {
       ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
     },
@@ -173,7 +173,13 @@ function BirdsTable() {
   }
   
   console.log("data", data);
-  const birdsInventory: BirdEventInventory[] = data?.data || [];
+  const eventInventories: EventInventory[] = data?.data || [];
+  console.log(eventInventories);
+  
+  // Flatten eventInventoryItems from all eventInventories
+  const birdsInventory: EventInventoryItemDetail[] = eventInventories.flatMap(
+    (inventory) => inventory.eventInventoryItems || []
+  );
 
   return (
     <DataTable columns={BirdEventInventoryColumns} data={birdsInventory} />

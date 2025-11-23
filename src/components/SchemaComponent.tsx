@@ -16,14 +16,14 @@ export default function SchemaComponent({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <div className="p-4 border rounded mb-4 hover:bg-primary/10 cursor-pointer">
-          <h2 className="text-xl font-semibold">{schema.name}</h2>
+          <h2 className="text-xl font-semibold">{type === "fee" ? schema.feeSchemeName : type === "prize" ? schema.prizeName : schema.bettingSchemeName}</h2>
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         <SchemaForm 
           type={type} 
           action="update" 
-          id={schema.id} 
+          id={type === "fee" ? schema.idFeeScheme : type === "prize" ? schema.idPrizeScheme : schema.idBettingScheme}
           onClose={() => setIsDialogOpen(false)}
         />
       </DialogContent>

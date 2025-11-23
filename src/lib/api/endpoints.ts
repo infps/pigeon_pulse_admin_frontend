@@ -7,57 +7,57 @@ const authEndpoints = {
 
 const schemaEndpoints = {
   getPrizes: "/schema/prizes",
-  getPrize: (id: string) => `/schema/prizes/${id}`,
+  getPrize: (id: number) => `/schema/prizes/${id}`,
   getFees: "/schema/fees",
-  getFee: (id: string) => `/schema/fees/${id}`,
+  getFee: (id: number) => `/schema/fees/${id}`,
   getBettings: "/schema/bettings",
-  getBetting: (id: string) => `/schema/bettings/${id}`,
+  getBetting: (id: number) => `/schema/bettings/${id}`,
 };
 
 const eventEndpoints = {
   listEvents: "/events/my",
-  getEvent: (id: string) => `/events/${id}`,
+  getEvent: (id: number) => `/events/${id}`,
   createEvent: "/events",
 };
 
 const userEndpoints = {
   getProfile: "/users/profile",
   updateProfile: "/users/profile",
-  getBreeders: (id: string) => `/users/breeders/event/${id}`,
+  getBreeders: (id: number) => `/users/breeders/event/${id}`,
   getBreedersAddressBook: `/users/breeders`,
 };
 
 const eventInventoryEndpoints = {
-  list: (eventId: string) => `/event-inventory/event/${eventId}`,
-  getDetails: (eventInventoryId: string) =>
+  list: (eventId: number) => `/event-inventory/event/${eventId}`,
+  getDetails: (eventInventoryId: number) =>
     `/event-inventory/${eventInventoryId}`,
-  updateItem: (id: string) => `/event-inventory/item/${id}`,
+  updateItem: (id: number) => `/event-inventory/item/${id}`,
 };
 
 const birdsEndpoints = {
-  listByEvent: (eventId: string) => `/birds/event/${eventId}`,
+  listByEvent: (eventId: number) => `/birds/event/${eventId}`,
 };
 
 const raceEndpoints = {
   create: "/races",
-  listRaces: (eventId: string) => `/races/event/${eventId}`,
-  listRace: (raceId: string) => `/races/${raceId}`,
-  updateRace: (raceId: string) => `/races/${raceId}`,
-  listRaceItems: (raceId: string) => `/races/${raceId}/items`,
-  updateRaceItem: (raceId: string, raceItemId: string) =>
+  listRaces: (eventId: number) => `/races/event/${eventId}`,
+  listRace: (raceId: number) => `/races/${raceId}`,
+  updateRace: (raceId: number) => `/races/${raceId}`,
+  listRaceItems: (raceId: number) => `/races/${raceId}/items`,
+  updateRaceItem: (raceId: number, raceItemId: number) =>
     `/races/${raceId}/items/${raceItemId}`,
-  listBaskets: (raceId: string) => `/races/${raceId}/baskets`,
-  createBasket: (raceId: string) => `/races/${raceId}/baskets`,
-  updateBasket: (raceId: string, basketId: string) =>
+  listBaskets: (raceId: number) => `/races/${raceId}/baskets`,
+  createBasket: (raceId: number) => `/races/${raceId}/baskets`,
+  updateBasket: (raceId: number, basketId: number) =>
     `/races/${raceId}/baskets/${basketId}`,
-  deleteBasket: (raceId: string, basketId: string) =>
+  deleteBasket: (raceId: number, basketId: number) =>
     `/races/${raceId}/baskets/${basketId}`,
-  assignBasket: (raceId: string, basketId: string) =>
+  assignBasket: (raceId: number, basketId: number) =>
     `/races/${raceId}/baskets/${basketId}/assign`,
-  loftBasketing: (raceId: string) => `/races/${raceId}/item/loft-basket`,
-  raceBasketing: (raceId: string) => `/races/${raceId}/item/race-basket`,
-  publishResult: (raceId: string) => `/races/${raceId}/publish-result`,
-  listResults: (raceId: string) => `/races/${raceId}/results`,
+  loftBasketing: (raceId: number) => `/races/${raceId}/item/loft-basket`,
+  raceBasketing: (raceId: number) => `/races/${raceId}/item/race-basket`,
+  publishResult: (raceId: number) => `/races/${raceId}/publish-result`,
+  listResults: (raceId: number) => `/races/${raceId}/results`,
 };
 
 export const apiEndpoints = {

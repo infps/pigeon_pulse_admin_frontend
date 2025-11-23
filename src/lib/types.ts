@@ -1,18 +1,17 @@
 type User = {
-  id: string;
+  id: number;
   email: string;
   firstName: string | null;
   lastName: string | null;
 };
 
 type CurrentUser = {
-  id: string;
-  breederNumber: string | null;
-  email: string;
+  idBreeder: number;
+  number: number | null;
   firstName: string | null;
   lastName: string | null;
   country: string | null;
-  isDefaultAddress1: boolean;
+  isDefaultAddress1: number | null;
   address1: string | null;
   city1: string | null;
   state1: string | null;
@@ -24,114 +23,111 @@ type CurrentUser = {
   phone: string | null;
   cell: string | null;
   fax: string | null;
+  email: string | null;
   email2: string | null;
   webAddress: string | null;
   sms: string | null;
-  ssn: string | null;
+  socialSecurityNumber: string | null;
   taxNumber: string | null;
+  status: number | null;
   statusDate: string | null;
   note: string | null;
   loginName: string | null;
-  loginPassword: string | null;
-  defaultNameAgn: string | null;
-  defaultNameAs: string | null;
-  pictureId: string | null;
+  defNameAgn: string | null;
+  defNameAs: string | null;
+  idPicture: number | null;
 };
 
 type PrizeSchema = {
-  id: string;
-  name: string;
+  idPrizeScheme: number;
+  prizeName: string;
 };
 type FeeSchema = {
-  id: string;
-  name: string;
+  idFeeScheme: number;
+  feeSchemeName: string;
 };
 type BettingSchema = {
-  id: string;
-  name: string;
+  idBettingScheme: number;
+  bettingSchemeName: string;
 };
 
 type FullFeeSchema = {
-  id: string;
-  name: string;
-  createdById: string;
-  entryFee: number;
-  isRefundable: boolean;
-  minEntryFees: number;
-  maxBirdCount: number;
-  maxBackupBirdCount: number;
-  isFloatingBackup: boolean;
-  feesCutPercent: number;
-  hotSpot1Fee: number;
-  hotSpot2Fee: number;
-  hotSpot3Fee: number;
-  hotSpotFinalFee: number;
-  perchFees: {
-    birdNo: number;
-    perchFee: number;
+  idFeeScheme: number;
+  feeSchemeName: string | null;
+  entryFee: number | null;
+  isRefundable: number | null;
+  minEntryFees: number | null;
+  maxBirdCount: number | null;
+  maxBackupBirdCount: number | null;
+  isFloatingBackup: number | null;
+  feesCutPercent: number | null;
+  hotSpot1Fee: number | null;
+  hotSpot2Fee: number | null;
+  hotSpot3Fee: number | null;
+  hotSpotFinalFee: number | null;
+  creatorId: number | null;
+  perchFeeItems: {
+    birdNo: number | null;
+    perchFee: number | null;
   }[];
 };
 
 type FullPrizeSchema = {
-  id: string;
-  name: string;
-  distributions: {
-    fromPosition: number;
-    toPosition: number;
-    prizeValue: number;
+  idPrizeScheme: number;
+  prizeName: string | null;
+  creatorId: number | null;
+  prizeSchemeItems: {
+    fromPosition: number | null;
+    toPosition: number | null;
+    prizeValue: number | null;
   }[];
 };
 
 type Event = {
-  name: string;
-  date: Date;
-  id: string;
-  type: "AGN" | "AS";
-  bettingSchemeId: string | null;
-  feeSchema: {
-    entryFee: number;
-    hotSpot1Fee: number;
-    hotSpot2Fee: number;
-    hotSpot3Fee: number;
-    hotSpotFinalFee: number;
-  };
-  _count: {
-    eventInventoryItems: number;
-  };
-  shortName: string;
-  isOpen: boolean;
-  feeSchemaId: string;
-  finalRacePrizeSchemaId: string | null;
-  hotspot1PrizeSchemaId: string | null;
-  hotspot2PrizeSchemaId: string | null;
-  hotspot3PrizeSchemaId: string | null;
-  avgWinnerPrizeSchemaId: string | null;
-  finalRacePrizeSchema: {
-    distributions: {
-      fromPosition: number;
-      toPosition: number;
-      prizeValue: number;
+  idEvent: number;
+  eventName: string | null;
+  eventShortName: string | null;
+  eventDate: string | null;
+  eventType: number | null;
+  idBettingScheme: number | null;
+  idFeeScheme: number | null;
+  idFinalPrizeScheme: number | null;
+  idHotSpot1PrizeScheme: number | null;
+  idHotSpot2PrizeScheme: number | null;
+  idHotSpot3PrizeScheme: number | null;
+  idHotSpotAvgPrizeScheme: number | null;
+  isOpen: number | null;
+  creatorId: number | null;
+  feeScheme?: {
+    entryFee: number | null;
+    hotSpot1Fee: number | null;
+    hotSpot2Fee: number | null;
+    hotSpot3Fee: number | null;
+    hotSpotFinalFee: number | null;
+    perchFeeItems?: {
+      birdNo: number | null;
+      perchFee: number | null;
     }[];
   } | null;
-  trainingFrom: number;
-  trainingTo: number;
-  inventoryFrom: number;
-  inventoryTo: number;
-  finalFrom: number;
-  finalTo: number;
-  hotspotFrom: number;
-  hotspotTo: number;
+  finalPrizeScheme?: {
+    prizeSchemeItems: {
+      fromPosition: number | null;
+      toPosition: number | null;
+      prizeValue: number | null;
+    }[];
+  } | null;
+  _count?: {
+    eventInventories: number;
+  };
 };
 
 type Breeder = {
-  id: string;
-  breederNumber: string | null;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
+  idBreeder: number;
+  number: number | null;
+  firstName: string | null;
+  lastName: string | null;
   country: string | null;
-  isDefaultAddress1: boolean;
+  isDefaultAddress1: number | null;
   address1: string | null;
   city1: string | null;
   state1: string | null;
@@ -143,66 +139,50 @@ type Breeder = {
   phone: string | null;
   cell: string | null;
   fax: string | null;
+  email: string | null;
   email2: string | null;
   webAddress: string | null;
-  sms: string | null;
-  ssn: string | null;
-  taxNumber: string | null;
-  status: "ACTIVE" | "INACTIVE" | "PROSPECT";
+  socialSecurityNumber: string | null;
+  status: number | null;
   statusDate: string | null;
   note: string | null;
   loginName: string | null;
   loginPassword: string | null;
-  defaultNameAgn: string | null;
-  defaultNameAs: string | null;
-  pictureId: string | null;
-  createdAt: string;
-  updatedAt: string;
+  idPicture: number | null;
+  sms: string | null;
+  taxNumber: string | null;
+  defNameAgn: string | null;
+  defNameAs: string | null;
 };
 
 type EventInventoryPayment = {
-  id: string;
-  type:
-    | "PERCH_FEE"
-    | "ENTRY_FEE"
-    | "HOTSPOT_FEE_1"
-    | "HOTSPOT_FEE_2"
-    | "HOTSPOT_FEE_3"
-    | "HOTSPOT_FEE_4"
-    | "FINAL_RACE_FEE"
-    | "OTHER";
+  idPayment: number;
+  idEventInventory: number | null;
+  paymentType: number | null;
   paymentDate: string | null;
-  paymentValue: number;
-  paymentMethod: string;
+  paymentValue: number | null;
+  paymentMethod: number | null;
   paymentDesc: string | null;
   paymentTimestamp: string | null;
-  transactionId: string | null;
-  pictureId: string | null;
-  eventInventoryId: string;
-  breederId: string;
-  status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
-  createdAt: string;
-  updatedAt: string;
+  idPicture: number | null;
 };
 
 type EventInventoryItemDetail = {
-  id: string;
-  eventId: string;
-  eventInventoryId: string;
-  birdId: string;
+  idEventInventoryItem: number;
+  idEventInventory: number | null;
+  idBird: number | null;
   birdNo: number | null;
-  arrivalDate: string | null;
+  arrivalTime: string | null;
   departureDate: string | null;
-  perchFeeValue: number;
-  entryFeeValue: number;
-  entryFeePaid: boolean;
+  perchFeeValue: number | null;
+  entryFeeValue: number | null;
+  entryFeePaid: number | null;
   entryRefund: number | null;
   betsRefund: number | null;
-  hotSpotFeeValue: number;
+  hotSpotFeeValue: number | null;
   hotSpotRefund: number | null;
-  transferDue: number | null;
-  replacedItemId: string | null;
-  isBackup: boolean;
+  idReplacedItem: number | null;
+  isBackup: number | null;
   belgianShowBet1: number | null;
   belgianShowBet2: number | null;
   belgianShowBet3: number | null;
@@ -221,125 +201,102 @@ type EventInventoryItemDetail = {
   wtaBet3: number | null;
   wtaBet4: number | null;
   wtaBet5: number | null;
-  isBetActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  bird: {
-    id: string;
+  isBetActive: number | null;
+  transferDue: number | null;
+  bird?: {
+    idBird: number;
     band: string | null;
     band1: string | null;
     band2: string | null;
     band3: string | null;
     band4: string | null;
-    birdName: string;
+    birdName: string | null;
     rfId: string | null;
-    color: string;
-    sex: "HEN" | "COCK";
-    isActive: boolean;
-    isRaceVerified: boolean;
-    isLost: boolean;
+    color: string | null;
+    sex: number | null;
+    isActive: number | null;
+    isRaceVerified: number | null;
+    isLost: number | null;
     lostDate: string | null;
-    lostRaceId: string | null;
+    lostIdRace: number | null;
     note: string | null;
-    playAttentionSound: boolean;
-    pictureId: string | null;
-    breederId: string;
-    createdAt: string;
-    updatedAt: string;
-    breeder: {
-      id: string;
-      firstName: string;
-      lastName: string;
+    playAttentionSound: number | null;
+    idPicture: number | null;
+    breederId: number | null;
+    breeder?: {
+      idBreeder: number;
+      firstName: string | null;
+      lastName: string | null;
     };
   };
 };
 
 type EventInventory = {
-  id: string;
-  eventId: string;
-  breederId: string;
+  idEventInventory: number;
+  idEvent: number | null;
+  idBreeder: number | null;
   signInDate: string | null;
   waitingDate: string | null;
-  isWaiting: boolean;
-  reservedBirds: number;
-  loft: string;
+  isWaiting: number | null;
+  reservedBirds: number | null;
+  loft: string | null;
   note: string | null;
-  createdAt: string;
-  updatedAt: string;
-  breeder: Breeder;
-  eventInventoryItems: EventInventoryItemDetail[];
-  payments: EventInventoryPayment[];
+  breeder?: Breeder;
+  eventInventoryItems?: EventInventoryItemDetail[];
+  payments?: EventInventoryPayment[];
 };
 
 type EventInventoryItem = {
-  breeder: {
-    firstName: string;
-    lastName: string;
+  breeder?: {
+    firstName: string | null;
+    lastName: string | null;
   };
-  event: {
-    name: string;
-    date: string;
+  event?: {
+    eventName: string | null;
+    eventDate: string | null;
   };
-  eventInventoryItems: (EventInventoryItemDetail & {
-    bird: {
-      id: string;
-      band: string | null;
-      band1: string | null;
-      band2: string | null;
-      band3: string | null;
-      band4: string | null;
-      birdName: string;
-      rfId: string | null;
-      color: string;
-      sex: "HEN" | "COCK";
-      isActive: boolean;
-      isRaceVerified: boolean;
-      isLost: boolean;
-      lostDate: string | null;
-      lostRaceId: string | null;
-      note: string | null;
-      playAttentionSound: boolean;
-      pictureId: string | null;
-      breederId: string;
-      createdAt: string;
-      updatedAt: string;
-      breeder: {
-        id: string;
-        firstName: string;
-        lastName: string;
-      };
-    };
-  })[];
-  loft: string;
-  payments: EventInventoryPayment[];
-  createdAt: string;
-  reservedBirds: number;
+  eventInventoryItems?: EventInventoryItemDetail[];
+  loft: string | null;
+  payments?: EventInventoryPayment[];
+  reservedBirds: number | null;
 };
 
 type Breeders = {
-  id: string;
-  email: string;
-  name: string | null;
+  idBreeder: number;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
 };
 
 type BirdEventInventory = {
-  id: string;
-  eventId: string;
-  eventInventoryId: string;
-  birdId: string;
+  idEventInventory:number;
+  idEvent:number | null;
+  idBreeder:number | null;
+  signInDate:string | null;
+  waitingDate:string | null;
+  isWaiting:number | null;
+  reservedBirds:number | null;
+  loft:string | null;
+  note:string | null;
+  eventInventoryItems?: EventInventoryItems[];
+};
+
+type EventInventoryItems = {
+  idEventInventoryItem: number;
+  idEventInventory: number | null;
+  idBird: number | null;
   birdNo: number | null;
-  arrivalDate: string | null;
+  arrivalTime: string | null;
   departureDate: string | null;
-  perchFeeValue: number;
-  entryFeeValue: number;
-  entryFeePaid: boolean;
+  perchFeeValue: number | null;
+  entryFeeValue: number | null;
+  entryFeePaid: number | null;
   entryRefund: number | null;
   betsRefund: number | null;
-  hotSpotFeeValue: number;
+  hotSpotFeeValue: number | null;
   hotSpotRefund: number | null;
-  transferDue: number | null;
-  replacedItemId: string | null;
-  isBackup: boolean;
+  idReplacedItem: number | null;
+  isBackup: number | null;
   belgianShowBet1: number | null;
   belgianShowBet2: number | null;
   belgianShowBet3: number | null;
@@ -358,69 +315,55 @@ type BirdEventInventory = {
   wtaBet3: number | null;
   wtaBet4: number | null;
   wtaBet5: number | null;
-  isBetActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  bird: {
-    id: string;
+  isBetActive: number | null;
+  transferDue: number | null;
+  bird?: {
+    idBird: number;
     band: string | null;
     band1: string | null;
     band2: string | null;
     band3: string | null;
     band4: string | null;
-    birdName: string;
+    birdName: string | null;
     rfId: string | null;
-    color: string;
-    sex: "HEN" | "COCK";
-    isActive: boolean;
-    isRaceVerified: boolean;
-    isLost: boolean;
+    color: string | null;
+    sex: number | null;
+    isActive: number | null;
+    isRaceVerified: number | null;
+    isLost: number | null;
     lostDate: string | null;
-    lostRaceId: string | null;
+    lostIdRace: number | null;
     note: string | null;
-    playAttentionSound: boolean;
-    pictureId: string | null;
-    breederId: string;
-    createdAt: string;
-    updatedAt: string;
-    breeder: {
-      id: string;
-      firstName: string;
-      lastName: string;
+    playAttentionSound: number | null;
+    idPicture: number | null;
+    breederId: number | null;
+    breeder?: {
+      idBreeder: number;
+      firstName: string | null;
+      lastName: string | null;
     };
   };
 };
 
 type Race = {
-  arrivalTemperature: string | null;
-  arrivalWeather: string | null;
-  arrivalWind: string | null;
-  createdAt: string;
+  idRace: number;
+  idRaceType: number | null;
+  raceNumber: number | null;
+  idEvent: number | null;
+  location: string | null;
   description: string | null;
-  distance: number;
+  distance: number | null;
+  startTime: string | null;
   endTime: string | null;
-  eventId: string;
-  id: string;
-  isClosed: boolean;
-  location: string;
-  raceNumber: number;
-  startTime: string;
   sunrise: string | null;
   sunset: string | null;
-  temperature: string | null;
-  type:
-    | "TRAINING"
-    | "INVENTORY"
-    | "LOFT_FLY"
-    | "PULLING_FLIGHT"
-    | "FINAL_RACE"
-    | "HOTSPOT_1"
-    | "HOTSPOT_2"
-    | "HOTSPOT_3"
-    | "AVG_WINNER";
-  updatedAt: string;
+  isClosed: number | null;
   weather: string | null;
   wind: string | null;
+  temperature: string | null;
+  arrivalWeather: string | null;
+  arrivalWind: string | null;
+  arrivalTemperature: string | null;
   stats?: {
     totalBirds: number;
     basketed: number;
@@ -431,105 +374,102 @@ type Race = {
 };
 
 type RaceItem = {
-  id: string;
-  loftBasketed: boolean;
-  raceBasketed: boolean;
-  raceBasketTime: Date | null;
-  isLost: boolean;
-  eventInventoryItem: {
-    bird: {
-      isLost: boolean;
+  idRaceItem: number;
+  idRace: number | null;
+  idInventoryItem: number | null;
+  idDistBasket: number | null;
+  idRaceBasket: number | null;
+  isDistBasketted: number | null;
+  isLost: number | null;
+  lostIdRace: number | null;
+  raceBasketTime: string | null;
+  inventoryItem?: {
+    bird?: {
+      isLost: number | null;
       band: string | null;
-      birdName: string;
+      birdName: string | null;
       rfId: string | null;
-      color: string;
-      breeder: {
+      color: string | null;
+      breeder?: {
         firstName: string | null;
         lastName: string | null;
       };
     };
   };
-  loftBasket: {
-    id: string;
-    basketNumber: number;
+  distBasket?: {
+    idBasket: number;
+    basketNo: number | null;
   } | null;
-  raceBasket: {
-    id: string;
-    basketNumber: number;
+  raceBasket?: {
+    idBasket: number;
+    basketNo: number | null;
   } | null;
 };
 type RaceResult = {
-  eventInventoryItem: {
-    rfId: string | null;
-    band: string | null;
-    bird: {
-      birdName: string;
-      color: string;
-      breeder: {
-        name: string | null;
+  inventoryItem?: {
+    bird?: {
+      rfId: string | null;
+      band: string | null;
+      birdName: string | null;
+      color: string | null;
+      breeder?: {
+        firstName: string | null;
+        lastName: string | null;
       };
     };
   };
-  raceItemResult: {
-    distance: number;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    raceItemId: string;
-    arrivalTime: Date;
-    speed: number;
-    distanceUnit: string;
-    speedUnit: string;
+  raceItemResult?: {
+    idRaceItem: number;
+    birdPosition: number | null;
+    birdPositionHotSpot: number | null;
+    arrivalTime: string | null;
+    birdDrop: number | null;
+    prizeValue: number | null;
   } | null;
 };
 
 type BreederAddressBook = {
-  address1: string | null;
-  address2: string | null;
-  breederNumber: number;
-  cell: string | null;
-  city1: string | null;
-  city2: string | null;
+  idBreeder: number;
+  number: number | null;
+  firstName: string | null;
+  lastName: string | null;
   country: string | null;
-  createdAt: string;
-  defaultNameAgn: string | null;
-  defaultNameAs: string | null;
+  isDefaultAddress1: number | null;
+  address1: string | null;
+  city1: string | null;
+  state1: string | null;
+  zip1: string | null;
+  address2: string | null;
+  city2: string | null;
+  state2: string | null;
+  zip2: string | null;
+  phone: string | null;
+  cell: string | null;
+  fax: string | null;
   email: string | null;
   email2: string | null;
-  fax: string | null;
-  firstName: string | null;
-  id: string;
-  isDefaultAddress1: boolean;
-  lastName: string | null;
-  loginName: string | null;
-  loginPassword: string | null;
-  note: string | null;
-  phone: string | null;
-  pictureId: string | null;
-  sms: string | null;
-  ssn: string | null;
-  state1: string | null;
-  state2: string | null;
-  status: "ACTIVE" | "INACTIVE" | "PROSPECT";
-  statusDate: string | null;
-  taxNumber: string | null;
-  updatedAt: string;
   webAddress: string | null;
-  zip1: string | null;
-  zip2: string | null;
+  socialSecurityNumber: string | null;
+  status: number | null;
+  statusDate: string | null;
+  note: string | null;
+  loginName: string | null;
+  idPicture: number | null;
+  sms: string | null;
+  taxNumber: string | null;
+  defNameAgn: string | null;
+  defNameAs: string | null;
 };
 
 type Basket = {
-  id: string;
-  raceId: string;
-  basketNumber: number;
-  capacity: number;
-  isRaceBasket: boolean;
-  createdAt: string;
-  updatedAt: string;
+  idBasket: number;
+  idRace: number | null;
+  basketNo: number | null;
+  capacity: number | null;
+  isRaceBasket: number | null;
   _count?: {
     raceBasketItems: number;
-    loftBasketItems: number;
+    distBasketItems: number;
   };
 };
 

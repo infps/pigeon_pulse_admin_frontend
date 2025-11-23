@@ -5,7 +5,11 @@ import EventInventoryDialog from "@/components/EventInventoryDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SelectSkeleton, TableSkeleton, SearchSkeleton } from "@/components/loading-skeletons";
+import {
+  SelectSkeleton,
+  TableSkeleton,
+  SearchSkeleton,
+} from "@/components/loading-skeletons";
 import {
   Select,
   SelectContent,
@@ -19,7 +23,12 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { getEventInventory } from "@/lib/api/eventInventory";
 import { useListEvents } from "@/lib/api/events";
 import { useGetBreeders } from "@/lib/api/user";
-import { Breeders, Event, EventInventory, EventInventoryPayment } from "@/lib/types";
+import {
+  Breeders,
+  Event,
+  EventInventory,
+  EventInventoryPayment,
+} from "@/lib/types";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 
@@ -28,7 +37,7 @@ export default function EventInventoryPage() {
     defaultValue: "",
   });
   const { data, error, isError, isPending } = useListEvents();
-  
+
   if (isPending) {
     return (
       <div className="p-4">
@@ -43,21 +52,23 @@ export default function EventInventoryPage() {
       </div>
     );
   }
-  
+
   if (isError) {
     return (
       <div className="p-4">
         <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
         <div className="flex h-96 w-full items-center justify-center">
           <div className="text-center">
-            <p className="text-lg text-destructive mb-2">Failed to load events</p>
+            <p className="text-lg text-destructive mb-2">
+              Failed to load events
+            </p>
             <p className="text-sm text-muted-foreground">{error.message}</p>
           </div>
         </div>
       </div>
     );
   }
-  
+
   if (!data || data.length === 0) {
     return (
       <div className="p-4">
@@ -68,12 +79,12 @@ export default function EventInventoryPage() {
       </div>
     );
   }
-  
+
   const events: Event[] = data.data.events || [];
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Event Inventory</h2>
-      
+
       {/* Event Selection Dropdown - Always visible */}
       <div className="mb-4">
         <Label htmlFor="main-event-select">Select Event</Label>
@@ -92,11 +103,8 @@ export default function EventInventoryPage() {
           </SelectTrigger>
           <SelectContent>
             {events.map((event) => (
-              <SelectItem
-                key={event.id}
-                value={event.id}
-              >
-                {event.name} ({event.shortName})
+              <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                {event.eventName} ({event.eventShortName})
               </SelectItem>
             ))}
           </SelectContent>
@@ -132,20 +140,23 @@ function EventInventoryTable({ events }: { events: Event[] }) {
   const [showPartners, setShowPartners] = useState(false);
   const [showOnlyRefunds, setShowOnlyRefunds] = useState(false);
 
-  const { data, error, isError, isPending } = getEventInventory(eventId, {});
-  
+  const { data, error, isError, isPending } = getEventInventory(
+    parseInt(eventId),
+    {}
+  );
+
   const inventory: EventInventory[] = data?.data || [];
 
   // Get unique breeders from inventory
   const breeders = useMemo(() => {
-    const uniqueBreeders = inventory.map(inv => ({
-      id: inv.breederId,
-      name: `${inv.breeder.firstName} ${inv.breeder.lastName}`.trim()
+    const uniqueBreeders = inventory.map((inv) => ({
+      id: inv.idBreeder,
+      name: `${inv.breeder?.firstName} ${inv.breeder?.lastName}`.trim(),
     }));
-    
+
     // Remove duplicates
     const seen = new Set();
-    return uniqueBreeders.filter(breeder => {
+    return uniqueBreeders.filter((breeder) => {
       const duplicate = seen.has(breeder.id);
       seen.add(breeder.id);
       return !duplicate;
@@ -154,41 +165,20 @@ function EventInventoryTable({ events }: { events: Event[] }) {
 
   // Filter inventory based on selected filters
   const filteredInventory = useMemo(() => {
-    return inventory.filter(inv => {
+    return inventory.filter((inv) => {
       // Filter by breeder
-      if (selectedBreeder !== "all" && inv.breederId !== selectedBreeder) {
+      if (selectedBreeder !== "all" && inv.idBreeder?.toString() !== selectedBreeder) {
         return false;
       }
 
       // Filter by payment status
       if (paymentStatus !== "all") {
-        if (feeView === "FINAL_FEES") {
-          // For final fees, check if ANY of the hotspot or final race fees match the status
-          const finalPayments = inv.payments.filter(p => 
-            p.type === "HOTSPOT_FEE_1" || 
-            p.type === "HOTSPOT_FEE_2" || 
-            p.type === "HOTSPOT_FEE_3" || 
-            p.type === "HOTSPOT_FEE_4" ||
-            p.type === "FINAL_RACE_FEE"
-          );
-          
-          if (paymentStatus === "paid") {
-            // Show if all final payments are completed
-            const allPaid = finalPayments.every(p => p.status === "COMPLETED");
-            if (!allPaid) return false;
-          } else if (paymentStatus === "pending") {
-            // Show if any final payment is not completed
-            const anyPending = finalPayments.some(p => p.status !== "COMPLETED");
-            if (!anyPending) return false;
-          }
-        } else {
-          const payment = inv.payments.find(p => p.type === feeView);
-          if (paymentStatus === "paid" && payment?.status !== "COMPLETED") {
-            return false;
-          }
-          if (paymentStatus === "pending" && payment?.status === "COMPLETED") {
-            return false;
-          }
+        const hasPayments = inv.payments && inv.payments.length > 0;
+        if (paymentStatus === "paid" && !hasPayments) {
+          return false;
+        }
+        if (paymentStatus === "pending" && hasPayments) {
+          return false;
         }
       }
 
@@ -208,53 +198,55 @@ function EventInventoryTable({ events }: { events: Event[] }) {
       totalFinalFeesDue: 0,
     };
 
-    filteredInventory.forEach(inv => {
+    filteredInventory.forEach((inv) => {
       // Count birds registered
-      stats.totalBirdsRegistered += inv.reservedBirds;
+      stats.totalBirdsRegistered += inv.reservedBirds || 0;
 
-      // Perch Fees
-      const perchFee = inv.payments.find(p => p.type === "PERCH_FEE");
-      if (perchFee) {
-        stats.totalPerchFees += perchFee.paymentValue;
-        if (perchFee.status !== "COMPLETED") {
-          stats.totalPerchFeesDue += perchFee.paymentValue;
-        }
-      }
-
-      // Entry Fees
-      const entryFee = inv.payments.find(p => p.type === "ENTRY_FEE");
-      if (entryFee) {
-        stats.totalEntryFees += entryFee.paymentValue;
-        if (entryFee.status !== "COMPLETED") {
-          stats.totalEntryFeesDue += entryFee.paymentValue;
-        }
-      }
-
-      // Final Fees (Aggregate of Hotspot 1, 2, 3, 4 and Final Race)
-      const finalFeeTypes = ["HOTSPOT_FEE_1", "HOTSPOT_FEE_2", "HOTSPOT_FEE_3", "HOTSPOT_FEE_4", "FINAL_RACE_FEE"];
-      finalFeeTypes.forEach(feeType => {
-        const fee = inv.payments.find(p => p.type === feeType);
-        if (fee) {
-          stats.totalFinalFees += fee.paymentValue;
-          if (fee.status !== "COMPLETED") {
-            stats.totalFinalFeesDue += fee.paymentValue;
+      // Calculate fees from eventInventoryItems
+      if (inv.eventInventoryItems) {
+        inv.eventInventoryItems.forEach((item) => {
+          // Perch Fees
+          if (item.perchFeeValue) {
+            stats.totalPerchFees += item.perchFeeValue;
           }
-        }
-      });
+          
+          // Entry Fees
+          if (item.entryFeeValue) {
+            stats.totalEntryFees += item.entryFeeValue;
+            const entryPaid = item.entryFeePaid || 0;
+            stats.totalEntryFeesDue += item.entryFeeValue - entryPaid;
+          }
+          
+          // Hot Spot Fees
+          if (item.hotSpotFeeValue) {
+            stats.totalFinalFees += item.hotSpotFeeValue;
+          }
+        });
+      }
+      
+      // Calculate what's been paid vs due based on payments
+      const hasPaid = inv.payments && inv.payments.length > 0;
+      if (!hasPaid) {
+        // If no payments, all fees are due
+        stats.totalPerchFeesDue = stats.totalPerchFees;
+        stats.totalFinalFeesDue = stats.totalFinalFees;
+      }
     });
 
     return stats;
   }, [filteredInventory]);
-  
+
   if (isPending) {
     return <TableSkeleton rows={6} columns={6} />;
   }
-  
+
   if (isError) {
     return (
       <div className="flex h-96 w-full items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-destructive mb-2">Failed to load event inventory</p>
+          <p className="text-lg text-destructive mb-2">
+            Failed to load event inventory
+          </p>
           <p className="text-sm text-muted-foreground">{error.message}</p>
         </div>
       </div>
@@ -285,11 +277,8 @@ function EventInventoryTable({ events }: { events: Event[] }) {
               </SelectTrigger>
               <SelectContent>
                 {events.map((event) => (
-                  <SelectItem
-                    key={event.id}
-                    value={event.id}
-                  >
-                    {event.name}
+                  <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                    {event.eventName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -327,7 +316,7 @@ function EventInventoryTable({ events }: { events: Event[] }) {
               <SelectContent>
                 <SelectItem value="all">All Breeders</SelectItem>
                 {breeders.map((breeder) => (
-                  <SelectItem key={breeder.id} value={breeder.id}>
+                  <SelectItem key={breeder.id} value={String(breeder.id)}>
                     {breeder.name}
                   </SelectItem>
                 ))}
@@ -469,7 +458,10 @@ function EventInventoryTable({ events }: { events: Event[] }) {
       </div>
 
       {/* Data Table */}
-      <DataTable columns={getEventInventoryColumnsForFeeType(feeView)} data={filteredInventory} />
+      <DataTable
+        columns={getEventInventoryColumnsForFeeType(feeView)}
+        data={filteredInventory}
+      />
     </div>
   );
 }

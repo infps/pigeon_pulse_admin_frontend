@@ -115,11 +115,11 @@ function EventSelect({ events }: { events: Event[] }) {
           </SelectItem>
           {events.map((event) => (
             <SelectItem
-              key={event.id}
-              value={event.id}
-              onClick={() => setEventId(event.id)}
+              key={event.idEvent}
+              value={String(event.idEvent)}
+              onClick={() => setEventId(String(event.idEvent))}
             >
-              {event.name} ({event.shortName})
+              {event.eventName} ({event.eventShortName})
             </SelectItem>
           ))}
         </SelectContent>
@@ -133,7 +133,7 @@ function ListRacesTable() {
     defaultValue: "",
   });
 
-  const { data, error, isError, isPending } = useListRaces(eventId);
+  const { data, error, isError, isPending } = useListRaces(parseInt(eventId));
 
   if (isPending) {
     return <TableSkeleton rows={6} columns={5} />;

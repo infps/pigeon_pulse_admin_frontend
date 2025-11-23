@@ -17,11 +17,11 @@ export function useUpdateProfile() {
   });
 }
 
-export function useGetBreeders(eventId: string) {
+export function useGetBreeders(eventId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.users.getBreeders(eventId),
     method: "GET",
-    queryKey: ["breeders", eventId],
+    queryKey: ["breeders", String(eventId)],
   });
 }
 

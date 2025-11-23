@@ -36,48 +36,22 @@ import { useCreateEvent, useGetEvent, useUpdateEvent } from "@/lib/api/events";
 import { useGetFees, useGetPrizes, useGetBettings } from "@/lib/api/schema";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Event name is required"),
-  shortName: z.string().min(1, "Short name is required"),
-  date: z.date(),
-  type: z.enum(["AGN", "AS"]),
-  isOpen: z.boolean(),
-  trainingFrom: z
-    .number()
-    .int()
-    .min(0, "Training from must be a non-negative integer"),
-  trainingTo: z
-    .number()
-    .int()
-    .min(0, "Training to must be a non-negative integer"),
-  inventoryFrom: z
-    .number()
-    .int()
-    .min(0, "Inventory from must be a non-negative integer"),
-  inventoryTo: z
-    .number()
-    .int()
-    .min(0, "Inventory to must be a non-negative integer"),
-  finalFrom: z.number().int().min(0, "Final to must be a non-negative integer"),
-  finalTo: z.number().int().min(0, "Final to must be a non-negative integer"),
-  hotspotFrom: z
-    .number()
-    .int()
-    .min(0, "Hotspot from must be a non-negative integer"),
-  hotspotTo: z
-    .number()
-    .int()
-    .min(0, "Hotspot to must be a non-negative integer"),
-  feeSchemaId: z.uuid("Invalid fee schema ID format"),
-  finalRacePrizeSchemaId: z.uuid("Invalid prize schema ID format"),
-  hotspot1PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
-  hotspot2PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
-  hotspot3PrizeSchemaId: z.uuid("Invalid prize schema ID format"),
-  avgWinnerPrizeSchemaId: z.uuid("Invalid prize schema ID format"),
-  bettingSchemaId: z.uuid("Invalid betting schema ID format").optional(),
+  eventName: z.string().min(1, "Event name is required"),
+  eventShortName: z.string().min(1, "Short name is required"),
+  eventDate: z.date(),
+  eventType: z.number().int().min(0).max(1),
+  isOpen: z.number().int().min(0).max(1),
+  idBettingScheme: z.number().int().nullable().optional(),
+  idFeeScheme: z.number().int(),
+  idFinalPrizeScheme: z.number().int().nullable().optional(),
+  idHotSpot1PrizeScheme: z.number().int().nullable().optional(),
+  idHotSpot2PrizeScheme: z.number().int().nullable().optional(),
+  idHotSpot3PrizeScheme: z.number().int().nullable().optional(),
+  idHotSpotAvgPrizeScheme: z.number().int().nullable().optional(),
 });
 
 export function EventUpdateFetch({ id, onClose }: { id: string; onClose?: () => void }) {
-  const { data, isPending, error, isError, isSuccess } = useGetEvent(id);
+  const { data, isPending, error, isError, isSuccess } = useGetEvent(parseInt(id));
   const {
     data: getFeesData,
     error: getFeesError,
@@ -143,30 +117,22 @@ export default function EventCreateForm({
   onClose?: () => void;
 }) {
   const { mutateAsync: createEvent } = useCreateEvent();
-  const { mutateAsync: updateEvent } = useUpdateEvent(id || "");
+  const { mutateAsync: updateEvent } = useUpdateEvent(id ? parseInt(id) : 0);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      isOpen: defaultValues?.isOpen ?? true,
-      name: defaultValues?.name || "",
-      shortName: defaultValues?.shortName || "",
-      type: defaultValues?.type || "AGN",
-      trainingFrom: defaultValues?.trainingFrom || 0,
-      trainingTo: defaultValues?.trainingTo || 0,
-      inventoryFrom: defaultValues?.inventoryFrom || 0,
-      inventoryTo: defaultValues?.inventoryTo || 0,
-      finalFrom: defaultValues?.finalFrom || 0,
-      finalTo: defaultValues?.finalTo || 0,
-      hotspotFrom: defaultValues?.hotspotFrom || 0,
-      hotspotTo: defaultValues?.hotspotTo || 0,
-      feeSchemaId: defaultValues?.feeSchemaId || "",
-      bettingSchemaId: defaultValues?.bettingSchemeId || undefined,
-      finalRacePrizeSchemaId: defaultValues?.finalRacePrizeSchemaId || undefined,
-      hotspot1PrizeSchemaId: defaultValues?.hotspot1PrizeSchemaId || undefined,
-      hotspot2PrizeSchemaId: defaultValues?.hotspot2PrizeSchemaId || undefined,
-      hotspot3PrizeSchemaId: defaultValues?.hotspot3PrizeSchemaId || undefined,
-      avgWinnerPrizeSchemaId: defaultValues?.avgWinnerPrizeSchemaId || undefined,
-      date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
+      isOpen: defaultValues?.isOpen ?? 1,
+      eventName: defaultValues?.eventName || "",
+      eventShortName: defaultValues?.eventShortName || "",
+      eventType: defaultValues?.eventType ?? 0,
+      idFeeScheme: defaultValues?.idFeeScheme || 0,
+      idBettingScheme: defaultValues?.idBettingScheme || null,
+      idFinalPrizeScheme: defaultValues?.idFinalPrizeScheme || null,
+      idHotSpot1PrizeScheme: defaultValues?.idHotSpot1PrizeScheme || null,
+      idHotSpot2PrizeScheme: defaultValues?.idHotSpot2PrizeScheme || null,
+      idHotSpot3PrizeScheme: defaultValues?.idHotSpot3PrizeScheme || null,
+      idHotSpotAvgPrizeScheme: defaultValues?.idHotSpotAvgPrizeScheme || null,
+      eventDate: defaultValues?.eventDate ? new Date(defaultValues.eventDate) : new Date(),
     },
   });
 
@@ -211,8 +177,8 @@ export default function EventCreateForm({
             <FormItem>
               <FormLabel>Status</FormLabel>
               <Select
-                onValueChange={(value) => field.onChange(value === "true")}
-                value={field.value ? "true" : "false"}
+                onValueChange={(value) => field.onChange(value === "true" ? 1 : 0)}
+                value={field.value === 1 ? "true" : "false"}
                 disabled={form.formState.isSubmitting}
               >
                 <FormControl className="w-[300px]">
@@ -233,7 +199,7 @@ export default function EventCreateForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="name"
+            name="eventName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
@@ -253,7 +219,7 @@ export default function EventCreateForm({
 
           <FormField
             control={form.control}
-            name="shortName"
+            name="eventShortName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Short Name</FormLabel>
@@ -274,7 +240,7 @@ export default function EventCreateForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="date"
+            name="eventDate"
             render={({ field }) => (
               <FormItem className="flex flex-col w-full">
                 <FormLabel>Projected Final Date</FormLabel>
@@ -315,13 +281,13 @@ export default function EventCreateForm({
           />
           <FormField
             control={form.control}
-            name="type"
+            name="eventType"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>Type</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(parseInt(value))}
+                  value={field.value?.toString()}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -330,8 +296,8 @@ export default function EventCreateForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="AGN">AGN</SelectItem>
-                    <SelectItem value="AS">AS</SelectItem>
+                    <SelectItem value="0">AGN</SelectItem>
+                    <SelectItem value="1">AS</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -340,187 +306,17 @@ export default function EventCreateForm({
             )}
           />
         </div>
-        <h4 className="font-semibold mt-4 mb-2">Race Number Range</h4>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="trainingFrom"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Training From</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="trainingTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Training To</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="inventoryFrom"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Inventory/Loft fly/Pulling Flight From</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="inventoryTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Inventory/Loft fly/Pulling Flight To</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="finalFrom"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Final Race From</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="finalTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Final Race To</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="hotspotFrom"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hotspot From</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="hotspotTo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hotspot To</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
-                      type="text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={form.formState.isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
         <h4 className="font-semibold mt-4 mb-2">Schemas</h4>
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="feeSchemaId"
+            name="idFeeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Fee Schema</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  onValueChange={(value) => field.onChange(parseInt(value))}
+                  value={field.value?.toString()}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -530,8 +326,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {feeSchemas.map((fee: FeeSchema) => (
-                      <SelectItem key={fee.id} value={fee.id}>
-                        {fee.name}
+                      <SelectItem key={fee.idFeeScheme} value={fee.idFeeScheme.toString()}>
+                        {fee.feeSchemeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -544,13 +340,13 @@ export default function EventCreateForm({
 
           <FormField
             control={form.control}
-            name="bettingSchemaId"
+            name="idBettingScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Betting Schema (Optional)</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -560,8 +356,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {bettingSchemas.map((betting: BettingSchema) => (
-                      <SelectItem key={betting.id} value={betting.id}>
-                        {betting.name}
+                      <SelectItem key={betting.idBettingScheme} value={betting.idBettingScheme.toString()}>
+                        {betting.bettingSchemeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -575,13 +371,13 @@ export default function EventCreateForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="finalRacePrizeSchemaId"
+            name="idFinalPrizeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Final Race</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -591,8 +387,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {prizeSchemas.map((prize: PrizeSchema) => (
-                      <SelectItem key={prize.id} value={prize.id}>
-                        {prize.name}
+                      <SelectItem key={prize.idPrizeScheme} value={prize.idPrizeScheme.toString()}>
+                        {prize.prizeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -606,13 +402,13 @@ export default function EventCreateForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="hotspot1PrizeSchemaId"
+            name="idHotSpot1PrizeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Hot spot 1</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -622,8 +418,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {prizeSchemas.map((prize: PrizeSchema) => (
-                      <SelectItem key={prize.id} value={prize.id}>
-                        {prize.name}
+                      <SelectItem key={prize.idPrizeScheme} value={prize.idPrizeScheme.toString()}>
+                        {prize.prizeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -636,13 +432,13 @@ export default function EventCreateForm({
 
           <FormField
             control={form.control}
-            name="hotspot2PrizeSchemaId"
+            name="idHotSpot2PrizeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Hot spot 2</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -652,8 +448,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {prizeSchemas.map((prize: PrizeSchema) => (
-                      <SelectItem key={prize.id} value={prize.id}>
-                        {prize.name}
+                      <SelectItem key={prize.idPrizeScheme} value={prize.idPrizeScheme.toString()}>
+                        {prize.prizeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -668,13 +464,13 @@ export default function EventCreateForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="hotspot3PrizeSchemaId"
+            name="idHotSpot3PrizeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Hot spot 3</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -684,8 +480,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {prizeSchemas.map((prize: PrizeSchema) => (
-                      <SelectItem key={prize.id} value={prize.id}>
-                        {prize.name}
+                      <SelectItem key={prize.idPrizeScheme} value={prize.idPrizeScheme.toString()}>
+                        {prize.prizeName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -698,13 +494,13 @@ export default function EventCreateForm({
 
           <FormField
             control={form.control}
-            name="avgWinnerPrizeSchemaId"
+            name="idHotSpotAvgPrizeScheme"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Avg Winner</FormLabel>
                 <Select
-                  onValueChange={(value) => field.onChange(value || null)}
-                  value={field.value || undefined}
+                  onValueChange={(value) => field.onChange(value ? parseInt(value) : null)}
+                  value={field.value?.toString() || undefined}
                   disabled={form.formState.isSubmitting}
                 >
                   <FormControl className="w-full">
@@ -714,8 +510,8 @@ export default function EventCreateForm({
                   </FormControl>
                   <SelectContent>
                     {prizeSchemas.map((prize: PrizeSchema) => (
-                      <SelectItem key={prize.id} value={prize.id}>
-                        {prize.name}
+                      <SelectItem key={prize.idPrizeScheme} value={prize.idPrizeScheme.toString()}>
+                        {prize.prizeName}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -3,6 +3,7 @@ import {
   BreederAddressBook,
   Event,
   EventInventory,
+  EventInventoryItemDetail,
   Race,
   RaceItem,
   RaceResult,
@@ -24,7 +25,7 @@ import EventInventoryDialog from "./EventInventoryDialog";
 import { RaceUpdateDialog } from "./RaceUpdateDialog";
 import Link from "next/link";
 
-function EventEditDialog({ eventId }: { eventId: string }) {
+function EventEditDialog({ eventId }: { eventId: number }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -34,7 +35,7 @@ function EventEditDialog({ eventId }: { eventId: string }) {
       </DialogTrigger>
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogTitle>Edit Event</DialogTitle>
-        <EventUpdateFetch id={eventId} onClose={() => setIsDialogOpen(false)} />
+        <EventUpdateFetch id={String(eventId)} onClose={() => setIsDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );
@@ -43,7 +44,7 @@ function EventEditDialog({ eventId }: { eventId: string }) {
 function EventInventoryEditDialog({
   eventInventoryId,
 }: {
-  eventInventoryId: string;
+  eventInventoryId: number;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -55,7 +56,7 @@ function EventInventoryEditDialog({
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogTitle>Event Inventory</DialogTitle>
         <EventInventoryDialog
-          id={eventInventoryId}
+          id={String(eventInventoryId)}
           onClose={() => setIsDialogOpen(false)}
         />
       </DialogContent>
@@ -68,7 +69,7 @@ function ClickableEventInventoryRow({
   eventInventoryId,
   children,
 }: {
-  eventInventoryId: string;
+  eventInventoryId: number;
   children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -83,7 +84,7 @@ function ClickableEventInventoryRow({
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogTitle>Event Inventory</DialogTitle>
         <EventInventoryDialog
-          id={eventInventoryId}
+          id={String(eventInventoryId)}
           onClose={() => setIsDialogOpen(false)}
         />
       </DialogContent>
@@ -96,7 +97,7 @@ function ClickableEventName({
   eventId,
   name,
 }: {
-  eventId: string;
+  eventId: number;
   name: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -110,7 +111,7 @@ function ClickableEventName({
       </DialogTrigger>
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogTitle>Edit Event</DialogTitle>
-        <EventUpdateFetch id={eventId} onClose={() => setIsDialogOpen(false)} />
+        <EventUpdateFetch id={String(eventId)} onClose={() => setIsDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );
@@ -121,7 +122,7 @@ function ClickableRaceLocation({
   raceId,
   location,
 }: {
-  raceId: string;
+  raceId: number;
   location: string;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -136,7 +137,7 @@ function ClickableRaceLocation({
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogTitle>Edit Race</DialogTitle>
         <RaceUpdateDialog
-          raceId={raceId}
+          raceId={String(raceId)}
           onClose={() => setIsDialogOpen(false)}
         />
       </DialogContent>
@@ -146,7 +147,7 @@ function ClickableRaceLocation({
 
 export const EventColumns: ColumnDef<Event>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "eventName",
     header: ({ column }) => {
       return (
         <Button
@@ -160,13 +161,13 @@ export const EventColumns: ColumnDef<Event>[] = [
     },
     cell: ({ row }) => (
       <ClickableEventName
-        eventId={row.original.id}
-        name={row.getValue("name")}
+        eventId={row.original.idEvent}
+        name={row.getValue("eventName")}
       />
     ),
   },
   {
-    accessorKey: "shortName",
+    accessorKey: "eventShortName",
     header: ({ column }) => {
       return (
         <Button
@@ -178,10 +179,10 @@ export const EventColumns: ColumnDef<Event>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("shortName"),
+    cell: ({ row }) => row.getValue("eventShortName"),
   },
   {
-    accessorKey: "date",
+    accessorKey: "eventDate",
     header: ({ column }) => {
       return (
         <Button
@@ -194,8 +195,9 @@ export const EventColumns: ColumnDef<Event>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("date"));
-      return date.toLocaleDateString("en-US", {
+      const date = row.getValue("eventDate") as string | null;
+      if (!date) return "N/A";
+      return new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -203,7 +205,7 @@ export const EventColumns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "isOpen",
     header: ({ column }) => {
       return (
         <Button
@@ -221,7 +223,7 @@ export const EventColumns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: "type",
+    accessorKey: "eventType",
     header: ({ column }) => {
       return (
         <Button
@@ -233,14 +235,17 @@ export const EventColumns: ColumnDef<Event>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("type"),
+    cell: ({ row }) => {
+      const type = row.getValue("eventType") as number | null;
+      return type === 0 ? "AGN" : type === 1 ? "AS" : "N/A";
+    },
   },
   {
     accessorKey: "actions",
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => (
       <div className="flex justify-end">
-        <EventEditDialog eventId={row.original.id} />
+        <EventEditDialog eventId={row.original.idEvent} />
       </div>
     ),
   },
@@ -261,7 +266,7 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => (
-      <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+      <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
         {row.getValue("loft")}
       </ClickableEventInventoryRow>
     ),
@@ -280,10 +285,10 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const fullName = `${row.original.breeder.firstName} ${row.original.breeder.lastName}`;
+      const fullName = `${row.original.breeder?.firstName || ""} ${row.original.breeder?.lastName || ""}`.trim();
       return (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
-          {fullName}
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
+          {fullName || "N/A"}
         </ClickableEventInventoryRow>
       );
     },
@@ -302,13 +307,13 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => (
-      <ClickableEventInventoryRow eventInventoryId={row.original.id}>
-        {row.original?.breeder.state1 ? row.original.breeder.state1 : "-"}
+      <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
+        {row.original?.breeder?.state1 ? row.original.breeder.state1 : "-"}
       </ClickableEventInventoryRow>
     ),
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "signInDate",
     header: ({ column }) => {
       return (
         <Button
@@ -321,7 +326,7 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = row.original.createdAt;
+      const date = row.original.signInDate;
       const formattedDate = date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
@@ -330,7 +335,7 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
           })
         : "N/A";
       return (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
           {formattedDate}
         </ClickableEventInventoryRow>
       );
@@ -351,13 +356,13 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => (
-      <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+      <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
         {row.getValue("reservedBirds")}
       </ClickableEventInventoryRow>
     ),
   },
   {
-    accessorKey: "payment.paymentValue",
+    accessorKey: "payments",
     header: ({ column }) => {
       return (
         <Button
@@ -370,14 +375,14 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const perchFeePayment = row.original.payments.find(
-        (p) => p.type === "PERCH_FEE"
+      const perchFeePayment = row.original.payments?.find(
+        (p) => p.paymentType === 0 // PERCH_FEE
       );
-      const formattedPayment = perchFeePayment
+      const formattedPayment = perchFeePayment?.paymentValue
         ? `$${perchFeePayment.paymentValue.toFixed(2)}`
         : "N/A";
       return (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
           {formattedPayment}
         </ClickableEventInventoryRow>
       );
@@ -397,12 +402,12 @@ export const EventInventoryColumns: ColumnDef<EventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const perchFeePayment = row.original.payments.find(
-        (p) => p.type === "PERCH_FEE"
+      const perchFeePayment = row.original.payments?.find(
+        (p) => p.paymentType === 0 // PERCH_FEE
       );
-      const isPaid = perchFeePayment?.status === "COMPLETED";
+      const isPaid = perchFeePayment?.paymentValue ? true : false; // Simplified check
       return (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
           <span className={isPaid ? "text-green-500" : "text-red-500"}>
             {isPaid ? "Yes" : "No"}
           </span>
@@ -440,7 +445,7 @@ export const getEventInventoryColumnsForFeeType = (
         );
       },
       cell: ({ row }) => (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
           {row.getValue("loft")}
         </ClickableEventInventoryRow>
       ),
@@ -459,9 +464,9 @@ export const getEventInventoryColumnsForFeeType = (
         );
       },
       cell: ({ row }) => {
-        const fullName = `${row.original.breeder.firstName} ${row.original.breeder.lastName}`;
+        const fullName = `${row.original.breeder?.firstName || ""} ${row.original.breeder?.lastName || ""}`.trim();
         return (
-          <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+          <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
             {fullName}
           </ClickableEventInventoryRow>
         );
@@ -481,13 +486,13 @@ export const getEventInventoryColumnsForFeeType = (
         );
       },
       cell: ({ row }) => (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
-          {row.original?.breeder.state1 ? row.original.breeder.state1 : "-"}
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
+          {row.original?.breeder?.state1 ? row.original.breeder.state1 : "-"}
         </ClickableEventInventoryRow>
       ),
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "signInDate",
       header: ({ column }) => {
         return (
           <Button
@@ -500,7 +505,7 @@ export const getEventInventoryColumnsForFeeType = (
         );
       },
       cell: ({ row }) => {
-        const date = row.original.createdAt;
+        const date = row.original.signInDate;
         const formattedDate = date
           ? new Date(date).toLocaleDateString("en-US", {
               year: "numeric",
@@ -509,7 +514,7 @@ export const getEventInventoryColumnsForFeeType = (
             })
           : "N/A";
         return (
-          <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+          <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
             {formattedDate}
           </ClickableEventInventoryRow>
         );
@@ -529,13 +534,13 @@ export const getEventInventoryColumnsForFeeType = (
         );
       },
       cell: ({ row }) => (
-        <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+        <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
           {row.getValue("reservedBirds")}
         </ClickableEventInventoryRow>
       ),
     },
     {
-      accessorKey: "payment.paymentValue",
+      accessorKey: "payments",
       header: ({ column }) => {
         return (
           <Button
@@ -551,29 +556,25 @@ export const getEventInventoryColumnsForFeeType = (
         let totalPayment = 0;
 
         if (feeType === "FINAL_FEES") {
-          // Aggregate all final-related fees
-          const finalFeeTypes = [
-            "HOTSPOT_FEE_1",
-            "HOTSPOT_FEE_2",
-            "HOTSPOT_FEE_3",
-            "HOTSPOT_FEE_4",
-            "FINAL_RACE_FEE",
-          ];
+          // Aggregate all final-related fees (payment types 2,3,4,5,6)
+          const finalFeeTypes = [2, 3, 4, 5, 6];
           finalFeeTypes.forEach((type) => {
-            const payment = row.original.payments.find((p) => p.type === type);
-            if (payment) {
+            const payment = row.original.payments?.find((p) => p.paymentType === type);
+            if (payment?.paymentValue) {
               totalPayment += payment.paymentValue;
             }
           });
         } else {
-          const payment = row.original.payments.find((p) => p.type === feeType);
-          totalPayment = payment ? payment.paymentValue : 0;
+          // Map fee types: PERCH_FEE=0, ENTRY_FEE=1
+          const typeMap = { "PERCH_FEE": 0, "ENTRY_FEE": 1 };
+          const payment = row.original.payments?.find((p) => p.paymentType === typeMap[feeType]);
+          totalPayment = payment?.paymentValue ?? 0;
         }
 
         const formattedPayment =
           totalPayment > 0 ? `$${totalPayment.toFixed(2)}` : "N/A";
         return (
-          <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+          <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
             {formattedPayment}
           </ClickableEventInventoryRow>
         );
@@ -598,29 +599,24 @@ export const getEventInventoryColumnsForFeeType = (
 
         if (feeType === "FINAL_FEES") {
           // Check if all final fees are completed
-          const finalFeeTypes = [
-            "HOTSPOT_FEE_1",
-            "HOTSPOT_FEE_2",
-            "HOTSPOT_FEE_3",
-            "HOTSPOT_FEE_4",
-            "FINAL_RACE_FEE",
-          ];
+          const finalFeeTypes = [2, 3, 4, 5, 6];
           const finalPayments = finalFeeTypes
-            .map((type) => row.original.payments.find((p) => p.type === type))
+            .map((type) => row.original.payments?.find((p) => p.paymentType === type))
             .filter((p) => p !== undefined);
 
           if (finalPayments.length > 0) {
-            isPaid = finalPayments.every((p) => p.status === "COMPLETED");
-            isPending = finalPayments.some((p) => p.status !== "COMPLETED");
+            isPaid = finalPayments.every((p) => p?.paymentValue && p.paymentValue > 0);
+            isPending = !isPaid && finalPayments.some((p) => p?.paymentValue);
           }
         } else {
-          const payment = row.original.payments.find((p) => p.type === feeType);
-          isPaid = payment?.status === "COMPLETED" || false;
-          isPending = payment?.status === "PENDING" || false;
+          const typeMap = { "PERCH_FEE": 0, "ENTRY_FEE": 1 };
+          const payment = row.original.payments?.find((p) => p.paymentType === typeMap[feeType]);
+          isPaid = payment?.paymentValue ? payment.paymentValue > 0 : false;
+          isPending = false;
         }
 
         return (
-          <ClickableEventInventoryRow eventInventoryId={row.original.id}>
+          <ClickableEventInventoryRow eventInventoryId={row.original.idEventInventory}>
             <span
               className={`px-2 py-1 rounded text-xs font-medium ${
                 isPaid
@@ -639,7 +635,7 @@ export const getEventInventoryColumnsForFeeType = (
   ];
 };
 
-export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
+export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = [
   {
     accessorKey: "bird.breeder",
     header: ({ column }) => {
@@ -654,8 +650,9 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const breeder = row.original.bird.breeder;
-      return `${breeder.firstName} ${breeder.lastName}`;
+      const breeder = row.original.bird?.breeder;
+      if (!breeder) return "N/A";
+      return `${breeder.firstName || ""} ${breeder.lastName || ""}`.trim() || "N/A";
     },
   },
   {
@@ -671,6 +668,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => row.original.bird?.birdName || "N/A",
   },
   {
     accessorKey: "birdNo",
@@ -700,7 +698,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.band1 || "N/A",
+    cell: ({ row }) => row.original.bird?.band1 || "N/A",
   },
   {
     accessorKey: "bird.band2",
@@ -715,7 +713,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.band2 || "N/A",
+    cell: ({ row }) => row.original.bird?.band2 || "N/A",
   },
   {
     accessorKey: "bird.band3",
@@ -730,7 +728,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.band3 || "N/A",
+    cell: ({ row }) => row.original.bird?.band3 || "N/A",
   },
   {
     accessorKey: "bird.band4",
@@ -745,7 +743,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.band4 || "N/A",
+    cell: ({ row }) => row.original.bird?.band4 || "N/A",
   },
   {
     accessorKey: "bird.band",
@@ -760,7 +758,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.band || "N/A",
+    cell: ({ row }) => row.original.bird?.band || "N/A",
   },
   {
     accessorKey: "bird.color",
@@ -775,6 +773,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => row.original.bird?.color || "N/A",
   },
   {
     accessorKey: "bird.sex",
@@ -788,6 +787,14 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }) => {
+      const sex = row.original.bird?.sex;
+      const sexMap: Record<number, string> = {
+        0: "Male",
+        1: "Female",
+      };
+      return sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A";
     },
   },
   {
@@ -803,7 +810,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.bird.isActive ? "Yes" : "No"),
+    cell: ({ row }) => (row.original.bird?.isActive ? "Yes" : "No"),
   },
   {
     accessorKey: "bird.isLost",
@@ -818,7 +825,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.bird.isLost ? "Yes" : "No"),
+    cell: ({ row }) => (row.original.bird?.isLost ? "Yes" : "No"),
   },
   {
     accessorKey: "bird.lostDate",
@@ -834,7 +841,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = row.original.bird.lostDate;
+      const date = row.original.bird?.lostDate;
       return date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
@@ -857,10 +864,10 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird.rfId || "N/A",
+    cell: ({ row }) => row.original.bird?.rfId || "N/A",
   },
   {
-    accessorKey: "arrivalDate",
+    accessorKey: "arrivalTime",
     header: ({ column }) => {
       return (
         <Button
@@ -873,7 +880,7 @@ export const BirdEventInventoryColumns: ColumnDef<BirdEventInventory>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = row.original.arrivalDate;
+      const date = row.original.arrivalTime;
       return date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
@@ -986,7 +993,7 @@ export const RaceColumns: ColumnDef<Race>[] = [
     },
     cell: ({ row }) => (
       <ClickableRaceLocation
-        raceId={row.original.id}
+        raceId={row.original.idRace}
         location={row.getValue("type")}
       />
     ),
@@ -1006,8 +1013,8 @@ export const RaceColumns: ColumnDef<Race>[] = [
     },
     cell: ({ row }) => (
       <ClickableRaceLocation
-        raceId={row.original.id}
-        location={row.getValue("location")}
+        raceId={row.original.idRace}
+        location={row.getValue("location") as string}
       />
     ),
   },
@@ -1139,7 +1146,7 @@ export const RaceColumns: ColumnDef<Race>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (row.getValue("isClosed") ? "Closed" : "Open"),
+    cell: ({ row }) => (row.original.isClosed ? "Closed" : "Open"),
   },
   {
     accessorKey: "actions",
@@ -1162,7 +1169,7 @@ export const RaceColumns: ColumnDef<Race>[] = [
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/races/${row.original.id}/entries`}
+                  href={`/races/${row.original.idRace}/entries`}
                   className="w-full"
                 >
                   Entries
@@ -1170,7 +1177,7 @@ export const RaceColumns: ColumnDef<Race>[] = [
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link
-                  href={`/races/${row.original.id}/results`}
+                  href={`/races/${row.original.idRace}/results`}
                   className="w-full"
                 >
                   Results
@@ -1183,7 +1190,7 @@ export const RaceColumns: ColumnDef<Race>[] = [
             <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogTitle>Edit Race</DialogTitle>
               <RaceUpdateDialog
-                raceId={row.original.id}
+                raceId={String(row.original.idRace)}
                 onClose={() => setIsEditDialogOpen(false)}
               />
             </DialogContent>
@@ -1209,12 +1216,13 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
       );
     },
     cell: ({ row }) => {
-      const breeder = row.original.eventInventoryItem.bird.breeder;
-      return `${breeder.firstName} ${breeder.lastName}`;
+      const breeder = row.original.inventoryItem?.bird?.breeder;
+      if (!breeder) return "N/A";
+      return `${breeder.firstName || ""} ${breeder.lastName || ""}`.trim() || "N/A";
     },
   },
   {
-    accessorKey: "eventInventoryItem.bird.birdName",
+    accessorKey: "inventoryItem.bird.birdName",
     header: ({ column }) => {
       return (
         <Button
@@ -1228,7 +1236,7 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.bird.band",
+    accessorKey: "inventoryItem.bird.band",
     header: ({ column }) => {
       return (
         <Button
@@ -1240,10 +1248,10 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.eventInventoryItem.bird.band || "N/A",
+    cell: ({ row }) => row.original.inventoryItem?.bird?.band || "N/A",
   },
   {
-    accessorKey: "eventInventoryItem.bird.rfId",
+    accessorKey: "inventoryItem.bird.rfId",
     header: ({ column }) => {
       return (
         <Button
@@ -1255,10 +1263,10 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.original.eventInventoryItem.bird.rfId || "N/A",
+    cell: ({ row }) => row.original.inventoryItem?.bird?.rfId || "N/A",
   },
   {
-    accessorKey: "eventInventoryItem.bird.color",
+    accessorKey: "inventoryItem.bird.color",
     header: ({ column }) => {
       return (
         <Button
@@ -1272,7 +1280,7 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.bird.isLost",
+    accessorKey: "inventoryItem.bird.isLost",
     header: ({ column }) => {
       return (
         <Button
@@ -1285,10 +1293,10 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
       );
     },
     cell: ({ row }) =>
-      row.original.eventInventoryItem.bird.isLost ? "Yes" : "No",
+      row.original.inventoryItem?.bird?.isLost ? "Yes" : "No",
   },
   {
-    accessorKey: "loftBasketed",
+    accessorKey: "isDistBasketted",
     header: ({ column }) => {
       return (
         <Button
@@ -1300,10 +1308,10 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.loftBasketed ? "Yes" : "No"),
+    cell: ({ row }) => (row.original.isDistBasketted ? "Yes" : "No"),
   },
   {
-    accessorKey: "raceBasketed",
+    accessorKey: "raceBasket",
     header: ({ column }) => {
       return (
         <Button
@@ -1315,7 +1323,7 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.raceBasketed ? "Yes" : "No"),
+    cell: ({ row }) => (row.original.raceBasket ? "Yes" : "No"),
   },
   {
     accessorKey: "raceBasketTime",
@@ -1354,7 +1362,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.bird.breeder.name",
+    accessorKey: "inventoryItem.bird.breeder",
     header: ({ column }) => {
       return (
         <Button
@@ -1366,9 +1374,14 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      const breeder = row.original.inventoryItem?.bird?.breeder;
+      if (!breeder) return "N/A";
+      return `${breeder.firstName || ""} ${breeder.lastName || ""}`.trim() || "N/A";
+    },
   },
   {
-    accessorKey: "eventInventoryItem.bird.birdName",
+    accessorKey: "inventoryItem.bird.birdName",
     header: ({ column }) => {
       return (
         <Button
@@ -1382,7 +1395,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.band",
+    accessorKey: "inventoryItem.bird.band",
     header: ({ column }) => {
       return (
         <Button
@@ -1396,7 +1409,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.rfId",
+    accessorKey: "inventoryItem.bird.rfId",
     header: ({ column }) => {
       return (
         <Button
@@ -1410,7 +1423,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
     },
   },
   {
-    accessorKey: "eventInventoryItem.bird.color",
+    accessorKey: "inventoryItem.bird.color",
     header: ({ column }) => {
       return (
         <Button
@@ -1437,8 +1450,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
       );
     },
     cell: ({ row }) => {
-      const speed = row.original.raceItemResult?.speed;
-      return speed ? `${speed.toFixed(2)} MPH` : "N/A";
+      return "N/A"; // Speed not in schema
     },
   },
   {
@@ -1481,8 +1493,7 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
       );
     },
     cell: ({ row }) => {
-      const distance = row.original.raceItemResult?.distance;
-      return distance ? `${distance} miles` : "N/A";
+      return "N/A"; // Distance not in RaceItemResult schema
     },
   },
 ];
@@ -1493,7 +1504,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     cell: ({ row }) => row.index + 1,
   },
   {
-    accessorKey: "breederNumber",
+    accessorKey: "number",
     header: ({ column }) => {
       return (
         <Button
@@ -1780,7 +1791,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     cell: ({ row }) => row.getValue("webAddress") || "N/A",
   },
   {
-    accessorKey: "ssn",
+    accessorKey: "socialSecurityNumber",
     header: ({ column }) => {
       return (
         <Button
@@ -1792,7 +1803,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("ssn") || "N/A",
+    cell: ({ row }) => row.getValue("socialSecurityNumber") || "N/A",
   },
   {
     accessorKey: "taxNumber",
@@ -1823,18 +1834,19 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
       );
     },
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status = row.getValue("status") as number | null;
+      const statusText = status === 0 ? "ACTIVE" : status === 1 ? "INACTIVE" : "PROSPECT";
       return (
         <span
           className={`px-2 py-1 rounded text-xs font-medium ${
-            status === "ACTIVE"
+            status === 0
               ? "bg-green-200 text-green-800"
-              : status === "INACTIVE"
+              : status === 1
               ? "bg-red-200 text-red-800"
               : "bg-yellow-200 text-yellow-800"
           }`}
         >
-          {status}
+          {statusText}
         </span>
       );
     },
@@ -1879,7 +1891,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     cell: ({ row }) => row.getValue("loginName") || "N/A",
   },
   {
-    accessorKey: "defaultNameAgn",
+    accessorKey: "defNameAgn",
     header: ({ column }) => {
       return (
         <Button
@@ -1891,10 +1903,10 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("defaultNameAgn") || "N/A",
+    cell: ({ row }) => row.getValue("defNameAgn") || "N/A",
   },
   {
-    accessorKey: "defaultNameAs",
+    accessorKey: "defNameAs",
     header: ({ column }) => {
       return (
         <Button
@@ -1906,7 +1918,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("defaultNameAs") || "N/A",
+    cell: ({ row }) => row.getValue("defNameAs") || "N/A",
   },
   {
     accessorKey: "note",

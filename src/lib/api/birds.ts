@@ -5,7 +5,7 @@ export function useListBirds({
   id,
   params,
 }: {
-  id: string;
+  id: number;
   params?: Record<string, any>;
 }) {
   const queryParams = params
@@ -17,6 +17,6 @@ export function useListBirds({
     endpoint: apiEndpoints.birds.listByEvent(id),
     params,
     method: "GET",
-    queryKey: ["birds", id, queryParams],
+    queryKey: ["birds", String(id), queryParams],
   });
 }

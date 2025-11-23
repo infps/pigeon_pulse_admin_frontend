@@ -9,7 +9,7 @@ export function useCreateRace() {
   });
 }
 
-export function useListRaces(eventId: string) {
+export function useListRaces(eventId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.listRaces(eventId),
     method: "GET",
@@ -17,49 +17,49 @@ export function useListRaces(eventId: string) {
   });
 }
 
-export function useGetRace(raceId: string) {
+export function useGetRace(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.listRace(raceId),
     method: "GET",
-    queryKey: ["race", raceId],
+    queryKey: ["race", String(raceId)],
   });
 }
 
-export function useUpdateRace(raceId: string) {
+export function useUpdateRace(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.updateRace(raceId),
     method: "PATCH",
-    invalidateKeys: [{ queryKey: ["races"] }, { queryKey: ["race", raceId] }],
+    invalidateKeys: [{ queryKey: ["races"] }, { queryKey: ["race", String(raceId)] }],
   });
 }
 
-export function useListRaceItems(raceId: string) {
+export function useListRaceItems(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.listRaceItems(raceId),
     method: "GET",
-    queryKey: ["raceItems", raceId],
+    queryKey: ["raceItems", String(raceId)],
   });
 }
 
-export function useUpdateRaceItemBasket(raceId: string, raceItemId: string) {
+export function useUpdateRaceItemBasket(raceId: number, raceItemId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.updateRaceItem(raceId, raceItemId),
     method: "PATCH",
     invalidateKeys: [
-      { queryKey: ["raceItems", raceId] },
-      { queryKey: ["raceBaskets", raceId] },
+      { queryKey: ["raceItems", String(raceId)] },
+      { queryKey: ["raceBaskets", String(raceId)] },
     ],
   });
 }
 
-export function useRaceLoftBasketing(raceId: string) {
+export function useRaceLoftBasketing(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.loftBasketing(raceId),
     method: "POST",
     invalidateKeys: [{ queryKey: ["raceItems"] }],
   });
 }
-export function useRaceBasketing(raceId: string) {
+export function useRaceBasketing(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.raceBasketing(raceId),
     method: "POST",
@@ -67,60 +67,60 @@ export function useRaceBasketing(raceId: string) {
   });
 }
 
-export function useListBaskets(raceId: string) {
+export function useListBaskets(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.listBaskets(raceId),
     method: "GET",
-    queryKey: ["raceBaskets", raceId],
+    queryKey: ["raceBaskets", String(raceId)],
   });
 }
 
-export function useCreateBasket(raceId: string) {
+export function useCreateBasket(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.createBasket(raceId),
     method: "POST",
-    invalidateKeys: [{ queryKey: ["raceBaskets", raceId] }],
+    invalidateKeys: [{ queryKey: ["raceBaskets", String(raceId)] }],
   });
 }
 
-export function useUpdateBasket(raceId: string, basketId: string) {
+export function useUpdateBasket(raceId: number, basketId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.updateBasket(raceId, basketId),
     method: "PATCH",
-    invalidateKeys: [{ queryKey: ["raceBaskets", raceId] }],
+    invalidateKeys: [{ queryKey: ["raceBaskets", String(raceId)] }],
   });
 }
 
-export function useDeleteBasket(raceId: string, basketId: string) {
+export function useDeleteBasket(raceId: number, basketId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.deleteBasket(raceId, basketId),
     method: "DELETE",
-    invalidateKeys: [{ queryKey: ["raceBaskets", raceId] }],
+    invalidateKeys: [{ queryKey: ["raceBaskets", String(raceId)] }],
   });
 }
 
-export function useAssignBasket(raceId: string, basketId: string) {
+export function useAssignBasket(raceId: number, basketId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.assignBasket(raceId, basketId),
     method: "POST",
     invalidateKeys: [
-      { queryKey: ["raceItems", raceId] },
-      { queryKey: ["raceBaskets", raceId] },
+      { queryKey: ["raceItems", String(raceId)] },
+      { queryKey: ["raceBaskets", String(raceId)] },
     ],
   });
 }
 
-export function usePublishRaceResult(raceId: string) {
+export function usePublishRaceResult(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.publishResult(raceId),
     method: "POST",
-    invalidateKeys: [{ queryKey: ["raceResults", raceId] }],
+    invalidateKeys: [{ queryKey: ["raceResults", String(raceId)] }],
   });
 }
-export function useListRaceResults(raceId: string) {
+export function useListRaceResults(raceId: number) {
   return useApiRequest({
     endpoint: apiEndpoints.races.listResults(raceId),
     method: "GET",
-    queryKey: ["raceResults", raceId],
+    queryKey: ["raceResults", String(raceId)],
   });
 }

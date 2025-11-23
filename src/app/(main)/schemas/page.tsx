@@ -79,7 +79,7 @@ export default function page() {
         )}
         {isFeeSuccess &&
           feeSchema.map((schema) => (
-            <SchemaComponent key={schema.id} schema={schema} type="fee" />
+            <SchemaComponent key={schema.idFeeScheme} schema={schema} type="fee" />
           ))}
       </div>
       <div className="w-1/3 p-4 border-r">
@@ -118,7 +118,7 @@ export default function page() {
         )}
         {isPrizeSuccess &&
           prizeSchema.map((schema) => (
-            <SchemaComponent key={schema.id} schema={schema} type="prize" />
+            <SchemaComponent key={schema.idPrizeScheme} schema={schema} type="prize" />
           ))}
       </div>
       <div className="w-1/3 p-4">
@@ -157,7 +157,7 @@ export default function page() {
         )}
         {isBettingSuccess &&
           bettingSchema.map((schema) => (
-            <SchemaComponent key={schema.id} schema={schema} type="betting" />
+            <SchemaComponent key={schema.idBettingScheme} schema={schema} type="betting" />
           ))}
       </div>
     </div>

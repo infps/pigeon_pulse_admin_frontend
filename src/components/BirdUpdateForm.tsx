@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { BirdEventInventory } from "@/lib/types";
+import { BirdEventInventory, EventInventoryItemDetail } from "@/lib/types";
 import { updateEventInventoryItem } from "@/lib/api/eventInventory";
 
 const formSchema = z.object({
@@ -55,27 +55,27 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface BirdUpdateFormProps {
-  bird: BirdEventInventory;
+  bird: EventInventoryItemDetail;
 }
 
 export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
-  const { mutateAsync: updateBird } = updateEventInventoryItem(bird.id);
+  const { mutateAsync: updateBird } = updateEventInventoryItem(bird.idEventInventoryItem);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      band_1: bird.band_1 ?? "",
-      band_2: bird.band_2 ?? "",
-      band_3: bird.band_3 ?? "",
-      band_4: bird.band_4 ?? "",
-      rfId: bird.rfId ?? "",
-      color: bird.bird.color ?? "",
-      birdName: bird.bird.birdName ?? "",
-      note: bird.note ?? "",
-      sex: bird.bird.sex ?? "HEN",
-      is_active: bird.bird.is_active ?? true,
-      is_lost: bird.bird.is_lost ?? false,
-      lost_date: bird.bird.lost_date ? new Date(bird.bird.lost_date) : null,
-      arrivalDate: bird.arrivalDate ? new Date(bird.arrivalDate) : null,
+      band_1: bird.bird?.band1 ?? "",
+      band_2: bird.bird?.band2 ?? "",
+      band_3: bird.bird?.band3 ?? "",
+      band_4: bird.bird?.band4 ?? "",
+      rfId: bird.bird?.rfId ?? "",
+      color: bird.bird?.color ?? "",
+      birdName: bird.bird?.birdName ?? "",
+      note: "",
+      sex: bird.bird?.sex === 0 ? "COCK" : "HEN",
+      is_active: bird.bird?.isActive === 1,
+      is_lost: bird.bird?.isLost === 1,
+      lost_date: bird.bird?.lostDate ? new Date(bird.bird.lostDate) : null,
+      arrivalDate: bird.arrivalTime ? new Date(bird.arrivalTime) : null,
       departureDate: bird.departureDate ? new Date(bird.departureDate) : null,
     },
   });
@@ -107,7 +107,7 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
             Breeder
           </h3>
           <Input
-            value={bird.bird.breeder?.name || "N/A"}
+            value={`${bird.bird?.breeder?.firstName || ""} ${bird.bird?.breeder?.lastName || ""}`.trim() || "N/A"}
             readOnly
             className="bg-gray-50 h-8 text-sm"
           />

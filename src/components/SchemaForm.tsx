@@ -34,7 +34,7 @@ import { toast } from "sonner";
 
 const feeSchema = z
   .object({
-    name: z.string().min(1, "Fee name is required"),
+    feeSchemeName: z.string().min(1, "Fee name is required"),
     entryFee: z.number().min(0, "Entry fee must be a non-negative number"),
     isRefundable: z.boolean(),
     minEntryFees: z
@@ -81,8 +81,8 @@ const feeSchema = z
   });
 
 const prizeSchema = z.object({
-  name: z.string().min(1, "Prize name is required"),
-  distributions: z.array(
+  prizeName: z.string().min(1, "Prize name is required"),
+  prizeSchemeItems: z.array(
     z.object({
       fromPosition: z.number().int().min(1, "From position must be at least 1"),
       toPosition: z.number().int().min(1, "To position must be at least 1"),
@@ -95,7 +95,7 @@ const prizeSchema = z.object({
 });
 
 const bettingSchema = z.object({
-  name: z.string().min(1, "Betting name is required"),
+  bettingSchemeName: z.string().min(1, "Betting name is required"),
   bettingCutPercent: z
     .number()
     .min(0, "Betting cut percent must be a non-negative number")
@@ -267,7 +267,7 @@ export default function SchemaForm({
 }
 
 function FeeSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
-  const { data, isPending, error, isError, isSuccess } = useGetFee(id);
+  const { data, isPending, error, isError, isSuccess } = useGetFee(parseInt(id));
   const feeSchema: FullFeeSchema = data?.data;
   
   if (isPending) {
@@ -291,7 +291,7 @@ function FeeSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void 
 }
 
 function PrizeSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
-  const { data, isPending, error, isError, isSuccess } = useGetPrize(id);
+  const { data, isPending, error, isError, isSuccess } = useGetPrize(parseInt(id));
   const prizeSchema: FullPrizeSchema = data?.data;
   
   if (isPending) {
@@ -328,17 +328,27 @@ function PrizeSchemaForm({
   onClose?: () => void;
 }) {
     const { mutateAsync: createPrize } = useCreatePrize();
-  const { mutateAsync: updatePrize } = useUpdatePrize(id ? id : "");
+  const { mutateAsync: updatePrize } = useUpdatePrize(id ? parseInt(id) : 0);
+  
+  const transformedDefaults = defaultValues ? {
+    prizeName: defaultValues.prizeName ?? "",
+    prizeSchemeItems: defaultValues.prizeSchemeItems.map(item => ({
+      fromPosition: item.fromPosition ?? 1,
+      toPosition: item.toPosition ?? 1,
+      prizeValue: item.prizeValue ?? 0,
+    })),
+  } : {
+    prizeName: "",
+    prizeSchemeItems: [],
+  };
+  
   const form = useForm<z.infer<typeof prizeSchema>>({
     resolver: zodResolver(prizeSchema),
-    defaultValues: defaultValues || {
-      name: "",
-      distributions: [],
-    },
+    defaultValues: transformedDefaults,
   });
 
   const { fields, append, remove } = useFieldArray({
-    name: "distributions",
+    name: "prizeSchemeItems",
     control: form.control,
   });
 
@@ -378,7 +388,7 @@ function PrizeSchemaForm({
       >
         <FormField
           control={form.control}
-          name="name"
+          name="prizeName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -399,7 +409,7 @@ function PrizeSchemaForm({
           <div className="flex items-start space-x-4" key={field.id}>
             <FormField
               control={form.control}
-              name={`distributions.${index}.fromPosition`}
+              name={`prizeSchemeItems.${index}.fromPosition`}
               render={({ field: fromField }) => (
                 <FormItem className="w-full">
                   <FormLabel>From Position</FormLabel>
@@ -421,7 +431,7 @@ function PrizeSchemaForm({
             />
             <FormField
               control={form.control}
-              name={`distributions.${index}.toPosition`}
+              name={`prizeSchemeItems.${index}.toPosition`}
               render={({ field: toField }) => (
                 <FormItem className="w-full">
                   <FormLabel>To Position</FormLabel>
@@ -441,7 +451,7 @@ function PrizeSchemaForm({
             />
             <FormField
               control={form.control}
-              name={`distributions.${index}.prizeValue`}
+              name={`prizeSchemeItems.${index}.prizeValue`}
               render={({ field: prizeValueField }) => (
                 <FormItem className="w-full">
                   <FormLabel>Prize Value</FormLabel>
@@ -496,7 +506,7 @@ function PrizeSchemaForm({
     </Form>
   );
 }function BettingSchemaFormFetch({ id, onClose }: { id: string; onClose?: () => void }) {
-  const { data, isPending, error, isError, isSuccess } = useGetBetting(id);
+  const { data, isPending, error, isError, isSuccess } = useGetBetting(parseInt(id));
   const bettingSchemaData = data?.data;
   
   if (isPending) {
@@ -533,11 +543,11 @@ function BettingSchemaForm({
   onClose?: () => void;
 }) {
   const { mutateAsync: createBetting } = useCreateBetting();
-  const { mutateAsync: updateBetting } = useUpdateBetting(id ? id : "");
+  const { mutateAsync: updateBetting } = useUpdateBetting(id ? parseInt(id) : 0);
   const form = useForm<z.infer<typeof bettingSchema>>({
     resolver: zodResolver(bettingSchema),
     defaultValues: defaultValues || {
-      name: "",
+      bettingSchemeName: "",
       belgianShow1: 0,
       belgianShow2: 0,
       belgianShow3: 0,
@@ -603,7 +613,7 @@ function BettingSchemaForm({
         {/* Name Field */}
         <FormField
           control={form.control}
-          name="name"
+          name="bettingSchemeName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -863,24 +873,44 @@ function FeeSchemaForm({
   onClose?: () => void;
 }) {
   const { mutateAsync: createFee } = useCreateFee();
-  const { mutateAsync: updateFee } = useUpdateFee(id ? id : "");
+  const { mutateAsync: updateFee } = useUpdateFee(id ? parseInt(id) : 0);
+  
+  const transformedDefaults = defaultValues ? {
+    feeSchemeName: defaultValues.feeSchemeName ?? "",
+    entryFee: defaultValues.entryFee ?? 0,
+    isRefundable: Boolean(defaultValues.isRefundable),
+    minEntryFees: defaultValues.minEntryFees ?? 0,
+    maxBirdCount: defaultValues.maxBirdCount ?? 1,
+    maxBackupBirdCount: defaultValues.maxBackupBirdCount ?? 0,
+    isFloatingBackup: Boolean(defaultValues.isFloatingBackup),
+    feesCutPercent: defaultValues.feesCutPercent ?? 0,
+    hotSpot1Fee: defaultValues.hotSpot1Fee ?? 0,
+    hotSpot2Fee: defaultValues.hotSpot2Fee ?? 0,
+    hotSpot3Fee: defaultValues.hotSpot3Fee ?? 0,
+    hotSpotFinalFee: defaultValues.hotSpotFinalFee ?? 0,
+    perchFees: defaultValues.perchFeeItems.map(item => ({
+      birdNo: item.birdNo ?? 1,
+      perchFee: item.perchFee ?? 0,
+    })),
+  } : {
+    feeSchemeName: "",
+    entryFee: 0,
+    isRefundable: false,
+    minEntryFees: 0,
+    maxBirdCount: 1,
+    maxBackupBirdCount: 0,
+    isFloatingBackup: false,
+    feesCutPercent: 0,
+    hotSpot1Fee: 0,
+    hotSpot2Fee: 0,
+    hotSpot3Fee: 0,
+    hotSpotFinalFee: 0,
+    perchFees: [{ birdNo: 1, perchFee: 0 }],
+  };
+  
   const form = useForm<z.infer<typeof feeSchema>>({
     resolver: zodResolver(feeSchema),
-    defaultValues: defaultValues || {
-      name: "",
-      entryFee: 0,
-      isRefundable: false,
-      minEntryFees: 0,
-      maxBirdCount: 1,
-      maxBackupBirdCount: 0,
-      isFloatingBackup: false,
-      feesCutPercent: 0,
-      hotSpot1Fee: 0,
-      hotSpot2Fee: 0,
-      hotSpot3Fee: 0,
-      hotSpotFinalFee: 0,
-      perchFees: [{ birdNo: 1, perchFee: 0 }],
-    },
+    defaultValues: transformedDefaults,
   });
 
   const maxBirdCountValue = form.watch("maxBirdCount");
@@ -897,9 +927,16 @@ function FeeSchemaForm({
 
   async function onSubmit(values: z.infer<typeof feeSchema>) {
     try {
+      // Transform boolean values to 0/1 for backend
+      const transformedValues = {
+        ...values,
+        isRefundable: values.isRefundable ? 1 : 0,
+        isFloatingBackup: values.isFloatingBackup ? 1 : 0,
+      };
+      
       if (action === "create") {
         if (!createFee) return;
-        const { data, error, status } = await createFee(values);
+        const { data, error, status } = await createFee(transformedValues);
         if (error) {
           toast.error(error);
           return;
@@ -909,7 +946,7 @@ function FeeSchemaForm({
         onClose?.();
       } else if (action === "update" && id) {
         if (!updateFee) return;
-        const { data, error, status } = await updateFee(values);
+        const { data, error, status } = await updateFee(transformedValues);
         if (error) {
           toast.error(error);
           return;
@@ -931,7 +968,7 @@ function FeeSchemaForm({
       >
         <FormField
           control={form.control}
-          name="name"
+          name="feeSchemeName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>

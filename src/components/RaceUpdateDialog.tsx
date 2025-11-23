@@ -62,10 +62,10 @@ interface RaceUpdateDialogProps {
 }
 
 export function RaceUpdateDialog({ raceId, onClose }: RaceUpdateDialogProps) {
-  const { data: raceData, isPending: isLoadingRace } = useGetRace(raceId);
+  const { data: raceData, isPending: isLoadingRace } = useGetRace(parseInt(raceId));
   const { data: eventsData } = useListEvents({});
   const events: Event[] = eventsData?.data?.events || [];
-  const { mutateAsync: updateRace } = useUpdateRace(raceId);
+  const { mutateAsync: updateRace } = useUpdateRace(parseInt(raceId));
 
   const race = raceData?.data;
 
@@ -179,8 +179,8 @@ export function RaceUpdateDialog({ raceId, onClose }: RaceUpdateDialogProps) {
                     </FormControl>
                     <SelectContent>
                       {events.map((event) => (
-                        <SelectItem key={event.id} value={event.id}>
-                          {event.name}
+                        <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                          {event.eventName}
                         </SelectItem>
                       ))}
                     </SelectContent>
