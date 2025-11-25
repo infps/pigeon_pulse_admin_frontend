@@ -1,5 +1,6 @@
 "use client";
-import Sidebar from "@/components/Sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AuthProvider } from "../auth-provider";
 import Header from "@/components/Header";
 
@@ -10,13 +11,13 @@ export default function MainLayout({
 }) {
   return (
     <AuthProvider requireAuth={true}>
-      <div className="h-screen w-full flex">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="flex flex-col overflow-hidden">
           <Header />
-          <div>{children}</div>
-        </main>
-      </div>
+          <div className="flex-1 overflow-y-auto">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
     </AuthProvider>
   );
 }

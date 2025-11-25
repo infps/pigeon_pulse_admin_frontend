@@ -1,8 +1,6 @@
 type User = {
-  id: number;
   email: string;
-  firstName: string | null;
-  lastName: string | null;
+  name: string | null;
 };
 
 type CurrentUser = {
@@ -269,15 +267,15 @@ type Breeders = {
 };
 
 type BirdEventInventory = {
-  idEventInventory:number;
-  idEvent:number | null;
-  idBreeder:number | null;
-  signInDate:string | null;
-  waitingDate:string | null;
-  isWaiting:number | null;
-  reservedBirds:number | null;
-  loft:string | null;
-  note:string | null;
+  idEventInventory: number;
+  idEvent: number | null;
+  idBreeder: number | null;
+  signInDate: string | null;
+  waitingDate: string | null;
+  isWaiting: number | null;
+  reservedBirds: number | null;
+  loft: string | null;
+  note: string | null;
   eventInventoryItems?: EventInventoryItems[];
 };
 

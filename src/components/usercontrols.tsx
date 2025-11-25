@@ -21,7 +21,6 @@ export default function UserControls() {
     return null;
   }
   const { mutateAsync: logout } = useLogout();
-  const router = useRouter();
   const handleLogout = async () => {
     if (!logout) return;
     try {

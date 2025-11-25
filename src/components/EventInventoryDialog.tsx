@@ -84,10 +84,12 @@ const paymentsColumns: ColumnDef<EventInventoryPayment>[] = [
         0: "Perch Fee",
         1: "Entry Fee",
         2: "Classes",
-        3: "Hotspot Fee 2",
-        4: "Hotspot Fee 3",
-        5: "Hotspot Fee 4",
-        6: "Final Race Fee",
+        3: "Hotspot Fee",
+        4: "Entry Refund",
+        5: "Unknown",
+        6: "Unknown",
+        7: "Transfer Due",
+        8: "Winner Payout"
       };
       return <div className="font-medium">{typeMap[type] || "Other"}</div>;
     },

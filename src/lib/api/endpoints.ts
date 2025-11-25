@@ -25,6 +25,9 @@ const userEndpoints = {
   updateProfile: "/users/profile",
   getBreeders: (id: number) => `/users/breeders/event/${id}`,
   getBreedersAddressBook: `/users/breeders`,
+  getBreeder: (breederId: number) => `/users/breeders/${breederId}`,
+  createBreeder: `/users/breeders`,
+  updateBreeder: (breederId: number) => `/users/breeders/${breederId}`,
 };
 
 const eventInventoryEndpoints = {

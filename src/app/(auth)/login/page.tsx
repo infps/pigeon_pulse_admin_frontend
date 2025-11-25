@@ -42,10 +42,9 @@ export default function page() {
       if (!login) return;
       const { data } = await login(values);
       console.log(data)
-      // Store token in localStorage instead of cookies
       tokenStorage.set(data.data.token);
       toast.success("Login successful!");
-      router.push("/");
+      router.push("/breeders");
     } catch (error: any) {
       toast.error(
         error.message || "Login failed. Please check your credentials."

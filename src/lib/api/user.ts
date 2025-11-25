@@ -36,3 +36,28 @@ export function useGetBreederAddressBook(params: Record<string, any>) {
     queryKey: ["breederAddressBook", queryParams],
   });
 }
+
+export function useGetBreeder(breederId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.getBreeder(breederId),
+    method: "GET",
+    queryKey: ["breeder", String(breederId)],
+    enabled: breederId > 0,
+  });
+}
+
+export function useCreateBreeder() {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.createBreeder,
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["breederAddressBook"] }],
+  });
+}
+
+export function useUpdateBreeder(breederId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.updateBreeder(breederId),
+    method: "PUT",
+    invalidateKeys: [{ queryKey: ["breederAddressBook"] }, { queryKey: ["breeder", String(breederId)] }],
+  });
+}

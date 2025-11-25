@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { BreederAddressBookColumns, EventColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -17,6 +19,9 @@ import { useGetBreederAddressBook } from "@/lib/api/user";
 import { useListEvents } from "@/lib/api/events";
 import { BreederAddressBook, Event } from "@/lib/types";
 import { useQueryState } from "nuqs";
+import { BreederUpdateDialog } from "@/components/BreederUpdateDialog";
+import { BreederCreateDialog } from "@/components/BreederCreateDialog";
+import { Plus } from "lucide-react";
 
 export default function BreedersTable() {
   const [q, setQ] = useQueryState("q", {
@@ -28,6 +33,10 @@ export default function BreedersTable() {
   const [status, setStatus] = useQueryState("status", {
     defaultValue: "",
   });
+  const [selectedBreederId, setSelectedBreederId] = useState<number | null>(null);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   const debouncedSearchTerm = useDebounce(q, 300);
   const { data, error, isError, isPending, isSuccess } =
     useGetBreederAddressBook({
@@ -53,7 +62,44 @@ export default function BreedersTable() {
   
   const breeders: BreederAddressBook[] = data?.data || [];
 
-  return <DataTable columns={BreederAddressBookColumns} data={breeders} />;
+  const handleRowClick = (breeder: BreederAddressBook) => {
+    setSelectedBreederId(breeder.idBreeder);
+    setIsUpdateDialogOpen(true);
+  };
+
+  const handleAddNewBreeder = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  return (
+    <>
+      <div className="mb-4 flex justify-end">
+        <Button onClick={handleAddNewBreeder} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Add New Breeder
+        </Button>
+      </div>
+      
+      <DataTable 
+        columns={BreederAddressBookColumns} 
+        data={breeders} 
+        onRowClick={handleRowClick}
+      />
+      
+      {selectedBreederId && (
+        <BreederUpdateDialog
+          breederId={selectedBreederId}
+          open={isUpdateDialogOpen}
+          onOpenChange={setIsUpdateDialogOpen}
+        />
+      )}
+
+      <BreederCreateDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
+    </>
+  );
 }
 
 export function BreederSearch() {

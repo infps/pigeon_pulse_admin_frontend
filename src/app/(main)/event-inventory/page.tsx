@@ -257,7 +257,7 @@ function EventInventoryTable({ events }: { events: Event[] }) {
     <div className="space-y-4">
       {/* Filters Section */}
       <div className="bg-gray-50 p-4 rounded-lg border">
-        <h3 className="font-semibold mb-3">Filters</h3>
+        {/* <h3 className="font-semibold mb-3">Filters</h3> */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Event Filter */}
           <div>
@@ -410,7 +410,7 @@ function EventInventoryTable({ events }: { events: Event[] }) {
 
       {/* Summary Section */}
       <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-        <h3 className="font-semibold mb-3">Summary</h3>
+        {/* <h3 className="font-semibold mb-3">Summary</h3> */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
           <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">Birds Registered</p>
@@ -424,36 +424,36 @@ function EventInventoryTable({ events }: { events: Event[] }) {
               ${summary.totalPerchFees.toFixed(2)}
             </p>
           </div>
-          <div className="bg-white p-3 rounded shadow-sm">
+          {/* <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">Perch Fees Due</p>
             <p className="text-lg font-bold text-red-600">
               ${summary.totalPerchFeesDue.toFixed(2)}
             </p>
-          </div>
+          </div> */}
           <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">Total Entry Fees</p>
             <p className="text-lg font-bold text-green-600">
               ${summary.totalEntryFees.toFixed(2)}
             </p>
           </div>
-          <div className="bg-white p-3 rounded shadow-sm">
+          {/* <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">Entry Fees Due</p>
             <p className="text-lg font-bold text-red-600">
               ${summary.totalEntryFeesDue.toFixed(2)}
             </p>
-          </div>
+          </div> */}
           <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">Total HOT SPOT</p>
             <p className="text-lg font-bold text-green-600">
               ${summary.totalFinalFees.toFixed(2)}
             </p>
           </div>
-          <div className="bg-white p-3 rounded shadow-sm">
+          {/* <div className="bg-white p-3 rounded shadow-sm">
             <p className="text-xs text-gray-600">HOT SPOT Due</p>
             <p className="text-lg font-bold text-red-600">
               ${summary.totalFinalFeesDue.toFixed(2)}
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 
