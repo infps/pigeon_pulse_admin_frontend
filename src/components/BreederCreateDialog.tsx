@@ -41,7 +41,11 @@ const createBreederSchema = z.object({
   cell: z.string().optional(),
   fax: z.string().optional(),
   email: z.string().email("Invalid email address").optional(),
-  email2: z.string().email("Invalid email address").optional().or(z.literal("")),
+  email2: z
+    .string()
+    .email("Invalid email address")
+    .optional()
+    .or(z.literal("")),
   webAddress: z.string().optional(),
   socialSecurityNumber: z.string().optional(),
   status: z.number().int().min(0).max(2).optional(),
@@ -121,8 +125,8 @@ export function BreederCreateDialog({
       if (!data.email2) {
         delete data.email2;
       }
-      if(!createBreeder) return;
-      await createBreeder({ data });
+      if (!createBreeder) return;
+      await createBreeder(data);
       toast.success("Breeder created successfully");
       reset();
       onOpenChange(false);
@@ -176,11 +180,7 @@ export function BreederCreateDialog({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                {...register("country")}
-                placeholder="USA"
-              />
+              <Input id="country" {...register("country")} placeholder="USA" />
               {errors.country && (
                 <p className="text-sm text-destructive">
                   {errors.country.message}
@@ -220,7 +220,10 @@ export function BreederCreateDialog({
                     if (checked) setIsDefaultAddress2(false);
                   }}
                 />
-                <Label htmlFor="isDefaultAddress1" className="text-sm font-normal">
+                <Label
+                  htmlFor="isDefaultAddress1"
+                  className="text-sm font-normal"
+                >
                   Set as default
                 </Label>
               </div>
@@ -290,7 +293,10 @@ export function BreederCreateDialog({
                     if (checked) setIsDefaultAddress1(false);
                   }}
                 />
-                <Label htmlFor="isDefaultAddress2" className="text-sm font-normal">
+                <Label
+                  htmlFor="isDefaultAddress2"
+                  className="text-sm font-normal"
+                >
                   Set as default
                 </Label>
               </div>
@@ -334,11 +340,7 @@ export function BreederCreateDialog({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  {...register("phone")}
-                  placeholder="( ) -"
-                />
+                <Input id="phone" {...register("phone")} placeholder="( ) -" />
                 {errors.phone && (
                   <p className="text-sm text-destructive">
                     {errors.phone.message}

@@ -791,8 +791,9 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
     cell: ({ row }) => {
       const sex = row.original.bird?.sex;
       const sexMap: Record<number, string> = {
-        0: "Male",
-        1: "Female",
+        0: "N/A",
+        1: "Cock",
+        2: "Hen",
       };
       return sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A";
     },

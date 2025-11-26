@@ -43,7 +43,11 @@ const updateBreederSchema = z.object({
   cell: z.string().optional(),
   fax: z.string().optional(),
   email: z.string().email("Invalid email address").optional(),
-  email2: z.string().email("Invalid email address").optional().or(z.literal("")),
+  email2: z
+    .string()
+    .email("Invalid email address")
+    .optional()
+    .or(z.literal("")),
   webAddress: z.string().optional(),
   socialSecurityNumber: z.string().optional(),
   status: z.number().int().min(0).max(2).optional(),
@@ -70,7 +74,8 @@ export function BreederUpdateDialog({
   open,
   onOpenChange,
 }: BreederUpdateDialogProps) {
-  const { data: breederData, isPending: isLoadingBreeder } = useGetBreeder(breederId);
+  const { data: breederData, isPending: isLoadingBreeder } =
+    useGetBreeder(breederId);
   const breeder = breederData?.data as BreederAddressBook | undefined;
 
   const [isDefaultAddress1, setIsDefaultAddress1] = useState(false);
@@ -137,8 +142,8 @@ export function BreederUpdateDialog({
       if (!data.email2) {
         delete data.email2;
       }
-      if(!updateBreeder) return;
-      await updateBreeder({ data });
+      if (!updateBreeder) return;
+      await updateBreeder(data);
       toast.success("Breeder profile updated successfully");
       onOpenChange(false);
     } catch (error: any) {
@@ -377,7 +382,11 @@ export function BreederUpdateDialog({
                 </div>
                 <div>
                   <Label htmlFor="statusDate">Date</Label>
-                  <Input id="statusDate" type="date" {...register("statusDate")} />
+                  <Input
+                    id="statusDate"
+                    type="date"
+                    {...register("statusDate")}
+                  />
                 </div>
               </div>
             </div>
