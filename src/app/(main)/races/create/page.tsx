@@ -29,23 +29,13 @@ import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   eventId: z.string().min(1, "Event is required"),
-  type: z.enum([
-    "TRAINING",
-    "INVENTORY",
-    "LOFT_FLY",
-    "PULLING_FLIGHT",
-    "FINAL_RACE",
-    "HOTSPOT_1",
-    "HOTSPOT_2",
-    "HOTSPOT_3",
-    "AVG_WINNER",
-  ]),
+  type: z.number().int().min(1).max(8),
   liberation: z.string().min(1, "Liberation is required"),
   distance: z.string().min(1, "Distance is required"),
   description: z.string().optional(),
   startTime: z.date(),
-  sunrise: z.string().min(1, "Sunrise is required"),
-  sunset: z.string().min(1, "Sunset is required"),
+  sunrise: z.date(),
+  sunset: z.date(),
   arrivalDate: z.date(),
   // Release conditions
   releaseWeather: z.string().optional(),
@@ -67,13 +57,13 @@ export default function Page() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       eventId: "",
-      type: "TRAINING",
+      type: 1,
       liberation: "",
       distance: "",
       description: "",
       startTime: new Date(),
-      sunrise: "12:00:00 AM",
-      sunset: "07:00:00 PM",
+      sunrise: new Date(),
+      sunset: new Date(),
       arrivalDate: new Date(),
       releaseWeather: "",
       releaseWind: "",
@@ -92,7 +82,7 @@ export default function Page() {
 
     try {
       const { data, error } = await createRace({
-        eventId: values.eventId,
+        eventId: Number(values.eventId),
         type: values.type,
         location: values.liberation,
         distance: values.distance,
@@ -149,8 +139,8 @@ export default function Page() {
                     </FormControl>
                     <SelectContent>
                       {events.map((event) => (
-                        <SelectItem key={event.id} value={event.id}>
-                          {event.name}
+                        <SelectItem key={event.idEvent} value={String(event.idEvent)}>
+                          {event.eventName}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -167,8 +157,8 @@ export default function Page() {
                 <FormItem className="md:col-span-1">
                   <FormLabel>Type</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    defaultValue={String(field.value)}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -176,17 +166,14 @@ export default function Page() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="TRAINING">Training</SelectItem>
-                      <SelectItem value="INVENTORY">Inventory</SelectItem>
-                      <SelectItem value="LOFT_FLY">Loft Fly</SelectItem>
-                      <SelectItem value="PULLING_FLIGHT">
-                        Pulling Flight
-                      </SelectItem>
-                      <SelectItem value="FINAL_RACE">Final Race</SelectItem>
-                      <SelectItem value="HOTSPOT_1">Hotspot 1</SelectItem>
-                      <SelectItem value="HOTSPOT_2">Hotspot 2</SelectItem>
-                      <SelectItem value="HOTSPOT_3">Hotspot 3</SelectItem>
-                      <SelectItem value="AVG_WINNER">Avg Winner</SelectItem>
+                      <SelectItem value="1">Training</SelectItem>
+                      <SelectItem value="2">Inventory</SelectItem>
+                      <SelectItem value="3">Loft Fly</SelectItem>
+                      <SelectItem value="4">Pulling Flight</SelectItem>
+                      <SelectItem value="5">Final Race</SelectItem>
+                      <SelectItem value="6">Hot Spot 1</SelectItem>
+                      <SelectItem value="7">Hot Spot 2</SelectItem>
+                      <SelectItem value="8">Hot Spot 3</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -216,10 +203,14 @@ export default function Page() {
               control={form.control}
               name="sunrise"
               render={({ field }) => (
-                <FormItem className="w-max">
+                <FormItem className="">
                   <FormLabel>Sunrise</FormLabel>
                   <FormControl>
-                    <Input {...field} type="time" />
+                    <SmartDatetimeInput
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Pick sunrise time"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -279,10 +270,14 @@ export default function Page() {
               control={form.control}
               name="sunset"
               render={({ field }) => (
-                <FormItem className="w-max">
+                <FormItem className="">
                   <FormLabel>Sunset</FormLabel>
                   <FormControl>
-                    <Input {...field} type="time" />
+                    <SmartDatetimeInput
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      placeholder="Pick sunset time"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

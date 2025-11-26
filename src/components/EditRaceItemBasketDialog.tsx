@@ -38,15 +38,15 @@ export function EditRaceItemBasketDialog({
   onClose,
 }: EditRaceItemBasketDialogProps) {
   const [loftBasketId, setLoftBasketId] = useState<string>(
-    raceItem.loftBasket?.id || "none"
+    raceItem.distBasket?.idBasket.toString() || "none"
   );
   const [raceBasketId, setRaceBasketId] = useState<string>(
-    raceItem.raceBasket?.id || "none"
+    raceItem.raceBasket?.idBasket.toString() || "none"
   );
-  const [basketedBird, setBasketedBird] = useState(raceItem.loftBasketed);
+  const [basketedBird, setBasketedBird] = useState(Boolean(raceItem.isDistBasketted));
 
-  const { data, error, isPending: isLoadingBaskets } = useListBaskets(raceId);
-  const { mutate, isPending } = useUpdateRaceItemBasket(raceId, raceItem.id);
+  const { data, error, isPending: isLoadingBaskets } = useListBaskets(parseInt(raceId));
+  const { mutate, isPending } = useUpdateRaceItemBasket(parseInt(raceId), raceItem.idRaceItem);
 
   const baskets: Basket[] = data?.data || [];
   const loftBaskets = baskets.filter((b) => !b.isRaceBasket);
@@ -58,9 +58,9 @@ export function EditRaceItemBasketDialog({
 
     mutate(
       {
-        loftBasketId: loftBasketId === "none" ? null : loftBasketId,
-        raceBasketId: raceBasketId === "none" ? null : raceBasketId,
-        loftBasketed: basketedBird,
+        loftBasketId: loftBasketId === "none" ? null : parseInt(loftBasketId),
+        raceBasketId: raceBasketId === "none" ? null : parseInt(raceBasketId),
+        loftBasketed: basketedBird ? 1 : 0,
       },
       {
         onSuccess: () => {
@@ -98,7 +98,7 @@ export function EditRaceItemBasketDialog({
         <DialogHeader>
           <DialogTitle>Edit Basket Assignment</DialogTitle>
           <DialogDescription>
-            Assign {raceItem.eventInventoryItem.bird.birdName} to baskets
+            Assign {raceItem.inventoryItem?.bird?.birdName || "Bird"} to baskets
           </DialogDescription>
         </DialogHeader>
 
@@ -114,17 +114,19 @@ export function EditRaceItemBasketDialog({
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
                   {loftBaskets.map((basket) => {
-                    const itemCount = basket._count?.loftBasketItems || 0;
-                    const isFull = itemCount >= basket.capacity;
+                    const itemCount = basket._count?.distBasketItems || 0;
+                    const capacity = basket.capacity || 0;
+                    const isFull = itemCount >= capacity;
+                    const basketIdStr = basket.idBasket.toString();
                     return (
                       <SelectItem
-                        key={basket.id}
-                        value={basket.id}
-                        disabled={isFull && basket.id !== loftBasketId}
+                        key={basket.idBasket}
+                        value={basketIdStr}
+                        disabled={isFull && basketIdStr !== loftBasketId}
                       >
-                        Basket #{basket.basketNumber} ({itemCount}/
-                        {basket.capacity})
-                        {isFull && basket.id !== loftBasketId ? " - Full" : ""}
+                        Basket #{basket.basketNo} ({itemCount}/
+                        {capacity})
+                        {isFull && basketIdStr !== loftBasketId ? " - Full" : ""}
                       </SelectItem>
                     );
                   })}
@@ -160,16 +162,18 @@ export function EditRaceItemBasketDialog({
                   <SelectItem value="none">None</SelectItem>
                   {raceBaskets.map((basket) => {
                     const itemCount = basket._count?.raceBasketItems || 0;
-                    const isFull = itemCount >= basket.capacity;
+                    const capacity = basket.capacity || 0;
+                    const isFull = itemCount >= capacity;
+                    const basketIdStr = basket.idBasket.toString();
                     return (
                       <SelectItem
-                        key={basket.id}
-                        value={basket.id}
-                        disabled={isFull && basket.id !== raceBasketId}
+                        key={basket.idBasket}
+                        value={basketIdStr}
+                        disabled={isFull && basketIdStr !== raceBasketId}
                       >
-                        Basket #{basket.basketNumber} ({itemCount}/
-                        {basket.capacity})
-                        {isFull && basket.id !== raceBasketId ? " - Full" : ""}
+                        Basket #{basket.basketNo} ({itemCount}/
+                        {capacity})
+                        {isFull && basketIdStr !== raceBasketId ? " - Full" : ""}
                       </SelectItem>
                     );
                   })}

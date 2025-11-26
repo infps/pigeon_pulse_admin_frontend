@@ -50,7 +50,7 @@ function CreateBasketDialog({
   const [isOpen, setIsOpen] = useState(false);
   const [basketNumber, setBasketNumber] = useState("");
   const [capacity, setCapacity] = useState("");
-  const { mutate, isPending } = useCreateBasket(raceId);
+  const { mutate, isPending } = useCreateBasket(parseInt(raceId));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +59,7 @@ function CreateBasketDialog({
       {
         basketNumber: parseInt(basketNumber),
         capacity: parseInt(capacity),
-        isRaceBasket,
+        isRaceBasket: isRaceBasket ? 1 : 0,
       },
       {
         onSuccess: () => {
@@ -138,10 +138,10 @@ function EditBasketDialog({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [basketNumber, setBasketNumber] = useState(
-    basket.basketNumber.toString()
+    basket?.basketNo?.toString() || ""
   );
-  const [capacity, setCapacity] = useState(basket.capacity.toString());
-  const { mutate, isPending } = useUpdateBasket(raceId, basket.id);
+  const [capacity, setCapacity] = useState(basket?.capacity?.toString() || "");
+  const { mutate, isPending } = useUpdateBasket(parseInt(raceId), basket.idBasket);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,7 +170,7 @@ function EditBasketDialog({
         <DialogHeader>
           <DialogTitle>Edit Basket</DialogTitle>
           <DialogDescription>
-            Update basket #{basket.basketNumber} details.
+            Update basket #{basket.basketNo} details.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -224,7 +224,7 @@ function DeleteBasketDialog({
   raceId: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { mutate, isPending } = useDeleteBasket(raceId, basket.id);
+  const { mutate, isPending } = useDeleteBasket(parseInt(raceId), basket.idBasket);
 
   const handleDelete = () => {
     if (!mutate) return;
@@ -247,7 +247,7 @@ function DeleteBasketDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Basket</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete basket #{basket.basketNumber}? This
+            Are you sure you want to delete basket #{basket.basketNo}? This
             action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -269,13 +269,14 @@ function DeleteBasketDialog({
 function BasketCard({ basket, raceId }: { basket: Basket; raceId: string }) {
   const itemCount = basket.isRaceBasket
     ? basket._count?.raceBasketItems || 0
-    : basket._count?.loftBasketItems || 0;
+    : basket._count?.distBasketItems || 0;
+  const capacity = basket.capacity || 0;
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-lg">
-          <span>Basket #{basket.basketNumber}</span>
+          <span>Basket #{basket.basketNo}</span>
           <div className="flex gap-2">
             <EditBasketDialog basket={basket} raceId={raceId} />
             <DeleteBasketDialog basket={basket} raceId={raceId} />
@@ -286,22 +287,22 @@ function BasketCard({ basket, raceId }: { basket: Basket; raceId: string }) {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Capacity:</span>
-            <span className="font-medium">{basket.capacity}</span>
+            <span className="font-medium">{capacity}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Current Items:</span>
             <span className="font-medium">
-              {itemCount} / {basket.capacity}
+              {itemCount} / {capacity}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Status:</span>
             <span
               className={`font-medium ${
-                itemCount >= basket.capacity ? "text-red-600" : "text-green-600"
+                itemCount >= capacity ? "text-red-600" : "text-green-600"
               }`}
             >
-              {itemCount >= basket.capacity ? "Full" : "Available"}
+              {itemCount >= capacity ? "Full" : "Available"}
             </span>
           </div>
         </div>
@@ -314,7 +315,7 @@ export function BasketManagement({
   raceId,
   isRaceBasket,
 }: BasketManagementProps) {
-  const { data, error, isPending, isError } = useListBaskets(raceId);
+  const { data, error, isPending, isError } = useListBaskets(parseInt(raceId));
 
   if (isPending) {
     return (
@@ -330,7 +331,7 @@ export function BasketManagement({
 
   const baskets: Basket[] = data?.data || [];
   const filteredBaskets = baskets.filter(
-    (basket) => basket.isRaceBasket === isRaceBasket
+    (basket) => Boolean(basket.isRaceBasket) === isRaceBasket
   );
 
   return (
@@ -353,7 +354,7 @@ export function BasketManagement({
       ) : (
         <div className="grid gap-4">
           {filteredBaskets.map((basket) => (
-            <BasketCard key={basket.id} basket={basket} raceId={raceId} />
+            <BasketCard key={basket.idBasket} basket={basket} raceId={raceId} />
           ))}
         </div>
       )}

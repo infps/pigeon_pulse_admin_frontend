@@ -992,12 +992,17 @@ export const RaceColumns: ColumnDef<Race>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <ClickableRaceLocation
-        raceId={row.original.idRace}
-        location={row.getValue("type")}
-      />
-    ),
+    cell: ({ row }) => {
+      if (row.original.idRaceType === 1) return "Training";
+      if (row.original.idRaceType === 2) return "Inventory";
+      if (row.original.idRaceType === 3) return "Loft Fly";
+      if (row.original.idRaceType === 4) return "Pulling Flight";
+      if (row.original.idRaceType === 5) return "Final Race";
+      if (row.original.idRaceType === 6) return "Hot Spot 1";
+      if (row.original.idRaceType === 7) return "Hot Spot 2";
+      if (row.original.idRaceType === 8) return "Hot Spot 3";
+      return row.original.idRaceType
+    }
   },
   {
     accessorKey: "location",
@@ -1220,20 +1225,6 @@ export const RaceItemColumns: ColumnDef<RaceItem>[] = [
       const breeder = row.original.inventoryItem?.bird?.breeder;
       if (!breeder) return "N/A";
       return `${breeder.firstName || ""} ${breeder.lastName || ""}`.trim() || "N/A";
-    },
-  },
-  {
-    accessorKey: "inventoryItem.bird.birdName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Bird Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
     },
   },
   {

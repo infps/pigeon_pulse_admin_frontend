@@ -16,7 +16,7 @@ export default function RaceEntriesPage() {
   const [selectedRaceItem, setSelectedRaceItem] = useState<RaceItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data, error, isPending, isError } = useListRaceItems(raceId);
+  const { data, error, isPending, isError } = useListRaceItems(parseInt(raceId));
   const raceItems: RaceItem[] = data?.data || [];
 
   const handleRowClick = (raceItem: RaceItem) => {
