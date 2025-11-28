@@ -44,7 +44,7 @@ const formSchema = z.object({
   color: z.string().min(1, "Color is required"),
   birdName: z.string().min(1, "Bird Name is required"),
   note: z.string().optional(),
-  sex: z.enum(["HEN", "COCK"]),
+  sex: z.enum(["N/A", "COCK", "HEN"]),
   is_active: z.boolean(),
   is_lost: z.boolean(),
   lost_date: z.date().nullable(),
@@ -71,7 +71,7 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
       color: bird.bird?.color ?? "",
       birdName: bird.bird?.birdName ?? "",
       note: "",
-      sex: bird.bird?.sex === 0 ? "COCK" : "HEN",
+      sex: bird.bird?.sex === 0 ? "N/A" : bird.bird?.sex === 1 ? "COCK" : "HEN",
       is_active: bird.bird?.isActive === 1,
       is_lost: bird.bird?.isLost === 1,
       lost_date: bird.bird?.lostDate ? new Date(bird.bird.lostDate) : null,
@@ -208,8 +208,9 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="HEN">Hen</SelectItem>
+                          <SelectItem value="N/A">N/A</SelectItem>
                           <SelectItem value="COCK">Cock</SelectItem>
+                          <SelectItem value="HEN">Hen</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

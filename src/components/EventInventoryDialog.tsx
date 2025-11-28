@@ -125,11 +125,11 @@ const paymentsColumns: ColumnDef<EventInventoryPayment>[] = [
     },
   },
   {
-    accessorKey: "paymentValue",
+    accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const value = row.getValue("paymentValue") as number | null;
-      const isPaid = value !== null && value > 0;
+      const status = row.getValue("status") as number | null;
+      const isPaid = status === 1;
       return (
         <div
           className={`font-medium ${
@@ -176,8 +176,9 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const sex = row.original.bird?.sex;
         const sexMap: Record<number, string> = {
-          0: "Male",
-          1: "Female",
+          0: "N/A",
+          1: "Cock",
+          2: "Hen",
         };
         return <div>{sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A"}</div>;
       },

@@ -163,6 +163,7 @@ type EventInventoryPayment = {
   paymentDesc: string | null;
   paymentTimestamp: string | null;
   idPicture: number | null;
+  status: number | null;
 };
 
 type EventInventoryItemDetail = {
