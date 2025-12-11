@@ -3,6 +3,7 @@ import React from "react";
 import UserControls from "./usercontrols";
 import { SidebarTrigger } from "./ui/sidebar";
 import { Separator } from "./ui/separator";
+import { ModeToggle } from "./mode-toggle";
 
 export default function Header() {
   return (
@@ -10,7 +11,7 @@ export default function Header() {
       <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="mr-2 h-4" />
       <div className="flex-1" />
-      <UserControls />
+      <ModeToggle />
     </header>
   );
 }

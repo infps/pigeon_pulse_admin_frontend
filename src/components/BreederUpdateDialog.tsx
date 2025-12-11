@@ -26,23 +26,25 @@ import { useUpdateBreeder, useGetBreeder } from "@/lib/api/user";
 import { BreederAddressBook } from "@/lib/types";
 import { toast } from "sonner";
 import { LoadingSpinner } from "./loading-spinner";
+import { COUNTRIES, STATES } from "@/lib/constants";
+import Image from "next/image";
 
 const updateBreederSchema = z.object({
   firstName: z.string().min(1, "First Name is required").optional(),
   lastName: z.string().min(1, "Last Name is required").optional(),
-  country: z.string().min(1, "Country is required").optional(),
-  address1: z.string().min(1, "Address Line 1 is required").optional(),
-  city1: z.string().min(1, "City is required").optional(),
-  state1: z.string().min(1, "State is required").optional(),
-  zip1: z.string().min(1, "ZIP Code is required").optional(),
+  country: z.string().optional(),
+  address1: z.string().optional(),
+  city1: z.string().optional(),
+  state1: z.string().optional(),
+  zip1: z.string().optional(),
   address2: z.string().optional(),
   city2: z.string().optional(),
   state2: z.string().optional(),
   zip2: z.string().optional(),
-  phone: z.string().min(1, "Phone number is required").optional(),
+  phone: z.string().optional(),
   cell: z.string().optional(),
   fax: z.string().optional(),
-  email: z.string().email("Invalid email address").optional(),
+  email: z.email("Invalid email address").optional(),
   email2: z
     .string()
     .email("Invalid email address")
@@ -67,12 +69,14 @@ interface BreederUpdateDialogProps {
   breederId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCopyBreeder?: (breeder: BreederAddressBook) => void;
 }
 
 export function BreederUpdateDialog({
   breederId,
   open,
   onOpenChange,
+  onCopyBreeder,
 }: BreederUpdateDialogProps) {
   const { data: breederData, isPending: isLoadingBreeder } =
     useGetBreeder(breederId);
@@ -194,7 +198,45 @@ export function BreederUpdateDialog({
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="country">Country</Label>
-                <Input id="country" {...register("country")} />
+                <Select
+                  value={watch("country") || ""}
+                  onValueChange={(value) => setValue("country", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select country">
+                      {watch("country") && (
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/countryflags/${watch("country")}.gif`}
+                            alt={watch("country") || ""}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>
+                            {COUNTRIES.find((c) => c.code === watch("country"))?.name || watch("country")}
+                          </span>
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/countryflags/${country.code}.gif`}
+                            alt={country.name}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>{country.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.country && (
                   <p className="text-sm text-red-500 mt-1">
                     {errors.country.message}
@@ -253,7 +295,45 @@ export function BreederUpdateDialog({
                 </div>
                 <div>
                   <Label htmlFor="state1">State</Label>
-                  <Input id="state1" {...register("state1")} />
+                  <Select
+                    value={watch("state1") || ""}
+                    onValueChange={(value) => setValue("state1", value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select state">
+                        {watch("state1") && (
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={`/stateflags/${watch("state1")}.gif`}
+                              alt={watch("state1") || ""}
+                              width={20}
+                              height={15}
+                              className="object-contain"
+                            />
+                            <span>
+                              {STATES.find((s) => s.code === watch("state1"))?.name || watch("state1")}
+                            </span>
+                          </div>
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATES.map((state) => (
+                        <SelectItem key={state.code} value={state.code}>
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={`/stateflags/${state.code}.gif`}
+                              alt={state.name}
+                              width={20}
+                              height={15}
+                              className="object-contain"
+                            />
+                            <span>{state.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {errors.state1 && (
                     <p className="text-sm text-red-500 mt-1">
                       {errors.state1.message}
@@ -301,7 +381,45 @@ export function BreederUpdateDialog({
                 </div>
                 <div>
                   <Label htmlFor="state2">State</Label>
-                  <Input id="state2" {...register("state2")} />
+                  <Select
+                    value={watch("state2") || ""}
+                    onValueChange={(value) => setValue("state2", value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select state">
+                        {watch("state2") && (
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={`/stateflags/${watch("state2")}.gif`}
+                              alt={watch("state2") || ""}
+                              width={20}
+                              height={15}
+                              className="object-contain"
+                            />
+                            <span>
+                              {STATES.find((s) => s.code === watch("state2"))?.name || watch("state2")}
+                            </span>
+                          </div>
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATES.map((state) => (
+                        <SelectItem key={state.code} value={state.code}>
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={`/stateflags/${state.code}.gif`}
+                              alt={state.name}
+                              width={20}
+                              height={15}
+                              className="object-contain"
+                            />
+                            <span>{state.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="zip2">Zip</Label>
@@ -443,18 +561,28 @@ export function BreederUpdateDialog({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-between gap-3 pt-4">
               <Button
                 type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isPending}
+                variant="secondary"
+                onClick={() => breeder && onCopyBreeder?.(breeder)}
+                disabled={isPending || !breeder}
               >
-                Cancel (Esc)
+                Copy Breeder
               </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "Saving..." : "Save (Enter)"}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isPending}
+                >
+                  Cancel (Esc)
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Saving..." : "Save (Enter)"}
+                </Button>
+              </div>
             </div>
           </form>
         )}

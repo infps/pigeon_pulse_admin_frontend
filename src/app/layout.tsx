@@ -4,6 +4,7 @@ import "./globals.css";
 import QueryProvider from "./query-client";
 import { Toaster } from "sonner";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { ThemeProvider } from "@/components/theme-provider"
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,17 +26,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
 
         <QueryProvider>
-          <NuqsAdapter>
-
-          <Toaster richColors={true} />
-          {children}
-          </NuqsAdapter>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <NuqsAdapter>
+              <Toaster richColors={true} />
+              {children}
+            </NuqsAdapter>
+          </ThemeProvider>
         </QueryProvider>
       </body>
     </html>

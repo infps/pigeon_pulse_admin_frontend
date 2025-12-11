@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,23 +24,25 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateBreeder } from "@/lib/api/user";
 import { toast } from "sonner";
+import { COUNTRIES, STATES } from "@/lib/constants";
+import Image from "next/image";
 
 const createBreederSchema = z.object({
   firstName: z.string().min(1, "First Name is required").optional(),
   lastName: z.string().min(1, "Last Name is required").optional(),
-  country: z.string().min(1, "Country is required").optional(),
-  address1: z.string().min(1, "Address Line 1 is required").optional(),
-  city1: z.string().min(1, "City is required").optional(),
-  state1: z.string().min(1, "State is required").optional(),
-  zip1: z.string().min(1, "ZIP Code is required").optional(),
+  country: z.string().optional(),
+  address1: z.string().optional(),
+  city1: z.string().optional(),
+  state1: z.string().optional(),
+  zip1: z.string().optional(),
   address2: z.string().optional(),
   city2: z.string().optional(),
   state2: z.string().optional(),
   zip2: z.string().optional(),
-  phone: z.string().min(1, "Phone number is required").optional(),
+  phone: z.string().optional(),
   cell: z.string().optional(),
   fax: z.string().optional(),
-  email: z.string().email("Invalid email address").optional(),
+  email: z.email("Invalid email address").optional(),
   email2: z
     .string()
     .email("Invalid email address")
@@ -64,11 +66,13 @@ type CreateBreederFormData = z.infer<typeof createBreederSchema>;
 interface BreederCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialData?: any | null;
 }
 
 export function BreederCreateDialog({
   open,
   onOpenChange,
+  initialData,
 }: BreederCreateDialogProps) {
   const [isDefaultAddress1, setIsDefaultAddress1] = useState(false);
   const [isDefaultAddress2, setIsDefaultAddress2] = useState(false);
@@ -82,7 +86,35 @@ export function BreederCreateDialog({
     reset,
   } = useForm<CreateBreederFormData>({
     resolver: zodResolver(createBreederSchema),
-    defaultValues: {
+    defaultValues: initialData ? {
+      firstName: initialData.firstName || "",
+      lastName: initialData.lastName || "",
+      country: initialData.country || "",
+      address1: initialData.address1 || "",
+      city1: initialData.city1 || "",
+      state1: initialData.state1 || "",
+      zip1: initialData.zip1 || "",
+      address2: initialData.address2 || "",
+      city2: initialData.city2 || "",
+      state2: initialData.state2 || "",
+      zip2: initialData.zip2 || "",
+      phone: initialData.phone || "",
+      cell: initialData.cell || "",
+      fax: initialData.fax || "",
+      email: initialData.email || "",
+      email2: initialData.email2 || "",
+      webAddress: initialData.webAddress || "",
+      socialSecurityNumber: initialData.socialSecurityNumber || "",
+      status: initialData.status ?? 0,
+      statusDate: initialData.statusDate || "",
+      note: initialData.note || "",
+      loginName: initialData.loginName ? `${initialData.loginName}_copy` : "",
+      loginPassword: "",
+      sms: initialData.sms || "",
+      taxNumber: initialData.taxNumber || "",
+      defNameAgn: initialData.defNameAgn || "",
+      defNameAs: initialData.defNameAs || "",
+    } : {
       firstName: "",
       lastName: "",
       country: "",
@@ -114,6 +146,43 @@ export function BreederCreateDialog({
   });
 
   const { mutateAsync: createBreeder, isPending } = useCreateBreeder();
+
+  // Reset form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        firstName: initialData.firstName || "",
+        lastName: initialData.lastName || "",
+        country: initialData.country || "",
+        address1: initialData.address1 || "",
+        city1: initialData.city1 || "",
+        state1: initialData.state1 || "",
+        zip1: initialData.zip1 || "",
+        address2: initialData.address2 || "",
+        city2: initialData.city2 || "",
+        state2: initialData.state2 || "",
+        zip2: initialData.zip2 || "",
+        phone: initialData.phone || "",
+        cell: initialData.cell || "",
+        fax: initialData.fax || "",
+        email: initialData.email || "",
+        email2: initialData.email2 || "",
+        webAddress: initialData.webAddress || "",
+        socialSecurityNumber: initialData.socialSecurityNumber || "",
+        status: initialData.status ?? 0,
+        statusDate: initialData.statusDate || "",
+        note: initialData.note || "",
+        loginName: initialData.loginName ? `${initialData.loginName}_copy` : "",
+        loginPassword: "",
+        sms: initialData.sms || "",
+        taxNumber: initialData.taxNumber || "",
+        defNameAgn: initialData.defNameAgn || "",
+        defNameAs: initialData.defNameAs || "",
+      });
+      setIsDefaultAddress1(initialData.isDefaultAddress1 ?? false);
+      setIsDefaultAddress2(!initialData.isDefaultAddress1);
+    }
+  }, [initialData, reset]);
 
   const onSubmit = async (data: CreateBreederFormData) => {
     try {
@@ -180,7 +249,45 @@ export function BreederCreateDialog({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Input id="country" {...register("country")} placeholder="USA" />
+              <Select
+                value={watch("country") || ""}
+                onValueChange={(value) => setValue("country", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select country">
+                    {watch("country") && (
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={`/countryflags/${watch("country")}.gif`}
+                          alt={watch("country") || ""}
+                          width={20}
+                          height={15}
+                          className="object-contain"
+                        />
+                        <span>
+                          {COUNTRIES.find((c) => c.code === watch("country"))?.name || watch("country")}
+                        </span>
+                      </div>
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {COUNTRIES.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={`/countryflags/${country.code}.gif`}
+                          alt={country.name}
+                          width={20}
+                          height={15}
+                          className="object-contain"
+                        />
+                        <span>{country.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.country && (
                 <p className="text-sm text-destructive">
                   {errors.country.message}
@@ -256,11 +363,45 @@ export function BreederCreateDialog({
 
               <div className="space-y-2">
                 <Label htmlFor="state1">State</Label>
-                <Input
-                  id="state1"
-                  {...register("state1")}
-                  placeholder="State"
-                />
+                <Select
+                  value={watch("state1") || ""}
+                  onValueChange={(value) => setValue("state1", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select state">
+                      {watch("state1") && (
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/stateflags/${watch("state1")}.gif`}
+                            alt={watch("state1") || ""}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>
+                            {STATES.find((s) => s.code === watch("state1"))?.name || watch("state1")}
+                          </span>
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATES.map((state) => (
+                      <SelectItem key={state.code} value={state.code}>
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/stateflags/${state.code}.gif`}
+                            alt={state.name}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>{state.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.state1 && (
                   <p className="text-sm text-destructive">
                     {errors.state1.message}
@@ -319,11 +460,45 @@ export function BreederCreateDialog({
 
               <div className="space-y-2">
                 <Label htmlFor="state2">State</Label>
-                <Input
-                  id="state2"
-                  {...register("state2")}
-                  placeholder="State"
-                />
+                <Select
+                  value={watch("state2") || ""}
+                  onValueChange={(value) => setValue("state2", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select state">
+                      {watch("state2") && (
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/stateflags/${watch("state2")}.gif`}
+                            alt={watch("state2") || ""}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>
+                            {STATES.find((s) => s.code === watch("state2"))?.name || watch("state2")}
+                          </span>
+                        </div>
+                      )}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATES.map((state) => (
+                      <SelectItem key={state.code} value={state.code}>
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={`/stateflags/${state.code}.gif`}
+                            alt={state.name}
+                            width={20}
+                            height={15}
+                            className="object-contain"
+                          />
+                          <span>{state.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
