@@ -63,7 +63,7 @@ export default function page() {
   );
 }
 function PublishResult({ raceId }: { raceId: string }) {
-  const { mutateAsync: publishResult } = usePublishRaceResult(raceId);
+  const { mutateAsync: publishResult } = usePublishRaceResult(parseInt(raceId));
   const ref = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: React.FormEvent) => {
     if (!publishResult) return;
@@ -106,7 +106,7 @@ function PublishResult({ raceId }: { raceId: string }) {
   );
 }
 function RaceDetails({ raceId }: { raceId: string }) {
-  const { data, error, isError, isPending } = useGetRace(raceId);
+  const { data, error, isError, isPending } = useGetRace(parseInt(raceId));
 
   if (isPending) {
     return (
@@ -136,8 +136,8 @@ function RaceDetails({ raceId }: { raceId: string }) {
 
   const race: Race = data.data;
 
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDateTime = (dateString: string | null) => {
+    return new Date(dateString || Date.now()).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -146,27 +146,27 @@ function RaceDetails({ raceId }: { raceId: string }) {
     });
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString: string | null) => {
+    return new Date(dateString || Date.now()).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   };
 
-  const getTypeLabel = (type: string) => {
+  const getTypeLabel = (type: number | null) => {
     const typeLabels: Record<string, string> = {
-      TRAINING: "Training",
-      INVENTORY: "Inventory",
-      LOFT_FLY: "Loft Fly",
-      PULLING_FLIGHT: "Pulling Flight",
-      FINAL_RACE: "Final Race",
-      HOTSPOT_1: "Hotspot 1",
-      HOTSPOT_2: "Hotspot 2",
-      HOTSPOT_3: "Hotspot 3",
-      AVG_WINNER: "Average Winner",
+      1: "Training",
+      2: "Inventory",
+      3: "Loft Fly",
+      4: "Pulling Flight",
+      5: "Final Race",
+      6: "Hotspot 1",
+      7: "Hotspot 2",
+      8: "Hotspot 3",
+      9: "Average Winner",
     };
-    return typeLabels[type] || type;
+    return type ? typeLabels[type] : "Training"
   };
 
   const getStatusBadge = (isClosed: boolean) => {
@@ -187,10 +187,10 @@ function RaceDetails({ raceId }: { raceId: string }) {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Race #{race.externalRaceId}</h1>
+          <h1 className="text-3xl font-bold">Race #{race.raceNumber}</h1>
           <p className="text-muted-foreground">Race Details and Results</p>
         </div>
-        {getStatusBadge(race.isClosed)}
+        {getStatusBadge(race.isClosed === 1 ? true: false)}
       </div>
 
       {/* Basic Information Cards */}
@@ -208,7 +208,7 @@ function RaceDetails({ raceId }: { raceId: string }) {
               <label className="text-sm font-medium text-muted-foreground">
                 Type
               </label>
-              <p className="text-lg">{getTypeLabel(race.type)}</p>
+              <p className="text-lg">{getTypeLabel(race.idRaceType)}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">
@@ -244,7 +244,7 @@ function RaceDetails({ raceId }: { raceId: string }) {
               <label className="text-sm font-medium text-muted-foreground">
                 Arrival Date
               </label>
-              <p className="text-lg">{formatDate(race.arrivalDate)}</p>
+              <p className="text-lg">{formatDate(race.endTime)}</p>
             </div>
           </div>
         </div>
@@ -352,7 +352,7 @@ function RaceDetails({ raceId }: { raceId: string }) {
 }
 
 function RaceResults({ raceId }: { raceId: string }) {
-  const { data, error, isError, isPending } = useListRaceResults(raceId);
+  const { data, error, isError, isPending } = useListRaceResults(parseInt(raceId));
   const results: RaceResult[] = data?.data || [];
   
   if (isPending) {
