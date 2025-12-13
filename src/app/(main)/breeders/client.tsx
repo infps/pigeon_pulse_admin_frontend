@@ -23,6 +23,16 @@ import { BreederUpdateDialog } from "@/components/BreederUpdateDialog";
 import { BreederCreateDialog } from "@/components/BreederCreateDialog";
 import { Plus, Download, Printer } from "lucide-react";
 import jsPDF from "jspdf";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function BreedersTable() {
   const [q, setQ] = useQueryState("q", {
@@ -41,6 +51,8 @@ export default function BreedersTable() {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [copiedBreederData, setCopiedBreederData] = useState<BreederAddressBook | null>(null);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
 
   const debouncedSearchTerm = useDebounce(q, 300);
   const { data, error, isError, isPending, isSuccess } =
@@ -84,74 +96,82 @@ export default function BreedersTable() {
     setIsCreateDialogOpen(true);
   };
 
-  const handleExportCSV = () => {
+  // Define all available columns
+  const allColumns = [
+    { key: "idBreeder", label: "ID" },
+    { key: "number", label: "Number" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "country", label: "Country" },
+    { key: "address1", label: "Address 1" },
+    { key: "city1", label: "City 1" },
+    { key: "state1", label: "State 1" },
+    { key: "zip1", label: "ZIP 1" },
+    { key: "address2", label: "Address 2" },
+    { key: "city2", label: "City 2" },
+    { key: "state2", label: "State 2" },
+    { key: "zip2", label: "ZIP 2" },
+    { key: "phone", label: "Phone" },
+    { key: "cell", label: "Cell" },
+    { key: "fax", label: "Fax" },
+    { key: "email", label: "Email" },
+    { key: "email2", label: "Email 2" },
+    { key: "webAddress", label: "Web Address" },
+    { key: "socialSecurityNumber", label: "SSN" },
+    { key: "status", label: "Status" },
+    { key: "statusDate", label: "Status Date" },
+    { key: "note", label: "Note" },
+    { key: "loginName", label: "Login Name" },
+    { key: "sms", label: "SMS" },
+    { key: "taxNumber", label: "Tax Number" },
+    { key: "defNameAgn", label: "AGN Team Name" },
+    { key: "defNameAs", label: "AS Team Name" },
+  ];
+
+  const handleOpenExportDialog = () => {
     if (!breeders || breeders.length === 0) {
       return;
     }
+    // Initialize with all columns selected
+    setSelectedColumns(allColumns.map(col => col.key));
+    setIsExportDialogOpen(true);
+  };
 
-    // Define CSV headers
-    const headers = [
-      "ID",
-      "Number",
-      "First Name",
-      "Last Name",
-      "Country",
-      "Address 1",
-      "City 1",
-      "State 1",
-      "ZIP 1",
-      "Address 2",
-      "City 2",
-      "State 2",
-      "ZIP 2",
-      "Phone",
-      "Cell",
-      "Fax",
-      "Email",
-      "Email 2",
-      "Web Address",
-      "SSN",
-      "Status",
-      "Status Date",
-      "Note",
-      "Login Name",
-      "SMS",
-      "Tax Number",
-      "AGN Team Name",
-      "AS Team Name",
-    ];
+  const handleToggleColumn = (columnKey: string) => {
+    setSelectedColumns(prev => 
+      prev.includes(columnKey)
+        ? prev.filter(key => key !== columnKey)
+        : [...prev, columnKey]
+    );
+  };
+
+  const handleSelectAllColumns = () => {
+    setSelectedColumns(allColumns.map(col => col.key));
+  };
+
+  const handleDeselectAllColumns = () => {
+    setSelectedColumns([]);
+  };
+
+  const handleExportCSV = () => {
+    if (!breeders || breeders.length === 0 || selectedColumns.length === 0) {
+      return;
+    }
+
+    // Filter columns based on selection
+    const selectedColumnData = allColumns.filter(col => selectedColumns.includes(col.key));
+    const headers = selectedColumnData.map(col => col.label);
 
     // Convert data to CSV rows
-    const csvRows = breeders.map((breeder) => [
-      breeder.idBreeder || "",
-      breeder.number || "",
-      breeder.firstName || "",
-      breeder.lastName || "",
-      breeder.country || "",
-      breeder.address1 || "",
-      breeder.city1 || "",
-      breeder.state1 || "",
-      breeder.zip1 || "",
-      breeder.address2 || "",
-      breeder.city2 || "",
-      breeder.state2 || "",
-      breeder.zip2 || "",
-      breeder.phone || "",
-      breeder.cell || "",
-      breeder.fax || "",
-      breeder.email || "",
-      breeder.email2 || "",
-      breeder.webAddress || "",
-      breeder.socialSecurityNumber || "",
-      breeder.status === 0 ? "Active" : breeder.status === 1 ? "Inactive" : breeder.status === 2 ? "Prospect" : "",
-      breeder.statusDate || "",
-      breeder.note || "",
-      breeder.loginName || "",
-      breeder.sms || "",
-      breeder.taxNumber || "",
-      breeder.defNameAgn || "",
-      breeder.defNameAs || "",
-    ]);
+    const csvRows = breeders.map((breeder) => {
+      return selectedColumnData.map(col => {
+        const key = col.key as keyof BreederAddressBook;
+        if (key === "status") {
+          return breeder.status === 0 ? "Active" : breeder.status === 1 ? "Inactive" : breeder.status === 2 ? "Prospect" : "";
+        }
+        return breeder[key] || "";
+      });
+    });
 
     // Escape CSV values (handle quotes and commas)
     const escapeCSV = (value: string | number) => {
@@ -178,6 +198,9 @@ export default function BreedersTable() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    // Close dialog after export
+    setIsExportDialogOpen(false);
   };
 
   const handlePrintLabels = () => {
@@ -288,7 +311,7 @@ export default function BreedersTable() {
           Print Labels
         </Button>
         <Button 
-          onClick={handleExportCSV} 
+          onClick={handleOpenExportDialog} 
           variant="outline"
           className="gap-2"
           disabled={!breeders || breeders.length === 0}
@@ -322,6 +345,75 @@ export default function BreedersTable() {
         onOpenChange={setIsCreateDialogOpen}
         initialData={copiedBreederData}
       />
+
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Export CSV</DialogTitle>
+            <DialogDescription>
+              Select the columns you want to include in the CSV export. You can select all columns or choose specific ones.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleSelectAllColumns} 
+                variant="outline" 
+                size="sm"
+              >
+                Select All
+              </Button>
+              <Button 
+                onClick={handleDeselectAllColumns} 
+                variant="outline" 
+                size="sm"
+              >
+                Deselect All
+              </Button>
+              <div className="ml-auto text-sm text-muted-foreground">
+                {selectedColumns.length} of {allColumns.length} columns selected
+              </div>
+            </div>
+
+            <ScrollArea className="h-[400px] rounded-md border p-4">
+              <div className="grid grid-cols-2 gap-4">
+                {allColumns.map((column) => (
+                  <div key={column.key} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={column.key}
+                      checked={selectedColumns.includes(column.key)}
+                      onCheckedChange={() => handleToggleColumn(column.key)}
+                    />
+                    <label
+                      htmlFor={column.key}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {column.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsExportDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleExportCSV}
+              disabled={selectedColumns.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export {selectedColumns.length > 0 && `(${selectedColumns.length} columns)`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
