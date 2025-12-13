@@ -61,3 +61,36 @@ export function useUpdateBreeder(breederId: number) {
     invalidateKeys: [{ queryKey: ["breederAddressBook"] }, { queryKey: ["breeder", String(breederId)] }],
   });
 }
+
+export function useGetTeams(breederId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.getTeams(breederId),
+    method: "GET",
+    queryKey: ["teams", String(breederId)],
+    enabled: breederId > 0
+  });
+}
+
+export function useCreateTeam(breederId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.createTeam,
+    method: "POST",
+    invalidateKeys: [{ queryKey: ["teams", String(breederId)] }],
+  });
+}
+
+export function useDeleteTeam(breederId: number, teamId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.deleteTeam(teamId),
+    method: "DELETE",
+    invalidateKeys: [{ queryKey: ["teams", String(breederId)] }],
+  });
+}
+
+export function useUpdateTeam(breederId: number, teamId: number) {
+  return useApiRequest({
+    endpoint: apiEndpoints.users.updateTeam(teamId),
+    method: "PUT",
+    invalidateKeys: [{ queryKey: ["teams", String(breederId)] }],
+  });
+}

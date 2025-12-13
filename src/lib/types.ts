@@ -3,6 +3,12 @@ type User = {
   name: string | null;
 };
 
+type Team = {
+  idTeam: number;
+  teamName: string;
+  idBreeder: number;
+};
+
 type CurrentUser = {
   idBreeder: number;
   number: number | null;
@@ -493,4 +499,5 @@ export type {
   BreederAddressBook,
   EventInventoryItem,
   Basket,
+  Team,
 };

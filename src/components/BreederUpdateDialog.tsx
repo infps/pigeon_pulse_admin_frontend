@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -92,6 +92,7 @@ export function BreederUpdateDialog({
     setValue,
     watch,
     reset,
+    control,
   } = useForm<UpdateBreederFormData>({
     resolver: zodResolver(updateBreederSchema),
   });
@@ -118,8 +119,11 @@ export function BreederUpdateDialog({
         email2: breeder.email2 || "",
         webAddress: breeder.webAddress || "",
         socialSecurityNumber: breeder.socialSecurityNumber || "",
-        status: breeder.status || 0,
-        statusDate: breeder.statusDate || "",
+        status: breeder.status !== null && breeder.status !== undefined ? breeder.status : 0,
+        statusDate:
+          breeder.statusDate
+            ? new Date(breeder.statusDate).toISOString().split("T")[0]
+            : "",
         note: breeder.note || "",
         loginName: breeder.loginName || "",
         loginPassword: "",
@@ -154,8 +158,6 @@ export function BreederUpdateDialog({
       toast.error(error?.message || "Failed to update breeder profile");
     }
   };
-
-  const statusValue = watch("status");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -198,45 +200,51 @@ export function BreederUpdateDialog({
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="country">Country</Label>
-                <Select
-                  value={watch("country") || ""}
-                  onValueChange={(value) => setValue("country", value)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select country">
-                      {watch("country") && (
-                        <div className="flex items-center gap-2">
-                          <Image
-                            src={`/countryflags/${watch("country")}.gif`}
-                            alt={watch("country") || ""}
-                            width={20}
-                            height={15}
-                            className="object-contain"
-                          />
-                          <span>
-                            {COUNTRIES.find((c) => c.code === watch("country"))?.name || watch("country")}
-                          </span>
-                        </div>
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRIES.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        <div className="flex items-center gap-2">
-                          <Image
-                            src={`/countryflags/${country.code}.gif`}
-                            alt={country.name}
-                            width={20}
-                            height={15}
-                            className="object-contain"
-                          />
-                          <span>{country.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="country"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select country">
+                          {field.value && (
+                            <div className="flex items-center gap-2">
+                              <Image
+                                src={`/countryflags/${field.value}.gif`}
+                                alt={field.value}
+                                width={20}
+                                height={15}
+                                className="object-contain"
+                              />
+                              <span>
+                                {COUNTRIES.find((c) => c.code === field.value)?.name || field.value}
+                              </span>
+                            </div>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COUNTRIES.map((country) => (
+                          <SelectItem key={country.code} value={country.code}>
+                            <div className="flex items-center gap-2">
+                              <Image
+                                src={`/countryflags/${country.code}.gif`}
+                                alt={country.name}
+                                width={20}
+                                height={15}
+                                className="object-contain"
+                              />
+                              <span>{country.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
                 {errors.country && (
                   <p className="text-sm text-red-500 mt-1">
                     {errors.country.message}
@@ -295,45 +303,51 @@ export function BreederUpdateDialog({
                 </div>
                 <div>
                   <Label htmlFor="state1">State</Label>
-                  <Select
-                    value={watch("state1") || ""}
-                    onValueChange={(value) => setValue("state1", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select state">
-                        {watch("state1") && (
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={`/stateflags/${watch("state1")}.gif`}
-                              alt={watch("state1") || ""}
-                              width={20}
-                              height={15}
-                              className="object-contain"
-                            />
-                            <span>
-                              {STATES.find((s) => s.code === watch("state1"))?.name || watch("state1")}
-                            </span>
-                          </div>
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATES.map((state) => (
-                        <SelectItem key={state.code} value={state.code}>
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={`/stateflags/${state.code}.gif`}
-                              alt={state.name}
-                              width={20}
-                              height={15}
-                              className="object-contain"
-                            />
-                            <span>{state.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="state1"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select state">
+                            {field.value && (
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={`/stateflags/${field.value}.gif`}
+                                  alt={field.value}
+                                  width={20}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                                <span>
+                                  {STATES.find((s) => s.code === field.value)?.name || field.value}
+                                </span>
+                              </div>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATES.map((state) => (
+                            <SelectItem key={state.code} value={state.code}>
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={`/stateflags/${state.code}.gif`}
+                                  alt={state.name}
+                                  width={20}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                                <span>{state.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                   {errors.state1 && (
                     <p className="text-sm text-red-500 mt-1">
                       {errors.state1.message}
@@ -381,45 +395,51 @@ export function BreederUpdateDialog({
                 </div>
                 <div>
                   <Label htmlFor="state2">State</Label>
-                  <Select
-                    value={watch("state2") || ""}
-                    onValueChange={(value) => setValue("state2", value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select state">
-                        {watch("state2") && (
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={`/stateflags/${watch("state2")}.gif`}
-                              alt={watch("state2") || ""}
-                              width={20}
-                              height={15}
-                              className="object-contain"
-                            />
-                            <span>
-                              {STATES.find((s) => s.code === watch("state2"))?.name || watch("state2")}
-                            </span>
-                          </div>
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATES.map((state) => (
-                        <SelectItem key={state.code} value={state.code}>
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={`/stateflags/${state.code}.gif`}
-                              alt={state.name}
-                              width={20}
-                              height={15}
-                              className="object-contain"
-                            />
-                            <span>{state.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="state2"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value || ""}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select state">
+                            {field.value && (
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={`/stateflags/${field.value}.gif`}
+                                  alt={field.value}
+                                  width={20}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                                <span>
+                                  {STATES.find((s) => s.code === field.value)?.name || field.value}
+                                </span>
+                              </div>
+                            )}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATES.map((state) => (
+                            <SelectItem key={state.code} value={state.code}>
+                              <div className="flex items-center gap-2">
+                                <Image
+                                  src={`/stateflags/${state.code}.gif`}
+                                  alt={state.name}
+                                  width={20}
+                                  height={15}
+                                  className="object-contain"
+                                />
+                                <span>{state.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="zip2">Zip</Label>
@@ -484,19 +504,25 @@ export function BreederUpdateDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={statusValue?.toString()}
-                    onValueChange={(value) => setValue("status", Number(value))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Active</SelectItem>
-                      <SelectItem value="1">Inactive</SelectItem>
-                      <SelectItem value="2">Prospect</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value !== undefined && field.value !== null ? field.value.toString() : "0"}
+                        onValueChange={(value) => field.onChange(Number(value))}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Active</SelectItem>
+                          <SelectItem value="1">Inactive</SelectItem>
+                          <SelectItem value="2">Prospect</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="statusDate">Date</Label>

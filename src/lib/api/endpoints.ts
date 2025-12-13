@@ -28,6 +28,10 @@ const userEndpoints = {
   getBreeder: (breederId: number) => `/users/breeders/${breederId}`,
   createBreeder: `/users/breeders`,
   updateBreeder: (breederId: number) => `/users/breeders/${breederId}`,
+  getTeams: (breederId: number) => `/users/teams/${breederId}`,
+  createTeam: `/users/teams`,
+  deleteTeam: (teamId: number) => `/users/teams/${teamId}`,
+  updateTeam: (teamId: number) => `/users/teams/${teamId}`,
 };
 
 const eventInventoryEndpoints = {

@@ -112,6 +112,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      <div className="text-sm text-muted-foreground py-2">
+        Total: {table.getFilteredRowModel().rows.length} record{table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
+      </div>
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center space-x-2">
           <DropdownMenu>

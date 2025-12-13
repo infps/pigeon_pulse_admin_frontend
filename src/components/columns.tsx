@@ -18,11 +18,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Pencil, Settings, EllipsisVertical, ArrowUpDown } from "lucide-react";
+import { Pencil, Settings, EllipsisVertical, ArrowUpDown, Users } from "lucide-react";
 import { EventUpdateFetch } from "./EventCreateForm";
 import BirdUpdateForm from "./BirdUpdateForm";
 import EventInventoryDialog from "./EventInventoryDialog";
 import { RaceUpdateDialog } from "./RaceUpdateDialog";
+import { BreederTeamsDialog } from "./BreederTeamsDialog";
 import Link from "next/link";
 import Image from "next/image";
 import { COUNTRIES, STATES } from "@/lib/constants";
@@ -1522,6 +1523,34 @@ export const RaceResultColumns: ColumnDef<RaceResult>[] = [
   },
 ];
 
+function TeamsCell({ breeder }: { breeder: BreederAddressBook }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const breederName = `${breeder.firstName || ""} ${breeder.lastName || ""}`.trim() || "Unknown";
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setIsDialogOpen(true)}
+        className="gap-2"
+      >
+        <Users className="h-4 w-4" />
+        View Teams
+      </Button>
+      {/* Only render the dialog when it's open */}
+      {isDialogOpen && (
+        <BreederTeamsDialog
+          breederId={breeder.idBreeder}
+          breederName={breederName}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+        />
+      )}
+    </div>
+  );
+}
+
 export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
   {
     accessorKey: "idBreeder",
@@ -1610,21 +1639,6 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     },
     cell: ({ row }) => row.getValue("defNameAs") || "N/A",
   },
-  // {
-  //   accessorKey: "email2",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Alternative Email
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("email2") || "N/A",
-  // },
   {
     accessorKey: "phone",
     header: ({ column }) => {
@@ -1655,36 +1669,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     },
     cell: ({ row }) => row.getValue("cell") || "N/A",
   },
-  // {
-  //   accessorKey: "fax",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Fax
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("fax") || "N/A",
-  // },
-  // {
-  //   accessorKey: "sms",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         SMS
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("sms") || "N/A",
-  // },
+ 
   {
     accessorKey: "country",
     header: ({ column }) => {
@@ -1715,21 +1700,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "isDefaultAddress1",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Default Address
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => (row.getValue("isDefaultAddress1") ? "Address 1" : "Address 2"),
-  // },
+  
   {
     accessorKey: "address1",
     header: ({ column }) => {
@@ -1805,81 +1776,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     },
     cell: ({ row }) => row.getValue("zip1") || "N/A",
   },
-  // {
-  //   accessorKey: "address2",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Address 2
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("address2") || "N/A",
-  // },
-  // {
-  //   accessorKey: "city2",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         City 2
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("city2") || "N/A",
-  // },
-  // {
-  //   accessorKey: "state2",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         State 2
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("state2") || "N/A",
-  // },
-  // {
-  //   accessorKey: "zip2",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Zip 2
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("zip2") || "N/A",
-  // },
-  // {
-  //   accessorKey: "webAddress",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Website
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("webAddress") || "N/A",
-  // },
+ 
   {
     accessorKey: "socialSecurityNumber",
     header: ({ column }) => {
@@ -1895,21 +1792,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     },
     cell: ({ row }) => row.getValue("socialSecurityNumber") || "N/A",
   },
-  // {
-  //   accessorKey: "taxNumber",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Tax Number
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("taxNumber") || "N/A",
-  // },
+  
   {
     accessorKey: "status",
     header: ({ column }) => {
@@ -1941,30 +1824,7 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
       );
     },
   },
-  // {
-  //   accessorKey: "statusDate",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Status Date
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //     const date = row.getValue("statusDate") as string | null;
-  //     return date
-  //       ? new Date(date).toLocaleDateString("en-US", {
-  //           year: "numeric",
-  //           month: "short",
-  //           day: "numeric",
-  //         })
-  //       : "N/A";
-  //   },
-  // },
+ 
   {
     accessorKey: "loginName",
     header: ({ column }) => {
@@ -1980,20 +1840,11 @@ export const BreederAddressBookColumns: ColumnDef<BreederAddressBook>[] = [
     },
     cell: ({ row }) => row.getValue("loginName") || "N/A",
   },
-  
-  // {
-  //   accessorKey: "note",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Note
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => row.getValue("note") || "N/A",
-  // }
+  {
+    id: "teams",
+    header: "Teams",
+    cell: ({ row }) => <TeamsCell breeder={row.original} />,
+    enableSorting: false,
+    enableHiding: false,
+  },
 ];
