@@ -91,16 +91,44 @@ function BirdSearch() {
   const [q, setQ] = useQueryState("q", {
     defaultValue: "",
   });
+  const [searchField, setSearchField] = useQueryState("searchField", {
+    defaultValue: "birdName",
+  });
+  
   return (
-    <div>
-      <Label htmlFor="bird-search">Search Birds</Label>
-      <Input
-        type="text"
-        placeholder="Search birds..."
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        className="border rounded-lg px-3 py-2 w-[300px] mt-2"
-      />
+    <div className="flex items-end gap-2">
+      <div>
+        <Label htmlFor="search-field-select">Search By</Label>
+        <Select
+          onValueChange={(value) => setSearchField(value)}
+          value={searchField}
+        >
+          <SelectTrigger className="w-[180px] mt-2" id="search-field-select">
+            <SelectValue placeholder="Select field" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="birdName">Bird Name</SelectItem>
+            <SelectItem value="band">Band</SelectItem>
+            <SelectItem value="band1">Band 1</SelectItem>
+            <SelectItem value="band2">Band 2</SelectItem>
+            <SelectItem value="band3">Band 3</SelectItem>
+            <SelectItem value="band4">Band 4</SelectItem>
+            <SelectItem value="color">Color</SelectItem>
+            <SelectItem value="rfId">RFID</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="bird-search">Search</Label>
+        <Input
+          id="bird-search"
+          type="text"
+          placeholder="Search birds..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="border rounded-lg px-3 py-2 w-[300px] mt-2"
+        />
+      </div>
     </div>
   );
 }
@@ -146,6 +174,9 @@ function EventSelect({ events }: { events: Event[] }) {
 
 function BirdsTable() {
   const [q, setQ] = useQueryState("q");
+  const [searchField, setSearchField] = useQueryState("searchField", {
+    defaultValue: "birdName",
+  });
   const [eventId, setEventId] = useQueryState("eventId", {
     defaultValue: "",
   });
@@ -154,6 +185,7 @@ function BirdsTable() {
     id: parseInt(eventId),
     params: {
       ...(debouncedSearchTerm ? { q: debouncedSearchTerm } : {}),
+      ...(searchField ? { searchField } : {}),
     },
   });
   

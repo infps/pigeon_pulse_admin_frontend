@@ -19,17 +19,17 @@ interface EventInventoryDialogContentProps {
   onClose: () => void;
 }
 
-// Clickable bird name component for the birds table
-function ClickableBirdName({
+// Clickable cell component that opens bird update dialog
+function ClickableBirdCell({
   bird,
-  birdName,
+  children,
 }: {
   bird: EventInventoryItemDetail;
-  birdName: string;
+  children: React.ReactNode;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  if (!bird.bird) return <div className="font-medium">{birdName}</div>;
+  if (!bird.bird) return <div>{children}</div>;
   
   // Map new structure to old BirdEventInventory structure for BirdUpdateForm
   const mappedBird = {
@@ -54,6 +54,8 @@ function ClickableBirdName({
       breeder: {
         id: bird.bird.breeder?.idBreeder || 0,
         name: `${bird.bird.breeder?.firstName || ""} ${bird.bird.breeder?.lastName || ""}`,
+        firstName: bird.bird.breeder?.firstName,
+        lastName: bird.bird.breeder?.lastName,
       },
     },
   };
@@ -61,8 +63,8 @@ function ClickableBirdName({
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <div className="font-medium cursor-pointer text-primary hover:underline">
-          {birdName}
+        <div className="cursor-pointer hover:bg-accent/50 rounded px-2 py-1 -mx-2 -my-1">
+          {children}
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -151,7 +153,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       header: "Bird Name",
       cell: ({ row }) => {
         const birdName = row.original.bird?.birdName || "N/A";
-        return <ClickableBirdName bird={row.original} birdName={birdName} />;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div className="font-medium text-primary">{birdName}</div>
+          </ClickableBirdCell>
+        );
       },
     },
     {
@@ -159,7 +165,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       header: "Band",
       cell: ({ row }) => {
         const band = row.original.bird?.band;
-        return <div>{band || "N/A"}</div>;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div>{band || "N/A"}</div>
+          </ClickableBirdCell>
+        );
       },
     },
     {
@@ -167,7 +177,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       header: "Color",
       cell: ({ row }) => {
         const color = row.original.bird?.color;
-        return <div>{color || "N/A"}</div>;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div>{color || "N/A"}</div>
+          </ClickableBirdCell>
+        );
       },
     },
     {
@@ -180,7 +194,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
           1: "Cock",
           2: "Hen",
         };
-        return <div>{sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A"}</div>;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div>{sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A"}</div>
+          </ClickableBirdCell>
+        );
       },
     },
     {
@@ -188,7 +206,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       header: "Arrival Date",
       cell: ({ row }) => {
         const date = row.getValue("arrivalTime") as string;
-        return <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>
+          </ClickableBirdCell>
+        );
       },
     },
     {
@@ -196,7 +218,11 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       header: "Departure Date",
       cell: ({ row }) => {
         const date = row.getValue("departureDate") as string;
-        return <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>;
+        return (
+          <ClickableBirdCell bird={row.original}>
+            <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>
+          </ClickableBirdCell>
+        );
       },
     },
   ];
