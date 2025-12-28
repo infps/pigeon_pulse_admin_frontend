@@ -1,5 +1,5 @@
 "use client";
-import { BirdEventInventoryColumns } from "@/components/columns";
+import { BirdEventInventoryColumns, getBirdEventInventoryColumns } from "@/components/columns";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -213,7 +213,10 @@ function BirdsTable() {
     (inventory) => inventory.eventInventoryItems || []
   );
 
+  // Get betting scheme from first event inventory (all should have same event)
+  const bettingScheme = eventInventories[0]?.event?.bettingScheme;
+
   return (
-    <DataTable columns={BirdEventInventoryColumns} data={birdsInventory} />
+    <DataTable columns={getBirdEventInventoryColumns(bettingScheme)} data={birdsInventory} />
   );
 }

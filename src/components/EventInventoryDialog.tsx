@@ -23,9 +23,11 @@ interface EventInventoryDialogContentProps {
 function ClickableBirdCell({
   bird,
   children,
+  bettingScheme,
 }: {
   bird: EventInventoryItemDetail;
   children: React.ReactNode;
+  bettingScheme?: any;
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -69,7 +71,7 @@ function ClickableBirdCell({
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogTitle>Edit Bird</DialogTitle>
-        <BirdUpdateForm bird={mappedBird as any} />
+        <BirdUpdateForm bird={mappedBird as any} bettingScheme={bettingScheme} onClose={() => setIsDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );
@@ -146,7 +148,7 @@ const paymentsColumns: ColumnDef<EventInventoryPayment>[] = [
 ];
 
 // Column definitions for birds table
-const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
+const getBirdsColumns = (bettingScheme?: any): ColumnDef<EventInventoryItemDetail>[] =>
   [
     {
       accessorKey: "bird.birdName",
@@ -154,7 +156,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const birdName = row.original.bird?.birdName || "N/A";
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div className="font-medium text-primary">{birdName}</div>
           </ClickableBirdCell>
         );
@@ -166,7 +168,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const band = row.original.bird?.band;
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div>{band || "N/A"}</div>
           </ClickableBirdCell>
         );
@@ -178,7 +180,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const color = row.original.bird?.color;
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div>{color || "N/A"}</div>
           </ClickableBirdCell>
         );
@@ -195,7 +197,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
           2: "Hen",
         };
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div>{sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A"}</div>
           </ClickableBirdCell>
         );
@@ -207,7 +209,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const date = row.getValue("arrivalTime") as string;
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>
           </ClickableBirdCell>
         );
@@ -219,7 +221,7 @@ const birdsColumns: ColumnDef<EventInventoryItemDetail>[] =
       cell: ({ row }) => {
         const date = row.getValue("departureDate") as string;
         return (
-          <ClickableBirdCell bird={row.original}>
+          <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
             <div>{date ? new Date(date).toLocaleDateString() : "N/A"}</div>
           </ClickableBirdCell>
         );
@@ -394,7 +396,7 @@ export default function EventInventoryDialog({
       <div className="space-y-2">
         <div className="font-semibold">Birds</div>
         <DataTable
-          columns={birdsColumns}
+          columns={getBirdsColumns(eventInventoryItem.event?.bettingScheme)}
           data={eventInventoryItem.eventInventoryItems || []}
         />
       </div>

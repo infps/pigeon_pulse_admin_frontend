@@ -53,6 +53,24 @@ type FeeSchema = {
 type BettingSchema = {
   idBettingScheme: number;
   bettingSchemeName: string;
+  belgianShow1?: number | null;
+  belgianShow2?: number | null;
+  belgianShow3?: number | null;
+  belgianShow4?: number | null;
+  belgianShow5?: number | null;
+  belgianShow6?: number | null;
+  belgianShow7?: number | null;
+  standardShow1?: number | null;
+  standardShow2?: number | null;
+  standardShow3?: number | null;
+  standardShow4?: number | null;
+  standardShow5?: number | null;
+  standardShow6?: number | null;
+  wta1?: number | null;
+  wta2?: number | null;
+  wta3?: number | null;
+  wta4?: number | null;
+  wta5?: number | null;
 };
 
 type FullFeeSchema = {
@@ -208,6 +226,11 @@ type EventInventoryItemDetail = {
   wtaBet5: number | null;
   isBetActive: number | null;
   transferDue: number | null;
+  eventInventory?: {
+    event?: {
+      bettingScheme?: BettingSchema | null;
+    };
+  };
   bird?: {
     idBird: number;
     band: string | null;
@@ -247,6 +270,9 @@ type EventInventory = {
   loft: string | null;
   note: string | null;
   breeder?: Breeder;
+  event?: {
+    bettingScheme?: BettingSchema | null;
+  };
   eventInventoryItems?: EventInventoryItemDetail[];
   payments?: EventInventoryPayment[];
 };
@@ -259,6 +285,7 @@ type EventInventoryItem = {
   event?: {
     eventName: string | null;
     eventDate: string | null;
+    bettingScheme?: BettingSchema | null;
   };
   eventInventoryItems?: EventInventoryItemDetail[];
   loft: string | null;
@@ -459,6 +486,7 @@ type BreederAddressBook = {
   statusDate: string | null;
   note: string | null;
   loginName: string | null;
+  loginPassword: string | null;
   idPicture: number | null;
   sms: string | null;
   taxNumber: string | null;

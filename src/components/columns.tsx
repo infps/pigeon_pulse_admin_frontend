@@ -95,6 +95,33 @@ function ClickableEventInventoryRow({
   );
 }
 
+// Wrapper component for clickable bird event inventory row
+function ClickableBirdCell({
+  bird,
+  bettingScheme,
+  children,
+}: {
+  bird: EventInventoryItemDetail;
+  bettingScheme?: any;
+  children: React.ReactNode;
+}) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  return (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <div className="cursor-pointer hover:bg-muted/50 transition-colors">
+          {children}
+        </div>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogTitle>Edit Bird</DialogTitle>
+        <BirdUpdateForm bird={bird} bettingScheme={bettingScheme} onClose={() => setIsDialogOpen(false)} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Wrapper component for clickable event name
 function ClickableEventName({
   eventId,
@@ -668,7 +695,7 @@ export const getEventInventoryColumnsForFeeType = (
   ];
 };
 
-export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = [
+export const getBirdEventInventoryColumns = (bettingScheme?: any): ColumnDef<EventInventoryItemDetail>[] => [
   {
     accessorKey: "bird.breeder",
     header: ({ column }) => {
@@ -701,7 +728,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.birdName || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.birdName || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "birdNo",
@@ -716,7 +747,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.birdNo || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.birdNo || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.band1",
@@ -731,7 +766,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.band1 || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.band1 || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.band2",
@@ -746,7 +785,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.band2 || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.band2 || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.band3",
@@ -761,7 +804,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.band3 || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.band3 || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.band4",
@@ -776,7 +823,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.band4 || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.band4 || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.band",
@@ -791,7 +842,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.band || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.band || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.color",
@@ -806,7 +861,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.color || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.color || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.sex",
@@ -828,7 +887,12 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         1: "Cock",
         2: "Hen",
       };
-      return sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A";
+      const sexDisplay = sex !== null && sex !== undefined ? sexMap[sex] || "Unknown" : "N/A";
+      return (
+        <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+          {sexDisplay}
+        </ClickableBirdCell>
+      );
     },
   },
   {
@@ -844,7 +908,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.bird?.isActive ? "Yes" : "No"),
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.isActive ? "Yes" : "No"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.isLost",
@@ -859,7 +927,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.bird?.isLost ? "Yes" : "No"),
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.isLost ? "Yes" : "No"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "bird.lostDate",
@@ -876,13 +948,18 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
     },
     cell: ({ row }) => {
       const date = row.original.bird?.lostDate;
-      return date
+      const dateDisplay = date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
           })
         : "N/A";
+      return (
+        <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+          {dateDisplay}
+        </ClickableBirdCell>
+      );
     },
   },
   {
@@ -898,7 +975,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => row.original.bird?.rfId || "N/A",
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.bird?.rfId || "N/A"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "arrivalTime",
@@ -915,13 +996,18 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
     },
     cell: ({ row }) => {
       const date = row.original.arrivalTime;
-      return date
+      const dateDisplay = date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
           })
         : "N/A";
+      return (
+        <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+          {dateDisplay}
+        </ClickableBirdCell>
+      );
     },
   },
   {
@@ -939,13 +1025,18 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
     },
     cell: ({ row }) => {
       const date = row.original.departureDate;
-      return date
+      const dateDisplay = date
         ? new Date(date).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
           })
         : "N/A";
+      return (
+        <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+          {dateDisplay}
+        </ClickableBirdCell>
+      );
     },
   },
   {
@@ -961,7 +1052,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.isBackup ? "Yes" : "No"),
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.isBackup ? "Yes" : "No"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "entryFeePaid",
@@ -976,7 +1071,11 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
         </Button>
       );
     },
-    cell: ({ row }) => (row.original.entryFeePaid ? "Yes" : "No"),
+    cell: ({ row }) => (
+      <ClickableBirdCell bird={row.original} bettingScheme={bettingScheme}>
+        {row.original.entryFeePaid ? "Yes" : "No"}
+      </ClickableBirdCell>
+    ),
   },
   {
     accessorKey: "actions",
@@ -989,13 +1088,16 @@ export const BirdEventInventoryColumns: ColumnDef<EventInventoryItemDetail>[] = 
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogTitle>Edit Bird</DialogTitle>
-            <BirdUpdateForm bird={row.original} />
+            <BirdUpdateForm bird={row.original} bettingScheme={bettingScheme} />
           </DialogContent>
         </Dialog>
       </div>
     ),
   },
 ];
+
+// Backward compatibility - default columns without betting scheme
+export const BirdEventInventoryColumns = getBirdEventInventoryColumns();
 
 export const RaceColumns: ColumnDef<Race>[] = [
   {

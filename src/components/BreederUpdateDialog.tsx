@@ -126,7 +126,7 @@ export function BreederUpdateDialog({
             : "",
         note: breeder.note || "",
         loginName: breeder.loginName || "",
-        loginPassword: "",
+        loginPassword: breeder.loginPassword || "",
         sms: breeder.sms || "",
         taxNumber: breeder.taxNumber || "",
         defNameAgn: breeder.defNameAgn || "",
@@ -552,7 +552,7 @@ export function BreederUpdateDialog({
                   <Label htmlFor="loginPassword">Password</Label>
                   <Input
                     id="loginPassword"
-                    type="password"
+                    type="text"
                     {...register("loginPassword")}
                     placeholder="Leave blank to keep current"
                   />

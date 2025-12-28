@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { EventInventoryItemDetail } from "@/lib/types";
+import { EventInventoryItemDetail, BettingSchema } from "@/lib/types";
 import { updateEventInventoryItem } from "@/lib/api/eventInventory";
 
 const formSchema = z.object({
@@ -105,10 +105,15 @@ type FormData = z.infer<typeof formSchema>;
 
 interface BirdUpdateFormProps {
   bird: EventInventoryItemDetail;
+  bettingScheme?: BettingSchema | null;
+  onClose?: () => void;
 }
 
-export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
+export default function BirdUpdateForm({ bird, bettingScheme: propBettingScheme, onClose }: BirdUpdateFormProps) {
   const { mutateAsync: updateBird } = updateEventInventoryItem(bird.idEventInventoryItem);
+  
+  // Use provided bettingScheme or get from bird's event inventory
+  const bettingScheme = propBettingScheme || bird.eventInventory?.event?.bettingScheme;
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema) as any,
@@ -186,33 +191,124 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
     }
   }
 
+  // Build a list of all available classes with continuous lettering
+  const getAvailableClasses = () => {
+    if (!bettingScheme) return [];
+    
+    const classes: Array<{
+      letter: string;
+      value: number;
+      type: 'belgian' | 'standard' | 'wta';
+      index: number;
+      fieldName: keyof FormData;
+      schemeField: string;
+    }> = [];
+    
+    let letterIndex = 0;
+    
+    // Belgian Show classes
+    const belgianFields = [
+      { bet: 'belgianShowBet1', scheme: 'belgianShow1', value: bettingScheme.belgianShow1 },
+      { bet: 'belgianShowBet2', scheme: 'belgianShow2', value: bettingScheme.belgianShow2 },
+      { bet: 'belgianShowBet3', scheme: 'belgianShow3', value: bettingScheme.belgianShow3 },
+      { bet: 'belgianShowBet4', scheme: 'belgianShow4', value: bettingScheme.belgianShow4 },
+      { bet: 'belgianShowBet5', scheme: 'belgianShow5', value: bettingScheme.belgianShow5 },
+      { bet: 'belgianShowBet6', scheme: 'belgianShow6', value: bettingScheme.belgianShow6 },
+      { bet: 'belgianShowBet7', scheme: 'belgianShow7', value: bettingScheme.belgianShow7 },
+    ];
+    
+    belgianFields.forEach((field, idx) => {
+      if (field.value !== null && field.value !== undefined) {
+        classes.push({
+          letter: String.fromCharCode(65 + letterIndex++), // A, B, C, ...
+          value: field.value,
+          type: 'belgian',
+          index: idx + 1,
+          fieldName: field.bet as keyof FormData,
+          schemeField: field.scheme,
+        });
+      }
+    });
+    
+    // Standard Show classes
+    const standardFields = [
+      { bet: 'standardShowBet1', scheme: 'standardShow1', value: bettingScheme.standardShow1 },
+      { bet: 'standardShowBet2', scheme: 'standardShow2', value: bettingScheme.standardShow2 },
+      { bet: 'standardShowBet3', scheme: 'standardShow3', value: bettingScheme.standardShow3 },
+      { bet: 'standardShowBet4', scheme: 'standardShow4', value: bettingScheme.standardShow4 },
+      { bet: 'standardShowBet5', scheme: 'standardShow5', value: bettingScheme.standardShow5 },
+      { bet: 'standardShowBet6', scheme: 'standardShow6', value: bettingScheme.standardShow6 },
+    ];
+    
+    standardFields.forEach((field, idx) => {
+      if (field.value !== null && field.value !== undefined) {
+        classes.push({
+          letter: String.fromCharCode(65 + letterIndex++),
+          value: field.value,
+          type: 'standard',
+          index: idx + 1,
+          fieldName: field.bet as keyof FormData,
+          schemeField: field.scheme,
+        });
+      }
+    });
+    
+    // WTA classes
+    const wtaFields = [
+      { bet: 'wtaBet1', scheme: 'wta1', value: bettingScheme.wta1 },
+      { bet: 'wtaBet2', scheme: 'wta2', value: bettingScheme.wta2 },
+      { bet: 'wtaBet3', scheme: 'wta3', value: bettingScheme.wta3 },
+      { bet: 'wtaBet4', scheme: 'wta4', value: bettingScheme.wta4 },
+      { bet: 'wtaBet5', scheme: 'wta5', value: bettingScheme.wta5 },
+    ];
+    
+    wtaFields.forEach((field, idx) => {
+      if (field.value !== null && field.value !== undefined) {
+        classes.push({
+          letter: String.fromCharCode(65 + letterIndex++),
+          value: field.value,
+          type: 'wta',
+          index: idx + 1,
+          fieldName: field.bet as keyof FormData,
+          schemeField: field.scheme,
+        });
+      }
+    });
+    
+    return classes;
+  };
+  
+  const availableClasses = getAvailableClasses();
+
   const calculateTotal = (type: 'belgian' | 'standard' | 'wta') => {
+    if (!bettingScheme) return 0;
+    
     if (type === 'belgian') {
       return (
-        (form.watch("belgianShowBet1") || 0) +
-        (form.watch("belgianShowBet2") || 0) +
-        (form.watch("belgianShowBet3") || 0) +
-        (form.watch("belgianShowBet4") || 0) +
-        (form.watch("belgianShowBet5") || 0) +
-        (form.watch("belgianShowBet6") || 0) +
-        (form.watch("belgianShowBet7") || 0)
+        ((form.watch("belgianShowBet1") ?? 0) > 0 ? (bettingScheme.belgianShow1 || 0) : 0) +
+        ((form.watch("belgianShowBet2") ?? 0) > 0 ? (bettingScheme.belgianShow2 || 0) : 0) +
+        ((form.watch("belgianShowBet3") ?? 0) > 0 ? (bettingScheme.belgianShow3 || 0) : 0) +
+        ((form.watch("belgianShowBet4") ?? 0) > 0 ? (bettingScheme.belgianShow4 || 0) : 0) +
+        ((form.watch("belgianShowBet5") ?? 0) > 0 ? (bettingScheme.belgianShow5 || 0) : 0) +
+        ((form.watch("belgianShowBet6") ?? 0) > 0 ? (bettingScheme.belgianShow6 || 0) : 0) +
+        ((form.watch("belgianShowBet7") ?? 0) > 0 ? (bettingScheme.belgianShow7 || 0) : 0)
       );
     } else if (type === 'standard') {
       return (
-        (form.watch("standardShowBet1") || 0) +
-        (form.watch("standardShowBet2") || 0) +
-        (form.watch("standardShowBet3") || 0) +
-        (form.watch("standardShowBet4") || 0) +
-        (form.watch("standardShowBet5") || 0) +
-        (form.watch("standardShowBet6") || 0)
+        ((form.watch("standardShowBet1") ?? 0) > 0 ? (bettingScheme.standardShow1 || 0) : 0) +
+        ((form.watch("standardShowBet2") ?? 0) > 0 ? (bettingScheme.standardShow2 || 0) : 0) +
+        ((form.watch("standardShowBet3") ?? 0) > 0 ? (bettingScheme.standardShow3 || 0) : 0) +
+        ((form.watch("standardShowBet4") ?? 0) > 0 ? (bettingScheme.standardShow4 || 0) : 0) +
+        ((form.watch("standardShowBet5") ?? 0) > 0 ? (bettingScheme.standardShow5 || 0) : 0) +
+        ((form.watch("standardShowBet6") ?? 0) > 0 ? (bettingScheme.standardShow6 || 0) : 0)
       );
     } else {
       return (
-        (form.watch("wtaBet1") || 0) +
-        (form.watch("wtaBet2") || 0) +
-        (form.watch("wtaBet3") || 0) +
-        (form.watch("wtaBet4") || 0) +
-        (form.watch("wtaBet5") || 0)
+        ((form.watch("wtaBet1") ?? 0) > 0 ? (bettingScheme.wta1 || 0) : 0) +
+        ((form.watch("wtaBet2") ?? 0) > 0 ? (bettingScheme.wta2 || 0) : 0) +
+        ((form.watch("wtaBet3") ?? 0) > 0 ? (bettingScheme.wta3 || 0) : 0) +
+        ((form.watch("wtaBet4") ?? 0) > 0 ? (bettingScheme.wta4 || 0) : 0) +
+        ((form.watch("wtaBet5") ?? 0) > 0 ? (bettingScheme.wta5 || 0) : 0)
       );
     }
   };
@@ -735,84 +831,77 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
         </div>
 
         {/* Classes Section */}
-        <div className="border rounded-lg p-4 bg-white">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Checkbox defaultChecked />
-              <h3 className="text-sm font-semibold">Classes</h3>
+        {bettingScheme && availableClasses.length > 0 && (
+          <div className="border rounded-lg p-4 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Checkbox defaultChecked />
+                <h3 className="text-sm font-semibold">Classes</h3>
+              </div>
+              <div className="text-sm">
+                <span className="mr-2">Total</span>
+                <span className="font-semibold">${grandTotal.toFixed(2)}</span>
+              </div>
             </div>
-            <div className="text-sm">
-              <span className="mr-2">Total</span>
-              <span className="font-semibold">${grandTotal.toFixed(2)}</span>
+            
+            <p className="text-xs text-gray-500 mb-3">Check or uncheck classes to participate</p>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    {availableClasses.filter(c => c.type === 'belgian').length > 0 && (
+                      <th className="p-2 text-left" colSpan={availableClasses.filter(c => c.type === 'belgian').length}>
+                        Belgian show
+                      </th>
+                    )}
+                    {availableClasses.filter(c => c.type === 'standard').length > 0 && (
+                      <th className="p-2 text-left" colSpan={availableClasses.filter(c => c.type === 'standard').length}>
+                        Standard show
+                      </th>
+                    )}
+                    {availableClasses.filter(c => c.type === 'wta').length > 0 && (
+                      <th className="p-2 text-left" colSpan={availableClasses.filter(c => c.type === 'wta').length}>
+                        WTA
+                      </th>
+                    )}
+                  </tr>
+                  <tr className="border-b bg-gray-50">
+                    {availableClasses.map((classItem) => (
+                      <th key={`${classItem.type}-${classItem.index}`} className="p-2 text-center">
+                        {classItem.letter}<br/>${classItem.value.toFixed(2)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    {availableClasses.map((classItem) => (
+                      <td key={`${classItem.type}-${classItem.index}-checkbox`} className="p-1">
+                        <FormField
+                          control={form.control}
+                          name={classItem.fieldName}
+                          render={({ field }) => (
+                            <FormItem className="flex justify-center">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value !== null && field.value !== undefined && typeof field.value === 'number' && field.value > 0}
+                                  onCheckedChange={(checked) => 
+                                    field.onChange(checked ? classItem.value : null)
+                                  }
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-          
-          <p className="text-xs text-gray-500 mb-3">Press table band to check or uncheck classes</p>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-2 text-left" colSpan={7}>Belgian show</th>
-                  <th className="p-2 text-left" colSpan={6}>Standard show</th>
-                  <th className="p-2 text-left" colSpan={5}>WTA</th>
-                </tr>
-                <tr className="border-b bg-gray-50">
-                  <th className="p-2">A<br/>20.00</th>
-                  <th className="p-2">B<br/>30.00</th>
-                  <th className="p-2">C<br/>50.00</th>
-                  <th className="p-2">D<br/>20.00</th>
-                  <th className="p-2">E<br/>30.00</th>
-                  <th className="p-2">F<br/>50.00</th>
-                  <th className="p-2">G<br/>100.00</th>
-                  <th className="p-2">A<br/>20.00</th>
-                  <th className="p-2">B<br/>30.00</th>
-                  <th className="p-2">C<br/>50.00</th>
-                  <th className="p-2">D<br/>20.00</th>
-                  <th className="p-2">E<br/>30.00</th>
-                  <th className="p-2">F<br/>50.00</th>
-                  <th className="p-2">G<br/>100.00</th>
-                  <th className="p-2">H<br/>100.00</th>
-                  <th className="p-2">I<br/>100.00</th>
-                  <th className="p-2">J<br/>100.00</th>
-                  <th className="p-2">K<br/>100.00</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {[
-                    "belgianShowBet1", "belgianShowBet2", "belgianShowBet3", "belgianShowBet4",
-                    "belgianShowBet5", "belgianShowBet6", "belgianShowBet7",
-                    "standardShowBet1", "standardShowBet2", "standardShowBet3", "standardShowBet4",
-                    "standardShowBet5", "standardShowBet6",
-                    "wtaBet1", "wtaBet2", "wtaBet3", "wtaBet4", "wtaBet5",
-                  ].map((fieldName) => (
-                    <td key={fieldName} className="p-1">
-                      <FormField
-                        control={form.control}
-                        name={fieldName as any}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type="number"
-                                step="0.01"
-                                value={field.value ?? ""}
-                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
-                                className="h-8 text-center"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-2 pt-4">
@@ -822,7 +911,7 @@ export default function BirdUpdateForm({ bird }: BirdUpdateFormProps) {
           <Button type="submit" size="sm">
             Save and Exit (Enter)
           </Button>
-          <Button type="button" variant="outline" size="sm">
+          <Button type="button" variant="outline" size="sm" onClick={onClose}>
             Cancel (Esc)
           </Button>
         </div>
